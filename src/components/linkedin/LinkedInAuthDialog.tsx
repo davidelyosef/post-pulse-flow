@@ -23,8 +23,7 @@ const LinkedInAuthDialog = ({ isOpen, onOpenChange }: LinkedInAuthDialogProps) =
             Connect to LinkedIn
           </DialogTitle>
           <DialogDescription>
-            Please complete the authentication process in the popup window.
-            If no popup appears, please check your browser's popup settings.
+            Please complete the authentication process to connect your LinkedIn account.
           </DialogDescription>
         </DialogHeader>
         
@@ -33,8 +32,11 @@ const LinkedInAuthDialog = ({ isOpen, onOpenChange }: LinkedInAuthDialogProps) =
             <Linkedin className="h-12 w-12 text-linkedin-blue" />
           </div>
           <p className="text-center text-sm text-muted-foreground">
-            A popup window has been opened to complete the authentication.
-            Please follow the instructions in the popup.
+            A popup window has been opened for LinkedIn authentication.
+            Please follow the instructions in the popup window.
+          </p>
+          <p className="text-center text-sm text-muted-foreground mt-2">
+            If no popup appears, please check your browser's popup settings.
           </p>
         </div>
       </DialogContent>

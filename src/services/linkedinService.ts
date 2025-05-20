@@ -1,4 +1,3 @@
-
 import { toast } from "sonner";
 
 // Create a function to open the LinkedIn auth popup
@@ -10,7 +9,7 @@ const openLinkedInAuthPopup = (): Promise<boolean> => {
     const left = window.innerWidth / 2 - width / 2;
     const top = window.innerHeight / 2 - height / 2;
 
-    // Open the popup
+    // Open the popup with blank content initially
     const popup = window.open(
       "about:blank",
       "LinkedIn Login",
@@ -23,31 +22,21 @@ const openLinkedInAuthPopup = (): Promise<boolean> => {
       return;
     }
 
-    // Set the popup content with iframe
-    popup.document.write(`
-      <html>
-        <head>
-          <title>Connect to LinkedIn</title>
-          <style>
-            body, html {
-              margin: 0;
-              padding: 0;
-              width: 100%;
-              height: 100%;
-              overflow: hidden;
-            }
-            iframe {
-              width: 100%;
-              height: 100%;
-              border: none;
-            }
-          </style>
-        </head>
-        <body>
-          <iframe src="https://linkedai-backend.vercel.app/api/auth/linkedin" allow="popup"></iframe>
-        </body>
-      </html>
-    `);
+    // Fetch the HTML content from the endpoint
+    fetch("https://linkedai-backend.vercel.app/api/auth/linkedin")
+      .then(response => response.text())
+      .then(html => {
+        // Write the fetched HTML directly to the popup document
+        popup.document.open();
+        popup.document.write(html);
+        popup.document.close();
+      })
+      .catch(error => {
+        console.error("Error fetching LinkedIn auth page:", error);
+        popup.close();
+        toast.error("Failed to load LinkedIn authentication page");
+        resolve(false);
+      });
 
     // Set up message event listener for communication
     const messageHandler = (event: MessageEvent) => {
