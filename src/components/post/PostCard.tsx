@@ -9,6 +9,7 @@ import { PostCardTags } from "./card/PostCardTags";
 import { PostCardContent } from "./card/PostCardContent";
 import { PostCardImage } from "./card/PostCardImage";
 import { PostCardActions } from "./card/PostCardActions";
+import { extractHashtags } from "@/lib/hashtag-utils";
 
 interface PostCardProps {
   post: Post;
@@ -35,6 +36,10 @@ export const PostCard = ({
   const [isGeneratingPrompts, setIsGeneratingPrompts] = useState(false);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const { generateImagePrompts, selectImagePrompt, generateImage } = usePostContext();
+  
+  // Extract hashtags from content
+  const extractedTags = extractHashtags(post.content);
+  const allTags = [...new Set([...(post.tags || []), ...extractedTags])];
   
   // Add swipe functionality with specific HTMLDivElement type
   const cardRef = useSwipe<HTMLDivElement>({
@@ -92,7 +97,7 @@ export const PostCard = ({
       ref={cardRef}
     >
       <CardHeader className="pb-2">
-        <PostCardTags tags={post.tags} showTags={showTags} />
+        <PostCardTags tags={allTags} showTags={showTags} />
       </CardHeader>
       <CardContent>
         <PostCardContent content={post.content} />
