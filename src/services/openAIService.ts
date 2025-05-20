@@ -58,23 +58,7 @@ export const generatePosts = async (
             return null;
           }
           
-          // Generate some relevant tags based on the topic
-          const possibleTags = [
-            "leadership", "innovation", "productivity", "career", "networking",
-            "growth", "mindset", "technology", "future-of-work", "remote-work",
-            "professional-development", "personal-branding", "team-building"
-          ];
-          
           const postTags = [];
-          const numberOfTags = Math.floor(Math.random() * 3) + 2; // 2-4 tags
-          
-          for (let j = 0; j < numberOfTags; j++) {
-            const randomTagIndex = Math.floor(Math.random() * possibleTags.length);
-            const tag = possibleTags[randomTagIndex];
-            if (!postTags.includes(tag)) {
-              postTags.push(tag);
-            }
-          }
           
           return {
             id: generateUniqueId(),
@@ -143,22 +127,7 @@ export const generatePosts = async (
               return null;
             }
             
-            // Generate tags
-            const possibleTags = [
-              "leadership", "innovation", "productivity", "career", "networking",
-              "growth", "mindset", "technology", "future-of-work", "remote-work"
-            ];
-            
             const postTags = [];
-            const numberOfTags = Math.floor(Math.random() * 3) + 2; // 2-4 tags
-            
-            for (let j = 0; j < numberOfTags; j++) {
-              const randomTagIndex = Math.floor(Math.random() * possibleTags.length);
-              const tag = possibleTags[randomTagIndex];
-              if (!postTags.includes(tag)) {
-                postTags.push(tag);
-              }
-            }
             
             return {
               id: generateUniqueId(),
@@ -236,23 +205,7 @@ export const generatePosts = async (
         return null;
       }
       
-      // Generate some relevant tags based on the content
-      const possibleTags = [
-        "leadership", "innovation", "productivity", "career", "networking",
-        "growth", "mindset", "technology", "future-of-work", "remote-work",
-        "professional-development", "personal-branding", "team-building"
-      ];
-      
       const postTags = [];
-      const numberOfTags = Math.floor(Math.random() * 3) + 2; // 2-4 tags
-      
-      for (let j = 0; j < numberOfTags; j++) {
-        const randomTagIndex = Math.floor(Math.random() * possibleTags.length);
-        const tag = possibleTags[randomTagIndex];
-        if (!postTags.includes(tag)) {
-          postTags.push(tag);
-        }
-      }
       
       return {
         id: generateUniqueId(),
