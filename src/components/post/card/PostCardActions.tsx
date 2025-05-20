@@ -20,7 +20,7 @@ export const PostCardActions = ({
   if (!showActions) return null;
   
   return (
-    <div className="flex justify-between pt-4">
+    <div className="flex justify-between pt-4 w-full">
       <Button 
         size="lg" 
         variant="outline" 
