@@ -1,5 +1,5 @@
 
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Linkedin, Menu } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -10,6 +10,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 export const Navbar = () => {
   const [connected, setConnected] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const location = useLocation();
   
   useEffect(() => {
     // Check if the user is connected to LinkedIn
@@ -47,18 +48,22 @@ export const Navbar = () => {
     }
   };
 
+  const isActive = (path: string) => {
+    return location.pathname === path;
+  };
+
   const NavLinks = () => (
     <>
-      <Link to="/" className="text-sm font-medium transition-colors hover:text-primary">
+      <Link to="/" className={`text-sm font-medium transition-colors hover:text-primary ${isActive('/') ? 'text-primary font-bold' : 'text-foreground'}`}>
         Home
       </Link>
-      <Link to="/generate" className="text-sm font-medium transition-colors hover:text-primary">
+      <Link to="/generate" className={`text-sm font-medium transition-colors hover:text-primary ${isActive('/generate') ? 'text-primary font-bold' : 'text-foreground'}`}>
         Generate
       </Link>
-      <Link to="/approve" className="text-sm font-medium transition-colors hover:text-primary">
+      <Link to="/approve" className={`text-sm font-medium transition-colors hover:text-primary ${isActive('/approve') ? 'text-primary font-bold' : 'text-foreground'}`}>
         Approve
       </Link>
-      <Link to="/schedule" className="text-sm font-medium transition-colors hover:text-primary">
+      <Link to="/schedule" className={`text-sm font-medium transition-colors hover:text-primary ${isActive('/schedule') ? 'text-primary font-bold' : 'text-foreground'}`}>
         Schedule
       </Link>
     </>
@@ -105,7 +110,7 @@ export const Navbar = () => {
           
           <Button 
             variant={connected ? "default" : "outline"} 
-            className="hidden sm:inline-flex gap-2 animate-fade-in" 
+            className="hidden sm:inline-flex gap-2 animate-fade-in text-primary-foreground dark:text-primary-foreground" 
             onClick={handleLinkedInButton}
           >
             <Linkedin className="h-4 w-4" />
@@ -117,7 +122,7 @@ export const Navbar = () => {
       {connected && user && (
         <div className="bg-muted/30 py-2 px-4 sm:px-6 lg:px-8 text-sm flex items-center justify-end">
           <span className="text-muted-foreground mr-2">Connected as:</span>
-          <span className="font-medium">{user.name}</span>
+          <span className="font-medium text-foreground">{user.name}</span>
         </div>
       )}
     </header>
