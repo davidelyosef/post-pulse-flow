@@ -6,13 +6,11 @@ import { connectToLinkedIn, isLinkedInConnected, getLinkedInUser, disconnectLink
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
-import LinkedInAuthDialog from "@/components/linkedin/LinkedInAuthDialog";
 
 const GeneratePage = () => {
   const [connected, setConnected] = useState(false);
   const [userData, setUserData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
-  const [showAuthDialog, setShowAuthDialog] = useState(false);
 
   useEffect(() => {
     // Check LinkedIn connection status on component mount
@@ -24,18 +22,14 @@ const GeneratePage = () => {
     checkConnection();
   }, []);
 
-  const handleConnectLinkedIn = () => {
+  const handleConnectLinkedIn = async () => {
     setLoading(true);
-    setShowAuthDialog(true);
-  };
-
-  const handleAuthDialogChange = (open: boolean) => {
-    setShowAuthDialog(open);
-    if (!open) {
-      setLoading(false);
-      // Check if user got connected during the dialog session
-      setConnected(isLinkedInConnected());
+    try {
+      await connectToLinkedIn();
+      setConnected(true);
       setUserData(getLinkedInUser());
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -96,11 +90,6 @@ const GeneratePage = () => {
         </div>
         
         <GenerateForm />
-
-        <LinkedInAuthDialog 
-          isOpen={showAuthDialog} 
-          onOpenChange={handleAuthDialogChange} 
-        />
       </div>
     </PageLayout>
   );

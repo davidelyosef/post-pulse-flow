@@ -1,32 +1,40 @@
+
 import { toast } from "sonner";
 
-// Listen for messages from the iframe
-window.addEventListener('message', (event) => {
-  // Check origin for security
-  if (event.origin === 'https://linkedai-backend.vercel.app') {
-    if (event.data?.type === 'linkedin-auth-success') {
-      // Handle successful authentication
-      const userData = event.data?.userData || {
-        name: "LinkedIn User",
-        position: "Professional",
-        profileImage: "https://via.placeholder.com/150",
-        connectedAt: new Date().toISOString()
-      };
-      
-      // Store connection state in localStorage
-      localStorage.setItem("linkedinConnected", "true");
-      localStorage.setItem("linkedinUser", JSON.stringify(userData));
-      
-      toast.success("LinkedIn account connected successfully!");
-    }
-  }
-});
-
 export const connectToLinkedIn = async (): Promise<boolean> => {
-  // Function now just returns true since actual connection
-  // is handled by the iframe in the dialog
-  console.log("Opening LinkedIn connection dialog...");
-  return true;
+  // In a real app, this would redirect to LinkedIn OAuth flow
+  // Here we're implementing a more realistic mock with proper error handling
+  
+  console.log("Connecting to LinkedIn...");
+  
+  try {
+    // Simulate network request
+    const mockAuthUrl = "https://www.linkedin.com/oauth/v2/authorization?mock=true";
+    
+    // In a real implementation, we would redirect to LinkedIn's OAuth flow
+    // window.location.href = mockAuthUrl;
+    
+    // For our mock, we'll simulate a successful connection
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        // Store connection state in localStorage to persist across page reloads
+        localStorage.setItem("linkedinConnected", "true");
+        localStorage.setItem("linkedinUser", JSON.stringify({
+          name: "Demo User",
+          position: "Professional at Company",
+          profileImage: "https://via.placeholder.com/150",
+          connectedAt: new Date().toISOString()
+        }));
+        
+        toast.success("LinkedIn account connected successfully!");
+        resolve(true);
+      }, 1500);
+    });
+  } catch (error) {
+    console.error("LinkedIn connection error:", error);
+    toast.error("Failed to connect to LinkedIn. Please try again.");
+    return false;
+  }
 };
 
 export const isLinkedInConnected = (): boolean => {
