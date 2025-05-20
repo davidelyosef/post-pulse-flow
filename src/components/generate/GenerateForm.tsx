@@ -47,13 +47,19 @@ export const GenerateForm = () => {
 
     setIsLoading(true);
     try {
+      // Pass the parameters to the generatePosts function
       const posts = await generatePosts(count, topic, tone, style);
-      addPosts(posts);
-      toast.success(`Generated ${posts.length} posts!`);
-      // Clear the form
-      setTopic("");
-      // Redirect to approve page
-      navigate("/approve");
+      
+      if (posts && posts.length > 0) {
+        addPosts(posts);
+        toast.success(`Generated ${posts.length} posts!`);
+        // Clear the form
+        setTopic("");
+        // Redirect to approve page
+        navigate("/approve");
+      } else {
+        toast.error("No posts were generated. Please try again.");
+      }
     } catch (error) {
       console.error("Error generating posts:", error);
       toast.error("Failed to generate posts. Please try again.");
