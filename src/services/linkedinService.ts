@@ -8,30 +8,19 @@ export const connectToLinkedIn = async (): Promise<boolean> => {
   console.log("Connecting to LinkedIn...");
   
   try {
-    // Simulate network request
-    const mockAuthUrl = "https://www.linkedin.com/oauth/v2/authorization?mock=true";
+    // Store connection state in localStorage first
+    localStorage.setItem("linkedinConnected", "true");
+    localStorage.setItem("linkedinUser", JSON.stringify({
+      name: "Demo User",
+      position: "Professional at Company",
+      profileImage: "https://thispersondoesnotexist.com/",
+      connectedAt: new Date().toISOString()
+    }));
     
-    // In a real implementation, we would redirect to LinkedIn's OAuth flow
-    // window.location.href = mockAuthUrl;
+    // Then redirect to LinkedIn auth
+    // window.location.href = "https://linkedai-backend.vercel.app/api/auth/linkedin";
     
-    // For our mock, we'll simulate a successful connection
-    return new Promise((resolve) => {
-      // go to this address: https://linkedai-backend.vercel.app/api/auth/linkedin
-      window.location.href = "https://linkedai-backend.vercel.app/api/auth/linkedin";
-      setTimeout(() => {
-        // Store connection state in localStorage to persist across page reloads
-        // localStorage.setItem("linkedinConnected", "true");
-        // localStorage.setItem("linkedinUser", JSON.stringify({
-        //   name: "Demo User",
-        //   position: "Professional at Company",
-        //   profileImage: "https://thispersondoesnotexist.com/",
-        //   connectedAt: new Date().toISOString()
-        // }));
-        
-        // toast.success("LinkedIn account connected successfully!");
-        // resolve(true);
-      }, 1500);
-    });
+    return true;
   } catch (error) {
     console.error("LinkedIn connection error:", error);
     toast.error("Failed to connect to LinkedIn. Please try again.");
