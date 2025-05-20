@@ -2,12 +2,53 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Linkedin } from "lucide-react";
+import { useEffect, useState } from "react";
+import { isLinkedInConnected, connectToLinkedIn, disconnectLinkedIn, getLinkedInUser } from "@/services/linkedinService";
 
 export const Navbar = () => {
+  const [connected, setConnected] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  
+  useEffect(() => {
+    // Check if the user is connected to LinkedIn
+    const checkConnection = () => {
+      const isConnected = isLinkedInConnected();
+      setConnected(isConnected);
+      
+      if (isConnected) {
+        const userData = getLinkedInUser();
+        setUser(userData);
+      }
+    };
+    
+    checkConnection();
+    
+    // Add event listener for storage changes (in case user connects in another tab)
+    window.addEventListener('storage', checkConnection);
+    
+    return () => {
+      window.removeEventListener('storage', checkConnection);
+    };
+  }, []);
+  
+  const handleLinkedInButton = async () => {
+    if (connected) {
+      disconnectLinkedIn();
+      setConnected(false);
+      setUser(null);
+    } else {
+      const success = await connectToLinkedIn();
+      if (success) {
+        setConnected(true);
+        setUser(getLinkedInUser());
+      }
+    }
+  };
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
       <div className="flex h-16 items-center px-4 sm:px-6 lg:px-8">
-        <Link to="/" className="flex items-center gap-2">
+        <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
           <Linkedin className="h-8 w-8 text-linkedin-blue" />
           <h1 className="text-2xl font-bold text-linkedin-blue">LinkedAI</h1>
         </Link>
@@ -28,11 +69,23 @@ export const Navbar = () => {
             </Link>
           </nav>
           
-          <Button variant="outline" className="hidden sm:inline-flex">
-            Connect to LinkedIn
+          <Button 
+            variant={connected ? "default" : "outline"} 
+            className="hidden sm:inline-flex gap-2 animate-fade-in" 
+            onClick={handleLinkedInButton}
+          >
+            <Linkedin className="h-4 w-4" />
+            {connected ? "Disconnect LinkedIn" : "Connect to LinkedIn"}
           </Button>
         </div>
       </div>
+      
+      {connected && user && (
+        <div className="bg-muted/30 py-2 px-4 sm:px-6 lg:px-8 text-sm flex items-center justify-end">
+          <span className="text-muted-foreground mr-2">Connected as:</span>
+          <span className="font-medium">{user.name}</span>
+        </div>
+      )}
     </header>
   );
 };
