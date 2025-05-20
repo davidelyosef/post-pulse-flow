@@ -7,6 +7,7 @@ import { Check, X, Edit, Calendar, Image, Loader2 } from "lucide-react";
 import { Post } from "@/types";
 import { cn } from "@/lib/utils";
 import { usePostContext } from "@/contexts/PostContext";
+import { useSwipe } from "@/hooks/use-swipe";
 
 interface PostCardProps {
   post: Post;
@@ -33,6 +34,16 @@ export const PostCard = ({
   const [isGeneratingPrompts, setIsGeneratingPrompts] = useState(false);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const { generateImagePrompts, selectImagePrompt, generateImage } = usePostContext();
+  
+  // Add swipe functionality
+  const cardRef = useSwipe({
+    onSwipeLeft: () => {
+      if (onReject) handleReject();
+    },
+    onSwipeRight: () => {
+      if (onApprove) handleApprove();
+    },
+  });
 
   const handleApprove = () => {
     setDirection("swipe-right");
@@ -73,7 +84,10 @@ export const PostCard = ({
   };
 
   return (
-    <Card className={cn("swipe-card shadow-lg", direction, className)}>
+    <Card 
+      className={cn("swipe-card shadow-lg", direction, className)}
+      ref={cardRef}
+    >
       <CardHeader className="pb-2">
         {post.subject && (
           <h3 className="text-xl font-bold mb-3">{post.subject}</h3>
@@ -147,19 +161,43 @@ export const PostCard = ({
       </CardContent>
       {showActions && (
         <CardFooter className="flex justify-between pt-4">
-          <Button size="lg" variant="outline" className="rounded-full w-14 h-14 p-0" onClick={handleReject}>
-            <X className="h-6 w-6 text-destructive" />
+          <Button 
+            size="lg" 
+            variant="outline" 
+            className="rounded-full w-12 h-12 sm:w-14 sm:h-14 p-0" 
+            onClick={handleReject}
+            aria-label="Reject post"
+          >
+            <X className="h-5 w-5 sm:h-6 sm:w-6 text-destructive" />
           </Button>
           <div className="flex gap-2">
-            <Button variant="outline" size="icon" className="rounded-full" onClick={onEdit}>
-              <Edit className="h-5 w-5" />
+            <Button 
+              variant="outline" 
+              size="icon" 
+              className="rounded-full" 
+              onClick={onEdit}
+              aria-label="Edit post"
+            >
+              <Edit className="h-4 w-4 sm:h-5 sm:w-5" />
             </Button>
-            <Button variant="outline" size="icon" className="rounded-full" onClick={onSchedule}>
-              <Calendar className="h-5 w-5" />
+            <Button 
+              variant="outline" 
+              size="icon" 
+              className="rounded-full" 
+              onClick={onSchedule}
+              aria-label="Schedule post"
+            >
+              <Calendar className="h-4 w-4 sm:h-5 sm:w-5" />
             </Button>
           </div>
-          <Button size="lg" variant="outline" className="rounded-full w-14 h-14 p-0" onClick={handleApprove}>
-            <Check className="h-6 w-6 text-green-500" />
+          <Button 
+            size="lg" 
+            variant="outline" 
+            className="rounded-full w-12 h-12 sm:w-14 sm:h-14 p-0" 
+            onClick={handleApprove}
+            aria-label="Approve post"
+          >
+            <Check className="h-5 w-5 sm:h-6 sm:w-6 text-green-500" />
           </Button>
         </CardFooter>
       )}

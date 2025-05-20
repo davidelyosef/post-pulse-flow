@@ -7,35 +7,35 @@ import { ArrowRight, Calendar, Check, Linkedin, MessageSquarePlus } from "lucide
 const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
-      <header className="container mx-auto pt-12 md:pt-24 px-4">
+      <header className="container mx-auto pt-8 md:pt-12 lg:pt-24 px-4">
         <div className="flex items-center gap-3 mb-3">
-          <Linkedin className="h-10 w-10 text-linkedin-blue" />
-          <h1 className="text-4xl md:text-5xl font-bold text-linkedin-blue">LinkedAI</h1>
+          <Linkedin className="h-8 w-8 md:h-10 md:w-10 text-linkedin-blue" />
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-linkedin-blue">LinkedAI</h1>
         </div>
-        <h2 className="text-3xl md:text-4xl font-bold mb-6 max-w-2xl">
+        <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 md:mb-6 max-w-2xl">
           Create, filter, and schedule engaging LinkedIn posts in just 2 minutes a day
         </h2>
-        <p className="text-lg text-muted-foreground mb-8 max-w-2xl">
+        <p className="text-base md:text-lg text-muted-foreground mb-6 md:mb-8 max-w-2xl">
           Leverage AI to generate professional, personalized content for your LinkedIn profile. 
           Approve posts with a simple swipe and schedule them for optimal engagement.
         </p>
         
-        <div className="flex flex-wrap gap-4">
-          <Link to="/generate">
-            <Button size="lg" className="gap-2">
+        <div className="flex flex-col sm:flex-row gap-4">
+          <Link to="/generate" className="w-full sm:w-auto">
+            <Button size="lg" className="w-full sm:w-auto gap-2">
               Start Creating <ArrowRight className="h-4 w-4" />
             </Button>
           </Link>
-          <Link to="/approve">
-            <Button size="lg" variant="outline" className="gap-2">
+          <Link to="/approve" className="w-full sm:w-auto">
+            <Button size="lg" variant="outline" className="w-full sm:w-auto gap-2">
               Review Posts <Check className="h-4 w-4" />
             </Button>
           </Link>
         </div>
       </header>
       
-      <section className="container mx-auto py-24 px-4">
-        <h3 className="text-2xl md:text-3xl font-bold mb-12 text-center">
+      <section className="container mx-auto py-12 md:py-16 lg:py-24 px-4">
+        <h3 className="text-xl md:text-2xl lg:text-3xl font-bold mb-8 md:mb-12 text-center">
           Your 2-minute daily ritual for LinkedIn success
         </h3>
         
