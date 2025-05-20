@@ -36,21 +36,61 @@ export const generatePosts = async (
     const data = await response.json();
     console.log("API response data:", data);
     
-    // If data is empty or not an array, throw an error
-    if (!data || !Array.isArray(data) || data.length === 0) {
-      console.error("Invalid API response format:", data);
-      throw new Error("Invalid response format from API");
+    // More flexible response format handling - check for various possible formats
+    let postsContent: string[] = [];
+    
+    // Handle different response formats
+    if (Array.isArray(data)) {
+      // Direct array of strings or objects
+      postsContent = data.map(item => typeof item === 'string' ? item : JSON.stringify(item));
+    } else if (typeof data === 'object' && data !== null) {
+      // If it's an object with a data/posts/content property
+      if (Array.isArray(data.data)) {
+        postsContent = data.data;
+      } else if (Array.isArray(data.posts)) {
+        postsContent = data.posts;
+      } else if (Array.isArray(data.content)) {
+        postsContent = data.content;
+      } else if (typeof data.content === 'string') {
+        // Single content string, split by a delimiter
+        postsContent = [data.content];
+      } else {
+        // Try to convert the object itself to a post
+        postsContent = [JSON.stringify(data)];
+      }
+    } else if (typeof data === 'string') {
+      // Single string response
+      postsContent = [data];
     }
     
-    // Map the API response to our Post type
-    const posts: Post[] = data.map((postContent: string) => {
-      if (!postContent || typeof postContent !== 'string') {
+    console.log("Processed post content array:", postsContent);
+    
+    if (postsContent.length === 0) {
+      console.error("Could not extract post content from API response");
+      throw new Error("Could not extract post content from API response");
+    }
+    
+    // Map the processed content to our Post type
+    const posts: Post[] = postsContent.map((postContent: any) => {
+      let content = '';
+      
+      // Ensure we have a string to work with
+      if (typeof postContent === 'string') {
+        content = postContent;
+      } else if (postContent && typeof postContent === 'object') {
+        // If it's an object, try to get the content or stringify it
+        content = postContent.content || postContent.text || JSON.stringify(postContent);
+      } else {
         console.warn("Skipping invalid post content:", postContent);
         return null;
       }
       
+      if (!content.trim()) {
+        return null;
+      }
+      
       // Extract a subject from the first line or use a default
-      let subject = postContent.split('\n')[0];
+      let subject = content.split('\n')[0];
       if (subject.length > 60) {
         subject = subject.substring(0, 60) + '...';
       }
@@ -76,7 +116,7 @@ export const generatePosts = async (
       return {
         id: generateUniqueId(),
         subject: subject,
-        content: postContent,
+        content: content,
         tags: postTags,
         createdAt: new Date(),
         status: "pending",
