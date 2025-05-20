@@ -104,22 +104,7 @@ export const generatePosts = async (
           throw new Error("Empty post content received from results");
         }
         
-        // Generate some tags based on the topic
-        const possibleTags = [
-          "leadership", "innovation", "productivity", "career", "networking",
-          "growth", "mindset", "technology", "future-of-work", "remote-work"
-        ];
-        
         const tags = [];
-        const numberOfTags = Math.floor(Math.random() * 3) + 2; // 2-4 tags
-        
-        for (let i = 0; i < numberOfTags; i++) {
-          const randomTagIndex = Math.floor(Math.random() * possibleTags.length);
-          const tag = possibleTags[randomTagIndex];
-          if (!tags.includes(tag)) {
-            tags.push(tag);
-          }
-        }
         
         const post: Post = {
           id: generateUniqueId(),
