@@ -35,7 +35,7 @@ const ApprovePage = () => {
         
         {pendingPosts.length > 0 && (
           <div className="text-center mt-6 text-sm text-muted-foreground">
-            <p>Swipe right to approve, left to reject</p>
+            <p className="font-medium">👆 Swipe right to approve, left to reject 👆</p>
             <p>Or use the buttons below the post</p>
           </div>
         )}

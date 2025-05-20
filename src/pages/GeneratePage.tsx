@@ -4,6 +4,8 @@ import GenerateForm from "@/components/generate/GenerateForm";
 import { Button } from "@/components/ui/button";
 import { connectToLinkedIn, isLinkedInConnected, getLinkedInUser, disconnectLinkedIn } from "@/services/linkedinService";
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
 
 const GeneratePage = () => {
   const [connected, setConnected] = useState(false);
@@ -45,6 +47,13 @@ const GeneratePage = () => {
           <p className="text-muted-foreground mb-6">
             Create AI-powered LinkedIn content tailored to your style and needs.
           </p>
+          
+          {/* Review Posts Link */}
+          <div className="mb-4">
+            <Link to="/approve" className="inline-flex items-center text-sm font-medium text-primary hover:text-primary/80">
+              Review your pending posts <ArrowRight className="ml-1 h-4 w-4" />
+            </Link>
+          </div>
           
           {/* LinkedIn Connection Status */}
           <div className="mb-6 p-4 bg-muted/50 rounded-lg">

@@ -76,10 +76,10 @@ export const PostCard = ({
     <Card className={cn("swipe-card shadow-lg", direction, className)}>
       <CardHeader className="pb-2">
         {post.subject && (
-          <h3 className="text-xl font-semibold">{post.subject}</h3>
+          <h3 className="text-xl font-bold mb-3">{post.subject}</h3>
         )}
         {showTags && post.tags && post.tags.length > 0 && (
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 mb-2">
             {post.tags.map((tag) => (
               <Badge key={tag} variant="secondary">
                 {tag}
@@ -89,31 +89,35 @@ export const PostCard = ({
         )}
       </CardHeader>
       <CardContent>
-        <p className="whitespace-pre-line">{post.content}</p>
+        <div className="prose prose-sm max-w-none">
+          {post.content.split('\n\n').map((paragraph, index) => (
+            <p key={index} className={index === 0 ? "font-medium text-base" : "text-base"}>{paragraph}</p>
+          ))}
+        </div>
         
         {/* Image Section */}
         {post.imageUrl ? (
-          <div className="mt-4">
+          <div className="mt-6">
             <img 
               src={post.imageUrl} 
               alt="Post visual" 
-              className="rounded-lg w-full h-auto object-cover"
+              className="rounded-lg w-full h-auto object-cover shadow-md"
             />
           </div>
         ) : (
-          <div className="mt-4">
+          <div className="mt-6">
             {isGeneratingPrompts ? (
-              <div className="flex justify-center items-center p-6 border rounded-lg border-dashed">
+              <div className="flex justify-center items-center p-8 border rounded-lg border-dashed">
                 <Loader2 className="h-6 w-6 animate-spin mr-2" />
                 <span>Generating image ideas...</span>
               </div>
             ) : isGeneratingImage ? (
-              <div className="flex justify-center items-center p-6 border rounded-lg border-dashed">
+              <div className="flex justify-center items-center p-8 border rounded-lg border-dashed">
                 <Loader2 className="h-6 w-6 animate-spin mr-2" />
                 <span>Generating image...</span>
               </div>
             ) : post.imagePrompts ? (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <p className="text-sm font-medium">Select an image concept:</p>
                 <div className="grid gap-2">
                   {post.imagePrompts.map((prompt, index) => (
@@ -131,7 +135,7 @@ export const PostCard = ({
             ) : (
               <Button 
                 variant="outline" 
-                className="w-full py-8 flex flex-col gap-2" 
+                className="w-full py-10 flex flex-col gap-2" 
                 onClick={handleGenerateImagePrompts}
               >
                 <Image className="h-8 w-8 opacity-50" />
@@ -142,9 +146,9 @@ export const PostCard = ({
         )}
       </CardContent>
       {showActions && (
-        <CardFooter className="flex justify-between pt-2">
-          <Button variant="outline" size="icon" className="rounded-full" onClick={handleReject}>
-            <X className="h-5 w-5" />
+        <CardFooter className="flex justify-between pt-4">
+          <Button size="lg" variant="outline" className="rounded-full w-14 h-14 p-0" onClick={handleReject}>
+            <X className="h-6 w-6 text-destructive" />
           </Button>
           <div className="flex gap-2">
             <Button variant="outline" size="icon" className="rounded-full" onClick={onEdit}>
@@ -154,8 +158,8 @@ export const PostCard = ({
               <Calendar className="h-5 w-5" />
             </Button>
           </div>
-          <Button variant="outline" size="icon" className="rounded-full" onClick={handleApprove}>
-            <Check className="h-5 w-5" />
+          <Button size="lg" variant="outline" className="rounded-full w-14 h-14 p-0" onClick={handleApprove}>
+            <Check className="h-6 w-6 text-green-500" />
           </Button>
         </CardFooter>
       )}

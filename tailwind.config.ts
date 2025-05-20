@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -93,19 +92,19 @@ export default {
 				},
 				'slide-right': {
 					from: {
-						transform: 'translateX(0)'
+						transform: 'translateX(0) rotate(0)'
 					},
 					to: {
-						transform: 'translateX(100%)',
+						transform: 'translateX(120%) rotate(20deg)',
 						opacity: '0'
 					}
 				},
 				'slide-left': {
 					from: {
-						transform: 'translateX(0)'
+						transform: 'translateX(0) rotate(0)'
 					},
 					to: {
-						transform: 'translateX(-100%)',
+						transform: 'translateX(-120%) rotate(-20deg)',
 						opacity: '0'
 					}
 				}

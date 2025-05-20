@@ -7,10 +7,10 @@ export const Navbar = () => {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
       <div className="flex h-16 items-center px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-2">
+        <Link to="/" className="flex items-center gap-2">
           <Linkedin className="h-8 w-8 text-linkedin-blue" />
           <h1 className="text-2xl font-bold text-linkedin-blue">LinkedAI</h1>
-        </div>
+        </Link>
         
         <div className="ml-auto flex items-center space-x-2">
           <nav className="hidden md:flex items-center space-x-4 lg:space-x-6">

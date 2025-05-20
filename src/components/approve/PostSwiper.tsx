@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -23,6 +22,14 @@ export const PostSwiper = () => {
   // For image generation
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
 
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState(0);
+  
+  // Swipe threshold (difference in px to trigger a swipe action)
+  const swipeThreshold = 100;
+  
   const currentPost = pendingPosts[currentPostIndex];
 
   useEffect(() => {
@@ -87,6 +94,57 @@ export const PostSwiper = () => {
     goToNextPost();
   };
 
+  const handleTouchStart = (e: React.TouchEvent | React.MouseEvent) => {
+    setIsDragging(true);
+    if ('touches' in e) {
+      setTouchStart(e.touches[0].clientX);
+    } else {
+      setTouchStart(e.clientX);
+    }
+    setTouchEnd(null); // Reset end position
+  };
+
+  const handleTouchMove = (e: React.TouchEvent | React.MouseEvent) => {
+    if (!isDragging) return;
+    
+    let currentPosition: number;
+    if ('touches' in e) {
+      currentPosition = e.touches[0].clientX;
+    } else {
+      currentPosition = e.clientX;
+    }
+    
+    setTouchEnd(currentPosition);
+    
+    // Calculate drag distance for animation
+    if (touchStart !== null) {
+      const offset = currentPosition - touchStart;
+      setDragOffset(offset);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+    
+    if (!touchStart || !touchEnd) return;
+    
+    // Calculate swipe distance
+    const distance = touchEnd - touchStart;
+    const isSwipeRight = distance > swipeThreshold;
+    const isSwipeLeft = distance < -swipeThreshold;
+    
+    if (isSwipeRight && currentPost) {
+      handleApprove();
+    } else if (isSwipeLeft && currentPost) {
+      handleReject();
+    }
+    
+    // Reset values
+    setDragOffset(0);
+    setTouchStart(null);
+    setTouchEnd(null);
+  };
+
   if (pendingPosts.length === 0) {
     return (
       <Card className="p-6 text-center">
@@ -102,14 +160,29 @@ export const PostSwiper = () => {
     <>
       <div className="relative h-[600px] w-full max-w-md mx-auto">
         {currentPost && (
-          <PostCard
-            post={currentPost}
-            onApprove={handleApprove}
-            onReject={handleReject}
-            onEdit={openEditDialog}
-            onSchedule={openScheduleDialog}
-            className="h-full overflow-auto"
-          />
+          <div 
+            className="absolute top-0 left-0 right-0 bottom-0"
+            style={{ 
+              transform: `translateX(${dragOffset}px) rotate(${dragOffset / 20}deg)`,
+              transition: isDragging ? 'none' : 'transform 0.5s ease-out'
+            }}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            onMouseDown={handleTouchStart}
+            onMouseMove={handleTouchMove}
+            onMouseUp={handleTouchEnd}
+            onMouseLeave={handleTouchEnd}
+          >
+            <PostCard
+              post={currentPost}
+              onApprove={handleApprove}
+              onReject={handleReject}
+              onEdit={openEditDialog}
+              onSchedule={openScheduleDialog}
+              className="h-full overflow-auto"
+            />
+          </div>
         )}
         
         <div className="absolute bottom-0 left-0 right-0 text-center text-xs text-muted-foreground mb-2">
