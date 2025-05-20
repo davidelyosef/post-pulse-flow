@@ -5,12 +5,14 @@ import { Button } from "@/components/ui/button";
 import { connectToLinkedIn, isLinkedInConnected, getLinkedInUser, disconnectLinkedIn } from "@/services/linkedinService";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Linkedin } from "lucide-react";
+import LinkedInAuthDialog from "@/components/linkedin/LinkedInAuthDialog";
 
 const GeneratePage = () => {
   const [connected, setConnected] = useState(false);
   const [userData, setUserData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
 
   useEffect(() => {
     // Check LinkedIn connection status on component mount
@@ -24,12 +26,16 @@ const GeneratePage = () => {
 
   const handleConnectLinkedIn = async () => {
     setLoading(true);
+    setShowAuthDialog(true);
     try {
-      await connectToLinkedIn();
-      setConnected(true);
-      setUserData(getLinkedInUser());
+      const success = await connectToLinkedIn();
+      if (success) {
+        setConnected(true);
+        setUserData(getLinkedInUser());
+      }
     } finally {
       setLoading(false);
+      setShowAuthDialog(false);
     }
   };
 
@@ -90,6 +96,12 @@ const GeneratePage = () => {
         </div>
         
         <GenerateForm />
+        
+        {/* LinkedIn Auth Dialog */}
+        <LinkedInAuthDialog 
+          isOpen={showAuthDialog} 
+          onOpenChange={setShowAuthDialog} 
+        />
       </div>
     </PageLayout>
   );

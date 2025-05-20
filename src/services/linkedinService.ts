@@ -1,35 +1,116 @@
 
 import { toast } from "sonner";
 
+// Create a function to open the LinkedIn auth popup
+const openLinkedInAuthPopup = (): Promise<boolean> => {
+  return new Promise((resolve) => {
+    // Calculate popup dimensions and position
+    const width = 600;
+    const height = 700;
+    const left = window.innerWidth / 2 - width / 2;
+    const top = window.innerHeight / 2 - height / 2;
+
+    // Open the popup
+    const popup = window.open(
+      "about:blank",
+      "LinkedIn Login",
+      `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
+    );
+
+    if (!popup) {
+      toast.error("Popup blocked! Please allow popups for this site.");
+      resolve(false);
+      return;
+    }
+
+    // Set the popup content with iframe
+    popup.document.write(`
+      <html>
+        <head>
+          <title>Connect to LinkedIn</title>
+          <style>
+            body, html {
+              margin: 0;
+              padding: 0;
+              width: 100%;
+              height: 100%;
+              overflow: hidden;
+            }
+            iframe {
+              width: 100%;
+              height: 100%;
+              border: none;
+            }
+          </style>
+        </head>
+        <body>
+          <iframe src="https://linkedai-backend.vercel.app/api/auth/linkedin" allow="popup"></iframe>
+        </body>
+      </html>
+    `);
+
+    // Set up message event listener for communication
+    const messageHandler = (event: MessageEvent) => {
+      // Check origin for security
+      if (event.origin !== "https://linkedai-backend.vercel.app") return;
+      
+      try {
+        if (event.data?.type === "linkedin-auth-success") {
+          // Store user data from the event
+          const userData = event.data.user || {
+            name: "LinkedIn User",
+            position: "Professional",
+            profileImage: "https://via.placeholder.com/150"
+          };
+          
+          // Save the authentication state and user data
+          localStorage.setItem("linkedinConnected", "true");
+          localStorage.setItem("linkedinUser", JSON.stringify({
+            ...userData,
+            connectedAt: new Date().toISOString()
+          }));
+          
+          // Close the popup
+          popup.close();
+          window.removeEventListener("message", messageHandler);
+          
+          toast.success("LinkedIn account connected successfully!");
+          resolve(true);
+        } else if (event.data?.type === "linkedin-auth-error") {
+          popup.close();
+          window.removeEventListener("message", messageHandler);
+          toast.error("Failed to connect to LinkedIn. Please try again.");
+          resolve(false);
+        }
+      } catch (error) {
+        console.error("Error processing auth message:", error);
+        resolve(false);
+      }
+    };
+
+    window.addEventListener("message", messageHandler);
+
+    // Handle popup close
+    const checkClosed = setInterval(() => {
+      if (popup.closed) {
+        clearInterval(checkClosed);
+        window.removeEventListener("message", messageHandler);
+        // Only show error if not already authenticated (prevents error when popup closes after successful auth)
+        if (!localStorage.getItem("linkedinConnected")) {
+          toast.error("LinkedIn authentication was canceled");
+          resolve(false);
+        }
+      }
+    }, 500);
+  });
+};
+
 export const connectToLinkedIn = async (): Promise<boolean> => {
-  // In a real app, this would redirect to LinkedIn OAuth flow
-  // Here we're implementing a more realistic mock with proper error handling
-  
   console.log("Connecting to LinkedIn...");
   
   try {
-    // Simulate network request
-    const mockAuthUrl = "https://www.linkedin.com/oauth/v2/authorization?mock=true";
-    
-    // In a real implementation, we would redirect to LinkedIn's OAuth flow
-    // window.location.href = mockAuthUrl;
-    
-    // For our mock, we'll simulate a successful connection
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        // Store connection state in localStorage to persist across page reloads
-        localStorage.setItem("linkedinConnected", "true");
-        localStorage.setItem("linkedinUser", JSON.stringify({
-          name: "Demo User",
-          position: "Professional at Company",
-          profileImage: "https://via.placeholder.com/150",
-          connectedAt: new Date().toISOString()
-        }));
-        
-        toast.success("LinkedIn account connected successfully!");
-        resolve(true);
-      }, 1500);
-    });
+    // Open the LinkedIn auth popup
+    return await openLinkedInAuthPopup();
   } catch (error) {
     console.error("LinkedIn connection error:", error);
     toast.error("Failed to connect to LinkedIn. Please try again.");
