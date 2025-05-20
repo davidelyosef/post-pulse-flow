@@ -25,7 +25,11 @@ const openLinkedInAuthPopup = (): Promise<boolean> => {
 
     // Fetch the HTML content from the endpoint and log it
     fetch("https://linkedai-backend.vercel.app/api/auth/linkedin")
-      .then(response => response.text())
+      .then(response => {
+        console.log("LinkedIn Auth Response:", response);
+        console.log("LinkedIn Auth Response text:", response.text());
+        return response.text();
+      })
       .then(html => {
         // Log the HTML response
         console.log("LinkedIn Auth HTML Response:", html);
