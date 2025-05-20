@@ -2,12 +2,39 @@
 import { toast } from "sonner";
 
 export const connectToLinkedIn = async (): Promise<boolean> => {
+  // In a real app, this would redirect to LinkedIn OAuth flow
+  // Here we're implementing a more realistic mock with proper error handling
+  
   console.log("Connecting to LinkedIn...");
   
-  // Since we're using an iframe in a dialog now, no need to open a popup
-  // The actual connection will be managed by the iframe content
-  // We'll just return true to indicate the dialog was opened successfully
-  return true;
+  try {
+    // Simulate network request
+    const mockAuthUrl = "https://www.linkedin.com/oauth/v2/authorization?mock=true";
+    
+    // In a real implementation, we would redirect to LinkedIn's OAuth flow
+    // window.location.href = mockAuthUrl;
+    
+    // For our mock, we'll simulate a successful connection
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        // Store connection state in localStorage to persist across page reloads
+        localStorage.setItem("linkedinConnected", "true");
+        localStorage.setItem("linkedinUser", JSON.stringify({
+          name: "Demo User",
+          position: "Professional at Company",
+          profileImage: "https://via.placeholder.com/150",
+          connectedAt: new Date().toISOString()
+        }));
+        
+        toast.success("LinkedIn account connected successfully!");
+        resolve(true);
+      }, 1500);
+    });
+  } catch (error) {
+    console.error("LinkedIn connection error:", error);
+    toast.error("Failed to connect to LinkedIn. Please try again.");
+    return false;
+  }
 };
 
 export const isLinkedInConnected = (): boolean => {

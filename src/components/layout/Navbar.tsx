@@ -6,12 +6,10 @@ import { useEffect, useState } from "react";
 import { isLinkedInConnected, connectToLinkedIn, disconnectLinkedIn, getLinkedInUser } from "@/services/linkedinService";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import LinkedInAuthDialog from "@/components/linkedin/LinkedInAuthDialog";
 
 export const Navbar = () => {
   const [connected, setConnected] = useState(false);
   const [user, setUser] = useState<any>(null);
-  const [showAuthDialog, setShowAuthDialog] = useState(false);
   const location = useLocation();
   
   useEffect(() => {
@@ -42,9 +40,7 @@ export const Navbar = () => {
       setConnected(false);
       setUser(null);
     } else {
-      setShowAuthDialog(true);
       const success = await connectToLinkedIn();
-      setShowAuthDialog(false);
       if (success) {
         setConnected(true);
         setUser(getLinkedInUser());
@@ -120,12 +116,6 @@ export const Navbar = () => {
             <Linkedin className="h-4 w-4" />
             {connected ? "Disconnect LinkedIn" : "Connect to LinkedIn"}
           </Button>
-          
-          {/* LinkedIn Auth Dialog */}
-          <LinkedInAuthDialog 
-            isOpen={showAuthDialog} 
-            onOpenChange={setShowAuthDialog} 
-          />
         </div>
       </div>
       
