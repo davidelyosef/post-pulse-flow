@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,7 +9,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, Loader2 } from "lucide-react";
+import { Calendar as CalendarIcon, Loader2, X, Edit, Save, Tags } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 
 export const PostSwiper = () => {
   const { pendingPosts, approvePost, rejectPost, updatePost, schedulePost, generateImagePrompts } = usePostContext();
@@ -18,6 +21,10 @@ export const PostSwiper = () => {
   const [scheduleDialogOpen, setScheduleDialogOpen] = useState(false);
   const [editContent, setEditContent] = useState("");
   const [scheduleDate, setScheduleDate] = useState<Date | undefined>(undefined);
+  
+  // For tags editing
+  const [editTags, setEditTags] = useState<string[]>([]);
+  const [newTag, setNewTag] = useState("");
   
   // For image generation
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
@@ -102,12 +109,16 @@ export const PostSwiper = () => {
   const openEditDialog = () => {
     if (!currentPost) return;
     setEditContent(currentPost.content);
+    setEditTags(currentPost.tags || []);
     setEditDialogOpen(true);
   };
 
   const handleSaveEdit = () => {
     if (!currentPost) return;
-    updatePost(currentPost.id, { content: editContent });
+    updatePost(currentPost.id, { 
+      content: editContent,
+      tags: editTags
+    });
     setEditDialogOpen(false);
   };
 
@@ -122,6 +133,17 @@ export const PostSwiper = () => {
     schedulePost(currentPost.id, scheduleDate);
     approvePost(currentPost.id); // Auto-approve scheduled posts
     setScheduleDialogOpen(false);
+  };
+
+  const addTag = () => {
+    if (newTag.trim() && !editTags.includes(newTag.trim())) {
+      setEditTags([...editTags, newTag.trim()]);
+      setNewTag("");
+    }
+  };
+
+  const removeTag = (tagToRemove: string) => {
+    setEditTags(editTags.filter(tag => tag !== tagToRemove));
   };
 
   const handleTouchStart = (e: React.TouchEvent | React.MouseEvent) => {
@@ -220,27 +242,78 @@ export const PostSwiper = () => {
         </div>
       </div>
 
-      {/* Edit Dialog */}
+      {/* Enhanced Edit Post Dialog */}
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-xl" size="large">
           <DialogHeader>
-            <DialogTitle>Edit Post</DialogTitle>
-            <DialogDescription>
-              Make changes to your post content.
+            <DialogTitle className="flex items-center gap-2 text-2xl font-bold">
+              <Edit className="h-5 w-5" />
+              Edit Post
+            </DialogTitle>
+            <DialogDescription className="text-base">
+              Customize your post content and metadata before publishing.
             </DialogDescription>
           </DialogHeader>
           
-          <Textarea 
-            value={editContent} 
-            onChange={(e) => setEditContent(e.target.value)}
-            className="min-h-[200px]" 
-          />
+          <div className="grid gap-6 py-4">
+            {/* Content editing */}
+            <div className="space-y-2">
+              <label htmlFor="content" className="text-sm font-medium">Post Content</label>
+              <Textarea 
+                id="content"
+                value={editContent} 
+                onChange={(e) => setEditContent(e.target.value)}
+                className="min-h-[180px] resize-none focus:ring-2 focus:ring-primary" 
+                placeholder="Enter your post content here..."
+              />
+            </div>
+            
+            {/* Tags editing */}
+            <div className="space-y-2">
+              <label className="flex items-center gap-2 text-sm font-medium">
+                <Tags className="h-4 w-4" />
+                Tags
+              </label>
+              
+              <div className="flex flex-wrap gap-2 mb-2">
+                {editTags.map(tag => (
+                  <Badge key={tag} className="flex items-center gap-1 bg-primary/20 hover:bg-primary/30 text-foreground">
+                    {tag}
+                    <button 
+                      onClick={() => removeTag(tag)} 
+                      className="ml-1 rounded-full hover:bg-muted p-0.5"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                ))}
+              </div>
+              
+              <div className="flex gap-2">
+                <Input 
+                  value={newTag}
+                  onChange={(e) => setNewTag(e.target.value)}
+                  placeholder="Add new tag..." 
+                  className="flex-1"
+                  onKeyPress={(e) => e.key === 'Enter' && addTag()}
+                />
+                <Button 
+                  onClick={addTag} 
+                  size="sm" 
+                  variant="outline"
+                >
+                  Add
+                </Button>
+              </div>
+            </div>
+          </div>
           
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
+          <DialogFooter className="border-t pt-4 mt-2">
+            <Button variant="outline" onClick={() => setEditDialogOpen(false)} className="gap-1">
               Cancel
             </Button>
-            <Button onClick={handleSaveEdit}>
+            <Button onClick={handleSaveEdit} className="gap-1">
+              <Save className="h-4 w-4" />
               Save Changes
             </Button>
           </DialogFooter>
@@ -274,6 +347,7 @@ export const PostSwiper = () => {
                   selected={scheduleDate}
                   onSelect={setScheduleDate}
                   initialFocus
+                  className="overflow-hidden max-w-full"
                 />
               </PopoverContent>
             </Popover>
