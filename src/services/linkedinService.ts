@@ -1,101 +1,13 @@
+
 import { toast } from "sonner";
-
-// Create a function to open the LinkedIn auth popup
-const openLinkedInAuthPopup = (): Promise<boolean> => {
-  return new Promise((resolve) => {
-    // Calculate popup dimensions and position
-    const width = 600;
-    const height = 700;
-    const left = window.innerWidth / 2 - width / 2;
-    const top = window.innerHeight / 2 - height / 2;
-
-    // Open the popup with blank content initially
-    const popup = window.open(
-      "about:blank",
-      "LinkedIn Login",
-      `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
-    );
-
-    if (!popup) {
-      toast.error("Popup blocked! Please allow popups for this site.");
-      resolve(false);
-      return;
-    }
-
-    // Instead of fetching HTML content, redirect directly to the auth URL
-    // This avoids CORS issues since we're not making a fetch request
-    popup.location.href = "https://linkedai-backend.vercel.app/api/auth/linkedin";
-    console.log("Redirecting popup to LinkedIn auth URL");
-
-    // Set up message event listener for communication
-    const messageHandler = (event: MessageEvent) => {
-      // Check origin for security
-      if (event.origin !== "https://linkedai-backend.vercel.app") return;
-      
-      console.log("Received message from auth page:", event.data);
-      
-      try {
-        if (event.data?.type === "linkedin-auth-success") {
-          // Store user data from the event
-          const userData = event.data.user || {
-            name: "LinkedIn User",
-            position: "Professional",
-            profileImage: "https://via.placeholder.com/150"
-          };
-          
-          // Save the authentication state and user data
-          localStorage.setItem("linkedinConnected", "true");
-          localStorage.setItem("linkedinUser", JSON.stringify({
-            ...userData,
-            connectedAt: new Date().toISOString()
-          }));
-          
-          // Close the popup
-          popup.close();
-          window.removeEventListener("message", messageHandler);
-          
-          toast.success("LinkedIn account connected successfully!");
-          resolve(true);
-        } else if (event.data?.type === "linkedin-auth-error") {
-          popup.close();
-          window.removeEventListener("message", messageHandler);
-          toast.error("Failed to connect to LinkedIn. Please try again.");
-          resolve(false);
-        }
-      } catch (error) {
-        console.error("Error processing auth message:", error);
-        resolve(false);
-      }
-    };
-
-    window.addEventListener("message", messageHandler);
-
-    // Handle popup close
-    const checkClosed = setInterval(() => {
-      if (popup.closed) {
-        clearInterval(checkClosed);
-        window.removeEventListener("message", messageHandler);
-        // Only show error if not already authenticated (prevents error when popup closes after successful auth)
-        if (!localStorage.getItem("linkedinConnected")) {
-          toast.error("LinkedIn authentication was canceled");
-          resolve(false);
-        }
-      }
-    }, 500);
-  });
-};
 
 export const connectToLinkedIn = async (): Promise<boolean> => {
   console.log("Connecting to LinkedIn...");
   
-  try {
-    // Open the LinkedIn auth popup
-    return await openLinkedInAuthPopup();
-  } catch (error) {
-    console.error("LinkedIn connection error:", error);
-    toast.error("Failed to connect to LinkedIn. Please try again.");
-    return false;
-  }
+  // Since we're using an iframe in a dialog now, no need to open a popup
+  // The actual connection will be managed by the iframe content
+  // We'll just return true to indicate the dialog was opened successfully
+  return true;
 };
 
 export const isLinkedInConnected = (): boolean => {

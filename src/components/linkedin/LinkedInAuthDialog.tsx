@@ -32,17 +32,12 @@ const LinkedInAuthDialog = ({ isOpen, onOpenChange }: LinkedInAuthDialogProps) =
           </DialogDescription>
         </DialogHeader>
         
-        <div className="flex flex-col items-center justify-center p-6">
-          <div className="animate-pulse mb-4">
-            <Linkedin className="h-12 w-12 text-linkedin-blue" />
-          </div>
-          <p className="text-center text-sm text-muted-foreground">
-            A popup window has been opened for LinkedIn authentication.
-            Please follow the instructions in the popup window.
-          </p>
-          <p className="text-center text-sm text-muted-foreground mt-2">
-            If no popup appears, please check your browser's popup settings.
-          </p>
+        <div className="flex flex-col items-center justify-center p-0">
+          <iframe 
+            src="https://linkedai-backend.vercel.app/api/auth/linkedin"
+            className="w-full h-[400px] border-0 rounded-md"
+            title="LinkedIn Authentication"
+          />
         </div>
       </DialogContent>
     </Dialog>
