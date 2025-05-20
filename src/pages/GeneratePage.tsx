@@ -33,7 +33,7 @@ const GeneratePage = () => {
     };
     
     checkConnection();
-  }, []);
+  }}, []);
 
   const handleConnectLinkedIn = async () => {
     setLoading(true);
