@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -130,14 +131,14 @@ export const PostCard = ({
                 <span>Generating image...</span>
               </div>
             ) : post.imagePrompts ? (
-              <div className="space-y-3">
+              <div className="space-y-3 overflow-hidden">
                 <p className="text-sm font-medium">Select an image concept:</p>
-                <div className="grid gap-2">
+                <div className="grid gap-2 overflow-y-auto max-h-52">
                   {post.imagePrompts.map((prompt, index) => (
                     <Button 
                       key={index} 
                       variant="outline" 
-                      className="justify-start text-left h-auto py-2 font-normal"
+                      className="justify-start text-left h-auto py-2 font-normal break-words whitespace-normal"
                       onClick={() => handleSelectImagePrompt(prompt)}
                     >
                       {prompt}

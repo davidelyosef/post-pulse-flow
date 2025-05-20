@@ -1,3 +1,4 @@
+
 // This is a service for generating LinkedIn posts using the external API
 
 import { Post } from "@/types";
@@ -33,9 +34,10 @@ export const generatePosts = async (
     }
 
     const data = await response.json();
+    console.log("API response data:", data);
     
     // Map the API response to our Post type
-    const posts: Post[] = data.map((postContent: string) => {
+    const posts: Post[] = Array.isArray(data) ? data.map((postContent: string) => {
       // Extract a subject from the first line or use a default
       let subject = postContent.split('\n')[0];
       if (subject.length > 60) {
@@ -70,8 +72,9 @@ export const generatePosts = async (
         tone: tone || undefined,
         style: style || undefined,
       };
-    });
+    }) : [];
     
+    console.log("Generated posts:", posts);
     return posts;
   } catch (error) {
     console.error("Error generating posts:", error);

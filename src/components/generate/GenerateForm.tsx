@@ -51,6 +51,7 @@ export const GenerateForm = () => {
       const posts = await generatePosts(count, topic, tone, style);
       
       if (posts && posts.length > 0) {
+        console.log("Adding posts to context:", posts);
         addPosts(posts);
         toast.success(`Generated ${posts.length} posts!`);
         // Clear the form
