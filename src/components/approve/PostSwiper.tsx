@@ -33,8 +33,10 @@ export const PostSwiper = () => {
   const currentPost = pendingPosts[currentPostIndex];
 
   useEffect(() => {
-    // Reset index if we've run out of posts
-    if (currentPostIndex >= pendingPosts.length && pendingPosts.length > 0) {
+    // Reset index if we've run out of posts or if the current index is no longer valid
+    if (pendingPosts.length === 0) {
+      setCurrentPostIndex(0);
+    } else if (currentPostIndex >= pendingPosts.length) {
       setCurrentPostIndex(pendingPosts.length - 1);
     }
   }, [pendingPosts, currentPostIndex]);
@@ -42,24 +44,49 @@ export const PostSwiper = () => {
   const handleApprove = async () => {
     if (!currentPost) return;
     
+    const postId = currentPost.id; // Store the ID before it's removed from pendingPosts
+    
     // If post doesn't have image prompts yet, generate them
     if (!currentPost.imagePrompts) {
       try {
         setIsGeneratingImage(true);
-        await generateImagePrompts(currentPost.id);
+        await generateImagePrompts(postId);
       } finally {
         setIsGeneratingImage(false);
       }
     }
     
-    approvePost(currentPost.id);
-    goToNextPost();
+    // Approve the post first
+    approvePost(postId);
+    
+    // Check if we need to adjust the current index
+    if (pendingPosts.length <= 1) {
+      // This was the last post, nothing to do
+      setCurrentPostIndex(0);
+    } else if (currentPostIndex >= pendingPosts.length - 1) {
+      // We're at the end, stay at the new last post
+      setCurrentPostIndex(pendingPosts.length - 2);
+    }
+    // Otherwise, currentPostIndex stays the same and will point to the next post
   };
 
   const handleReject = () => {
     if (!currentPost) return;
-    rejectPost(currentPost.id);
-    goToNextPost();
+    
+    const postId = currentPost.id; // Store the ID before it's removed from pendingPosts
+    
+    // Reject the post
+    rejectPost(postId);
+    
+    // Check if we need to adjust the current index
+    if (pendingPosts.length <= 1) {
+      // This was the last post
+      setCurrentPostIndex(0);
+    } else if (currentPostIndex >= pendingPosts.length - 1) {
+      // We're at the end, stay at the new last post
+      setCurrentPostIndex(pendingPosts.length - 2);
+    }
+    // Otherwise, currentPostIndex stays the same and will point to the next post
   };
 
   const goToNextPost = () => {
