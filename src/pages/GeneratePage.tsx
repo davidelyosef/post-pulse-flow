@@ -31,9 +31,9 @@ const GeneratePage = () => {
           console.error("Error fetching LinkedIn user data:", error);
         }
     };
-    
+    }  
     checkConnection();
-  }}, []);
+  }, []);
 
   const handleConnectLinkedIn = async () => {
     setLoading(true);
