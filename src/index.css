@@ -67,6 +67,23 @@
     color: hsl(var(--muted-foreground));
   }
 
+  /* Dark mode form input improvements */
+  .dark input, 
+  .dark textarea, 
+  .dark select {
+    color: hsl(var(--foreground));
+  }
+
+  /* Fix for background buttons in dark mode */
+  .dark button.bg-background {
+    color: hsl(var(--foreground));
+  }
+
+  /* Fix for select dropdown text in dark mode */
+  .dark [data-radix-select-trigger] {
+    color: hsl(var(--foreground));
+  }
+
   .dark .linkedin-connect-button {
     @apply bg-linkedin-blue text-white border-linkedin-blue;
   }

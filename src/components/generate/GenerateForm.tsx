@@ -29,7 +29,7 @@ const writingStyles = [
 
 export const GenerateForm = () => {
   const [topic, setTopic] = useState("");
-  const [count, setCount] = useState(5);
+  const [count, setCount] = useState(3);
   const [tone, setTone] = useState("professional");
   const [style, setStyle] = useState("concise");
   const [isLoading, setIsLoading] = useState(false);
@@ -93,9 +93,9 @@ export const GenerateForm = () => {
             id="count"
             type="number"
             min={1}
-            max={30}
+            max={5}
             value={count}
-            onChange={(e) => setCount(parseInt(e.target.value) || 1)}
+            onChange={(e) => setCount(Math.min(5, Math.max(1, parseInt(e.target.value) || 1)))}
           />
         </div>
         
