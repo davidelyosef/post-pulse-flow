@@ -17,8 +17,17 @@ export const connectToLinkedIn = async (): Promise<boolean> => {
       connectedAt: new Date().toISOString()
     }));
     
-    // Then redirect to LinkedIn auth
-    // window.location.href = "https://linkedai-backend.vercel.app/api/auth/linkedin";
+    const urlParams = new URLSearchParams(window.location.search);
+
+    if (urlParams.get("success") === "true") {
+      // get request to the backend to get the user data
+      const response = await fetch("https://linkedai-backend.vercel.app/api/auth/linkedin");
+      const data = await response.json();
+      console.log("LinkedIn user data:", data);
+      return data;
+    } else {
+      window.location.href = "http://34.226.170.38:3000/";
+    }
     
     return true;
   } catch (error) {
