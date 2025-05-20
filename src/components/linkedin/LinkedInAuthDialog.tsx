@@ -1,4 +1,3 @@
-
 import {
   Dialog,
   DialogContent,
@@ -14,8 +13,13 @@ interface LinkedInAuthDialogProps {
 }
 
 const LinkedInAuthDialog = ({ isOpen, onOpenChange }: LinkedInAuthDialogProps) => {
+  console.log('LinkedInAuthDialog state:', { isOpen });
+  
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+    <Dialog open={isOpen} onOpenChange={(open) => {
+      console.log('LinkedInAuthDialog onOpenChange:', { open });
+      onOpenChange(open);
+    }}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
