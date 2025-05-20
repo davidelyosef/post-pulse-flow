@@ -1,4 +1,3 @@
-
 import { toast } from "sonner";
 
 // Create a function to open the LinkedIn auth popup
@@ -23,33 +22,17 @@ const openLinkedInAuthPopup = (): Promise<boolean> => {
       return;
     }
 
-    // Fetch the HTML content from the endpoint and log it
-    fetch("https://linkedai-backend.vercel.app/api/auth/linkedin")
-      .then(response => {
-        console.log("LinkedIn Auth Response:", response);
-        console.log("LinkedIn Auth Response text:", response.text());
-        return response.text();
-      })
-      .then(html => {
-        // Log the HTML response
-        console.log("LinkedIn Auth HTML Response:", html);
-        
-        // Write the fetched HTML directly to the popup document
-        popup.document.open();
-        popup.document.write(html);
-        popup.document.close();
-      })
-      .catch(error => {
-        console.error("Error fetching LinkedIn auth page:", error);
-        popup.close();
-        toast.error("Failed to load LinkedIn authentication page");
-        resolve(false);
-      });
+    // Instead of fetching HTML content, redirect directly to the auth URL
+    // This avoids CORS issues since we're not making a fetch request
+    popup.location.href = "https://linkedai-backend.vercel.app/api/auth/linkedin";
+    console.log("Redirecting popup to LinkedIn auth URL");
 
     // Set up message event listener for communication
     const messageHandler = (event: MessageEvent) => {
       // Check origin for security
       if (event.origin !== "https://linkedai-backend.vercel.app") return;
+      
+      console.log("Received message from auth page:", event.data);
       
       try {
         if (event.data?.type === "linkedin-auth-success") {
