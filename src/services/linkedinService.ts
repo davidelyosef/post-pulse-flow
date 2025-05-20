@@ -18,9 +18,7 @@ export const connectToLinkedIn = async (): Promise<boolean> => {
     }));
 
     const urlParams = new URLSearchParams(window.location.search);
-    console.log("urlParams", urlParams);
-
-    if (urlParams.get("success") !== "true") {
+    if (urlParams.get("success") === "true") {
       window.location.href = "https://34.226.170.38:3000/api/auth/linkedin";
     }
     
