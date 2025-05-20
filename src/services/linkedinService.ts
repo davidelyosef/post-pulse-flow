@@ -17,18 +17,6 @@ export const connectToLinkedIn = async (): Promise<boolean> => {
       connectedAt: new Date().toISOString()
     }));
     
-    const urlParams = new URLSearchParams(window.location.search);
-
-    if (urlParams.get("success") === "true") {
-      // get request to the backend to get the user data
-      const response = await fetch("https://34.226.170.38:3000/api/auth/linkedin");
-      const data = await response.json();
-      console.log("LinkedIn user data:", data);
-      return data;
-    } else {
-      window.location.href = "https://34.226.170.38:3000/api/auth/linkedin";
-    }
-    
     return true;
   } catch (error) {
     console.error("LinkedIn connection error:", error);

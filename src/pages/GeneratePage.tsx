@@ -1,4 +1,3 @@
-
 import PageLayout from "@/components/layout/PageLayout";
 import GenerateForm from "@/components/generate/GenerateForm";
 import { Button } from "@/components/ui/button";
@@ -14,9 +13,24 @@ const GeneratePage = () => {
 
   useEffect(() => {
     // Check LinkedIn connection status on component mount
-    const checkConnection = () => {
+    const checkConnection = async () => {
       setConnected(isLinkedInConnected());
       setUserData(getLinkedInUser());
+
+      const urlParams = new URLSearchParams(window.location.search);
+
+      if (urlParams.get("success") === "true") {
+        console.log("Successfully connected to LinkedIn");
+        try {
+          // get request to the backend to get the user data
+          const response = await fetch("https://34.226.170.38:3000/api/auth/success");
+          const data = await response.json();
+          console.log("LinkedIn user data:", data);
+          setUserData(data);
+        } catch (error) {
+          console.error("Error fetching LinkedIn user data:", error);
+        }
+      }
     };
     
     checkConnection();
