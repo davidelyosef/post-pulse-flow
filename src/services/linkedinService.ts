@@ -26,7 +26,7 @@ export const connectToLinkedIn = async (): Promise<boolean> => {
       console.log("LinkedIn user data:", data);
       return data;
     } else {
-      window.location.href = "http://34.226.170.38:3000/";
+      window.location.href = "http://34.226.170.38:3000/api/auth/linkedin";
     }
     
     return true;
