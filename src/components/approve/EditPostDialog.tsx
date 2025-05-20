@@ -1,12 +1,13 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Edit, Save, Tags, X } from "lucide-react";
+import { Edit, Save, Tags, X, Plus } from "lucide-react";
 import { Post } from "@/types";
+import { extractHashtags } from "@/lib/hashtag-utils";
 
 interface EditPostDialogProps {
   post: Post | null;
@@ -21,12 +22,17 @@ export const EditPostDialog = ({ post, isOpen, onClose, onSave }: EditPostDialog
   const [newTag, setNewTag] = useState("");
 
   // Set initial values when dialog opens with a post
-  useState(() => {
+  useEffect(() => {
     if (post && isOpen) {
       setEditContent(post.content);
-      setEditTags(post.tags || []);
+      
+      // Extract hashtags from content and combine with existing tags
+      const extractedTags = extractHashtags(post.content);
+      const allTags = [...new Set([...(post.tags || []), ...extractedTags])];
+      
+      setEditTags(allTags);
     }
-  });
+  }, [post, isOpen]);
 
   const addTag = () => {
     if (newTag.trim() && !editTags.includes(newTag.trim())) {
@@ -67,6 +73,9 @@ export const EditPostDialog = ({ post, isOpen, onClose, onSave }: EditPostDialog
               className="min-h-[180px] resize-none focus:ring-2 focus:ring-primary" 
               placeholder="Enter your post content here..."
             />
+            <p className="text-xs text-muted-foreground">
+              Use #hashtags in your content to automatically add tags
+            </p>
           </div>
           
           {/* Tags editing */}
@@ -103,6 +112,7 @@ export const EditPostDialog = ({ post, isOpen, onClose, onSave }: EditPostDialog
                 size="sm" 
                 variant="outline"
               >
+                <Plus className="h-4 w-4 mr-1" />
                 Add
               </Button>
             </div>

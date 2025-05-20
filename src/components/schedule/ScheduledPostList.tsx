@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { format } from "date-fns";
 import { usePostContext } from "@/contexts/PostContext";
@@ -12,6 +11,7 @@ import { Calendar as CalendarIcon, Clock, Loader2, Edit, Trash2, Share2 } from "
 import { publishPost, schedulePost as scheduleLinkedInPost, isLinkedInConnected } from "@/services/linkedinService";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
+import { EditPostDialog } from "@/components/approve/EditPostDialog";
 
 export const ScheduledPostList = () => {
   const { approvedPosts, deletePost, updatePost, schedulePost } = usePostContext();
@@ -55,12 +55,12 @@ export const ScheduledPostList = () => {
     }
   };
   
-  const handleSaveEdit = () => {
-    if (selectedPostId && editedContent.trim()) {
-      updatePost(selectedPostId, { content: editedContent });
-      setEditDialogOpen(false);
-      toast.success("Post updated successfully");
-    }
+  // Updating the handleEditSave function to include tags
+  const handleEditSave = (content: string, tags: string[]) => {
+    if (!selectedPostId) return;
+    updatePost(selectedPostId, { content, tags });
+    setEditDialogOpen(false);
+    toast.success("Post updated successfully");
   };
   
   const handleScheduleDialog = (postId: string) => {
@@ -300,33 +300,13 @@ export const ScheduledPostList = () => {
         </DialogContent>
       </Dialog>
       
-      {/* Edit Post Dialog */}
-      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle>Edit Post</DialogTitle>
-            <DialogDescription>Make changes to your post content below.</DialogDescription>
-          </DialogHeader>
-          <div className="py-4">
-            <textarea 
-              className="w-full min-h-[200px] p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-              value={editedContent}
-              onChange={(e) => setEditedContent(e.target.value)}
-            />
-          </div>
-          <DialogFooter className="flex flex-col sm:flex-row gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setEditDialogOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button onClick={handleSaveEdit}>
-              Save Changes
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Edit Post Dialog - Replace the inline dialog with our component */}
+      <EditPostDialog
+        post={selectedPost}
+        isOpen={editDialogOpen}
+        onClose={() => setEditDialogOpen(false)}
+        onSave={handleEditSave}
+      />
       
       {/* Schedule Dialog */}
       <Dialog open={scheduleDialogOpen} onOpenChange={setScheduleDialogOpen}>

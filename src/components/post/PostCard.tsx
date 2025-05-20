@@ -89,17 +89,19 @@ export const PostCard = ({
     }
   };
 
-  console.log("post: ", post);
-
   return (
     <Card 
-      className={cn("swipe-card shadow-lg", direction, className)}
+      className={cn(
+        "swipe-card shadow-lg transition-all hover:shadow-xl", 
+        direction,
+        className
+      )}
       ref={cardRef}
     >
-      <CardHeader className="pb-2">
+      <CardHeader className="pb-2 pt-4">
         <PostCardTags tags={allTags} showTags={showTags} />
       </CardHeader>
-      <CardContent>
+      <CardContent className="px-5 py-3">
         <PostCardContent content={post.content} />
         
         <PostCardImage 
@@ -110,7 +112,7 @@ export const PostCard = ({
           onSelectPrompt={handleSelectImagePrompt}
         />
       </CardContent>
-      <CardFooter>
+      <CardFooter className="pt-2 pb-4 px-5">
         <PostCardActions 
           showActions={showActions}
           onApprove={handleApprove}
