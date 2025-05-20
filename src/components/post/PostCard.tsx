@@ -84,6 +84,8 @@ export const PostCard = ({
     }
   };
 
+  console.log("post: ", post);
+
   return (
     <Card 
       className={cn("swipe-card shadow-lg", direction, className)}
