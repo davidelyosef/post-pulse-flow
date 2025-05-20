@@ -2,6 +2,8 @@
 import { Button } from "@/components/ui/button";
 import { Image, Loader2 } from "lucide-react";
 import { Post } from "@/types";
+import { generateImage } from "@/services/linkedinService";
+import { usePostContext } from "@/contexts/PostContext";
 
 interface PostCardImageProps {
   post: Post;
@@ -18,6 +20,27 @@ export const PostCardImage = ({
   onGeneratePrompts, 
   onSelectPrompt 
 }: PostCardImageProps) => {
+  const { updatePost } = usePostContext();
+
+  const handleSelectPrompt = async (prompt: string) => {
+    onSelectPrompt(prompt);
+    
+    // If we don't yet have an image, generate one
+    if (!post.imageUrl) {
+      try {
+        // Generate image using the selected prompt and post content
+        const imageUrl = await generateImage(prompt, post.content);
+        
+        // If we got an image URL back, update the post with it
+        if (imageUrl) {
+          updatePost(post.id, { imageUrl });
+        }
+      } catch (error) {
+        console.error("Error generating image:", error);
+      }
+    }
+  };
+
   if (post.imageUrl) {
     return (
       <div className="mt-6">
@@ -51,7 +74,7 @@ export const PostCardImage = ({
                 key={index} 
                 variant="outline" 
                 className="justify-start text-left h-auto py-2 font-normal break-words whitespace-normal"
-                onClick={() => onSelectPrompt(prompt)}
+                onClick={() => handleSelectPrompt(prompt)}
               >
                 {prompt}
               </Button>

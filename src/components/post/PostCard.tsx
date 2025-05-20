@@ -35,7 +35,7 @@ export const PostCard = ({
   const [direction, setDirection] = useState<"" | "swipe-left" | "swipe-right">("");
   const [isGeneratingPrompts, setIsGeneratingPrompts] = useState(false);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
-  const { generateImagePrompts, selectImagePrompt, generateImage } = usePostContext();
+  const { generateImagePrompts, selectImagePrompt } = usePostContext();
   
   // Extract hashtags from content
   const extractedTags = extractHashtags(post.content);
@@ -77,15 +77,11 @@ export const PostCard = ({
   };
 
   const handleSelectImagePrompt = async (prompt: string) => {
-    selectImagePrompt(post.id, prompt);
-    
-    if (!post.imageUrl) {
-      setIsGeneratingImage(true);
-      try {
-        await generateImage(post.id, prompt);
-      } finally {
-        setIsGeneratingImage(false);
-      }
+    setIsGeneratingImage(true);
+    try {
+      await selectImagePrompt(post.id, prompt);
+    } finally {
+      setIsGeneratingImage(false);
     }
   };
 

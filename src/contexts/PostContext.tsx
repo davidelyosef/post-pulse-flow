@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import { Post } from "@/types";
 import { toast } from "sonner";
+import { generateImage as generateImageService } from "@/services/linkedinService";
 
 interface PostContextType {
   posts: Post[];
@@ -112,21 +113,51 @@ export const PostProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     );
   };
 
-  // Mock function that would call an image generation API
+  // Updated to use the real API
   const generateImage = async (id: string, prompt: string): Promise<string> => {
-    // This would be an API call to Sora/Stable Diffusion in a real implementation
+    const post = posts.find((p) => p.id === id);
+    if (!post) return "";
     
-    // Mock response - just returns a placeholder image
-    const mockImageUrl = "https://via.placeholder.com/800x450/0077B5/ffffff?text=AI+Generated+LinkedIn+Image";
-    
-    // Update the post with the image URL
-    setPosts((prevPosts) =>
-      prevPosts.map((post) =>
-        post.id === id ? { ...post, imageUrl: mockImageUrl } : post
-      )
-    );
-    
-    return mockImageUrl;
+    try {
+      // Call the real API service to generate an image
+      const imageUrl = await generateImageService(prompt, post.content);
+      
+      if (imageUrl) {
+        // Update the post with the image URL
+        setPosts((prevPosts) =>
+          prevPosts.map((p) =>
+            p.id === id ? { ...p, imageUrl } : p
+          )
+        );
+        
+        return imageUrl;
+      } else {
+        // If no image URL was returned, use fallback
+        const fallbackUrl = "https://via.placeholder.com/800x450/0077B5/ffffff?text=LinkedIn+Image";
+        
+        setPosts((prevPosts) =>
+          prevPosts.map((p) =>
+            p.id === id ? { ...p, imageUrl: fallbackUrl } : p
+          )
+        );
+        
+        return fallbackUrl;
+      }
+    } catch (error) {
+      console.error("Error generating image:", error);
+      toast.error("Failed to generate image. Using placeholder instead.");
+      
+      // Fallback to placeholder
+      const fallbackUrl = "https://via.placeholder.com/800x450/0077B5/ffffff?text=LinkedIn+Image";
+      
+      setPosts((prevPosts) =>
+        prevPosts.map((p) =>
+          p.id === id ? { ...p, imageUrl: fallbackUrl } : p
+        )
+      );
+      
+      return fallbackUrl;
+    }
   };
 
   const value = {

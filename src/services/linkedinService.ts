@@ -43,6 +43,39 @@ export const disconnectLinkedIn = (): void => {
   toast.success("LinkedIn account disconnected");
 };
 
+// New function to generate an image based on a prompt
+export const generateImage = async (prompt: string, content: string): Promise<string | null> => {
+  try {
+    console.log("Generating image with prompt:", prompt);
+    
+    const response = await fetch("https://linkedai-backend.vercel.app/api/generate/saveimage", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJxo2NFiYcR35GzCk5T3nxA7rGlSsXvIfJwg&s",
+        description: content,
+        userId: "682c65e996c62a2bca89a8ba"
+      }),
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Image generation failed with status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    console.log("Image generation response:", data);
+    
+    // Return the URL of the generated image
+    return data.imageUrl || data.url || null;
+  } catch (error) {
+    console.error("Image generation error:", error);
+    toast.error("Failed to generate image. Please try again.");
+    return null;
+  }
+};
+
 export const publishPost = async (
   content: string,
   imageUrl?: string
