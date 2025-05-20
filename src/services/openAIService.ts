@@ -36,6 +36,168 @@ export const generatePosts = async (
     const data = await response.json();
     console.log("API response data:", data);
     
+    // Check if the response has a 'results' property
+    if (data && data.results) {
+      console.log("Found results property in API response:", data.results);
+      
+      // If results is an array, use it directly
+      if (Array.isArray(data.results)) {
+        const posts = data.results.map((item: any, index: number) => {
+          let content = '';
+          
+          // Handle different content formats in results array
+          if (typeof item === 'string') {
+            content = item;
+          } else if (typeof item === 'object' && item !== null) {
+            // Try to get content from various properties
+            content = item.content || item.text || item.post || JSON.stringify(item);
+          }
+          
+          if (!content.trim()) {
+            console.warn("Skipping empty post content:", item);
+            return null;
+          }
+          
+          // Generate some relevant tags based on the topic
+          const possibleTags = [
+            "leadership", "innovation", "productivity", "career", "networking",
+            "growth", "mindset", "technology", "future-of-work", "remote-work",
+            "professional-development", "personal-branding", "team-building"
+          ];
+          
+          const postTags = [];
+          const numberOfTags = Math.floor(Math.random() * 3) + 2; // 2-4 tags
+          
+          for (let j = 0; j < numberOfTags; j++) {
+            const randomTagIndex = Math.floor(Math.random() * possibleTags.length);
+            const tag = possibleTags[randomTagIndex];
+            if (!postTags.includes(tag)) {
+              postTags.push(tag);
+            }
+          }
+          
+          return {
+            id: generateUniqueId(),
+            content: content,
+            tags: postTags,
+            createdAt: new Date(),
+            status: "pending",
+            tone: tone || undefined,
+            style: style || undefined,
+          };
+        }).filter(Boolean) as Post[];
+        
+        console.log("Generated posts from results array:", posts);
+        
+        if (posts.length === 0) {
+          throw new Error("No valid posts were generated from results array");
+        }
+        
+        return posts;
+      }
+      
+      // If results is a string, create a single post
+      if (typeof data.results === 'string') {
+        const content = data.results;
+        
+        if (!content.trim()) {
+          throw new Error("Empty post content received from results");
+        }
+        
+        // Generate some tags based on the topic
+        const possibleTags = [
+          "leadership", "innovation", "productivity", "career", "networking",
+          "growth", "mindset", "technology", "future-of-work", "remote-work"
+        ];
+        
+        const tags = [];
+        const numberOfTags = Math.floor(Math.random() * 3) + 2; // 2-4 tags
+        
+        for (let i = 0; i < numberOfTags; i++) {
+          const randomTagIndex = Math.floor(Math.random() * possibleTags.length);
+          const tag = possibleTags[randomTagIndex];
+          if (!tags.includes(tag)) {
+            tags.push(tag);
+          }
+        }
+        
+        const post: Post = {
+          id: generateUniqueId(),
+          content: content,
+          tags: tags,
+          createdAt: new Date(),
+          status: "pending",
+          tone: tone || undefined,
+          style: style || undefined,
+        };
+        
+        console.log("Generated single post from results string:", post);
+        
+        return [post];
+      }
+      
+      // If results is an object, try to extract content
+      if (typeof data.results === 'object' && data.results !== null) {
+        console.log("Results is an object, trying to extract content");
+        
+        // Try to get array data from the results object
+        const resultsArray = data.results.posts || data.results.data || data.results.content || [data.results];
+        
+        if (Array.isArray(resultsArray)) {
+          const posts = resultsArray.map((item: any, index: number) => {
+            let content = '';
+            
+            if (typeof item === 'string') {
+              content = item;
+            } else if (typeof item === 'object' && item !== null) {
+              content = item.content || item.text || item.post || JSON.stringify(item);
+            }
+            
+            if (!content.trim()) {
+              console.warn("Skipping empty post content from results object array:", item);
+              return null;
+            }
+            
+            // Generate tags
+            const possibleTags = [
+              "leadership", "innovation", "productivity", "career", "networking",
+              "growth", "mindset", "technology", "future-of-work", "remote-work"
+            ];
+            
+            const postTags = [];
+            const numberOfTags = Math.floor(Math.random() * 3) + 2; // 2-4 tags
+            
+            for (let j = 0; j < numberOfTags; j++) {
+              const randomTagIndex = Math.floor(Math.random() * possibleTags.length);
+              const tag = possibleTags[randomTagIndex];
+              if (!postTags.includes(tag)) {
+                postTags.push(tag);
+              }
+            }
+            
+            return {
+              id: generateUniqueId(),
+              content: content,
+              tags: postTags,
+              createdAt: new Date(),
+              status: "pending",
+              tone: tone || undefined,
+              style: style || undefined,
+            };
+          }).filter(Boolean) as Post[];
+          
+          console.log("Generated posts from results object array:", posts);
+          
+          if (posts.length === 0) {
+            throw new Error("No valid posts were generated from results object array");
+          }
+          
+          return posts;
+        }
+      }
+    }
+    
+    // Fallback to the original processing if no 'results' property found
     // More flexible response format handling - check for various possible formats
     let postsContent: string[] = [];
     
@@ -63,11 +225,11 @@ export const generatePosts = async (
       postsContent = [data];
     }
     
-    console.log("Processed post content array:", postsContent);
+    console.log("Processed post content array (fallback):", postsContent);
     
     if (postsContent.length === 0) {
       console.error("Could not extract post content from API response");
-      throw new Error("Could not extract post content from API response");
+      throw new Error("Invalid response format from API");
     }
     
     // Map the processed content to our Post type
@@ -87,12 +249,6 @@ export const generatePosts = async (
       
       if (!content.trim()) {
         return null;
-      }
-      
-      // Extract a subject from the first line or use a default
-      let subject = content.split('\n')[0];
-      if (subject.length > 60) {
-        subject = subject.substring(0, 60) + '...';
       }
       
       // Generate some relevant tags based on the content
@@ -115,7 +271,6 @@ export const generatePosts = async (
       
       return {
         id: generateUniqueId(),
-        subject: subject,
         content: content,
         tags: postTags,
         createdAt: new Date(),
@@ -125,7 +280,7 @@ export const generatePosts = async (
       };
     }).filter(Boolean) as Post[]; // Filter out any null values
     
-    console.log("Generated posts:", posts);
+    console.log("Generated posts (fallback):", posts);
     
     if (posts.length === 0) {
       throw new Error("No valid posts were generated");

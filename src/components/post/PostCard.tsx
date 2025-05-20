@@ -89,9 +89,6 @@ export const PostCard = ({
       ref={cardRef}
     >
       <CardHeader className="pb-2">
-        {post.subject && (
-          <h3 className="text-xl font-bold mb-3">{post.subject}</h3>
-        )}
         {showTags && post.tags && post.tags.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-2">
             {post.tags.map((tag) => (
