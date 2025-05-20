@@ -98,7 +98,7 @@ export const Navbar = () => {
                 <NavLinks />
                 <Button 
                   variant={connected ? "default" : "outline"} 
-                  className={`mt-4 w-full ${!connected && "border-muted-foreground/30 text-foreground"}`}
+                  className={`mt-4 w-full linkedin-connect-button ${!connected && "border-linkedin-blue text-linkedin-blue dark:border-linkedin-blue dark:text-white"}`}
                   onClick={handleLinkedInButton}
                 >
                   <Linkedin className="h-4 w-4 mr-2" />
@@ -110,7 +110,7 @@ export const Navbar = () => {
           
           <Button 
             variant={connected ? "default" : "outline"} 
-            className={`hidden sm:inline-flex gap-2 animate-fade-in ${!connected && "border-muted-foreground/30 text-foreground"}`}
+            className={`hidden sm:inline-flex gap-2 animate-fade-in linkedin-connect-button ${!connected && "border-linkedin-blue text-linkedin-blue dark:border-linkedin-blue dark:text-white"}`}
             onClick={handleLinkedInButton}
           >
             <Linkedin className="h-4 w-4" />

@@ -33,7 +33,7 @@ const Index = () => {
             </Button>
           </Link>
           <Link to="/approve" className="w-full sm:w-auto">
-            <Button size="lg" variant="outline" className="w-full sm:w-auto gap-2 border-muted-foreground/30">
+            <Button size="lg" variant="outline" className="w-full sm:w-auto gap-2 border-muted-foreground/30 dark:border-muted-foreground/70 dark:text-foreground">
               Review Posts <Check className="h-4 w-4" />
             </Button>
           </Link>
