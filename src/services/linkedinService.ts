@@ -1,3 +1,4 @@
+
 import { toast } from "sonner";
 
 // Create a function to open the LinkedIn auth popup
@@ -22,10 +23,13 @@ const openLinkedInAuthPopup = (): Promise<boolean> => {
       return;
     }
 
-    // Fetch the HTML content from the endpoint
+    // Fetch the HTML content from the endpoint and log it
     fetch("https://linkedai-backend.vercel.app/api/auth/linkedin")
       .then(response => response.text())
       .then(html => {
+        // Log the HTML response
+        console.log("LinkedIn Auth HTML Response:", html);
+        
         // Write the fetched HTML directly to the popup document
         popup.document.open();
         popup.document.write(html);
