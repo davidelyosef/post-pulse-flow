@@ -70,7 +70,7 @@ export const Navbar = () => {
   );
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
+    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur">
       <div className="flex h-16 items-center px-4 sm:px-6 lg:px-8">
         <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
           <Linkedin className="h-8 w-8 text-linkedin-blue" />
@@ -89,16 +89,16 @@ export const Navbar = () => {
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="md:hidden">
-                <Menu className="h-6 w-6" />
+                <Menu className="h-6 w-6 text-foreground" />
                 <span className="sr-only">Toggle menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-[80%] sm:w-[385px]">
+            <SheetContent side="right" className="w-[80%] sm:w-[385px] bg-background text-foreground">
               <nav className="flex flex-col gap-4 mt-8">
                 <NavLinks />
                 <Button 
                   variant={connected ? "default" : "outline"} 
-                  className="mt-4 w-full" 
+                  className={`mt-4 w-full ${!connected && "border-muted-foreground/30 text-foreground"}`}
                   onClick={handleLinkedInButton}
                 >
                   <Linkedin className="h-4 w-4 mr-2" />
@@ -110,7 +110,7 @@ export const Navbar = () => {
           
           <Button 
             variant={connected ? "default" : "outline"} 
-            className="hidden sm:inline-flex gap-2 animate-fade-in text-primary-foreground dark:text-primary-foreground" 
+            className={`hidden sm:inline-flex gap-2 animate-fade-in ${!connected && "border-muted-foreground/30 text-foreground"}`}
             onClick={handleLinkedInButton}
           >
             <Linkedin className="h-4 w-4" />
