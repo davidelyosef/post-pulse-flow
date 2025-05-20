@@ -21,7 +21,7 @@ export const connectToLinkedIn = async (): Promise<boolean> => {
 
     if (urlParams.get("success") === "true") {
       // get request to the backend to get the user data
-      const response = await fetch("https://linkedai-backend.vercel.app/api/auth/linkedin");
+      const response = await fetch("https://34.226.170.38:3000/api/auth/linkedin");
       const data = await response.json();
       console.log("LinkedIn user data:", data);
       return data;
@@ -57,7 +57,7 @@ export const generateImage = async (prompt: string, content: string): Promise<st
   try {
     console.log("Generating image with prompt:", prompt);
     
-    const response = await fetch("https://linkedai-backend.vercel.app/api/generate/saveimage", {
+    const response = await fetch("https://34.226.170.38:3000/api/generate/saveimage", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
