@@ -36,8 +36,19 @@ export const generatePosts = async (
     const data = await response.json();
     console.log("API response data:", data);
     
+    // If data is empty or not an array, throw an error
+    if (!data || !Array.isArray(data) || data.length === 0) {
+      console.error("Invalid API response format:", data);
+      throw new Error("Invalid response format from API");
+    }
+    
     // Map the API response to our Post type
-    const posts: Post[] = Array.isArray(data) ? data.map((postContent: string) => {
+    const posts: Post[] = data.map((postContent: string) => {
+      if (!postContent || typeof postContent !== 'string') {
+        console.warn("Skipping invalid post content:", postContent);
+        return null;
+      }
+      
       // Extract a subject from the first line or use a default
       let subject = postContent.split('\n')[0];
       if (subject.length > 60) {
@@ -72,9 +83,14 @@ export const generatePosts = async (
         tone: tone || undefined,
         style: style || undefined,
       };
-    }) : [];
+    }).filter(Boolean) as Post[]; // Filter out any null values
     
     console.log("Generated posts:", posts);
+    
+    if (posts.length === 0) {
+      throw new Error("No valid posts were generated");
+    }
+    
     return posts;
   } catch (error) {
     console.error("Error generating posts:", error);

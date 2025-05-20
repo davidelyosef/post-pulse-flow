@@ -46,11 +46,13 @@ export const GenerateForm = () => {
     }
 
     setIsLoading(true);
+    
     try {
       // Pass the parameters to the generatePosts function
       const posts = await generatePosts(count, topic, tone, style);
       
-      if (posts && posts.length > 0) {
+      // Validate posts before adding to context
+      if (posts && Array.isArray(posts) && posts.length > 0) {
         console.log("Adding posts to context:", posts);
         addPosts(posts);
         toast.success(`Generated ${posts.length} posts!`);
@@ -59,11 +61,12 @@ export const GenerateForm = () => {
         // Redirect to approve page
         navigate("/approve");
       } else {
-        toast.error("No posts were generated. Please try again.");
+        console.error("Invalid posts data received:", posts);
+        toast.error("Failed to generate posts. Please try again.");
       }
     } catch (error) {
       console.error("Error generating posts:", error);
-      toast.error("Failed to generate posts. Please try again.");
+      toast.error(error instanceof Error ? error.message : "Failed to generate posts. Please try again.");
     } finally {
       setIsLoading(false);
     }
