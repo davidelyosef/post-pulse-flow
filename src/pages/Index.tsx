@@ -1,12 +1,112 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArrowRight, Calendar, Check, Linkedin, MessageSquarePlus } from "lucide-react";
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
+      <header className="container mx-auto pt-12 md:pt-24 px-4">
+        <div className="flex items-center gap-3 mb-3">
+          <Linkedin className="h-10 w-10 text-linkedin-blue" />
+          <h1 className="text-4xl md:text-5xl font-bold text-linkedin-blue">LinkedAI</h1>
+        </div>
+        <h2 className="text-3xl md:text-4xl font-bold mb-6 max-w-2xl">
+          Create, filter, and schedule engaging LinkedIn posts in just 2 minutes a day
+        </h2>
+        <p className="text-lg text-muted-foreground mb-8 max-w-2xl">
+          Leverage AI to generate professional, personalized content for your LinkedIn profile. 
+          Approve posts with a simple swipe and schedule them for optimal engagement.
+        </p>
+        
+        <div className="flex flex-wrap gap-4">
+          <Link to="/generate">
+            <Button size="lg" className="gap-2">
+              Start Creating <ArrowRight className="h-4 w-4" />
+            </Button>
+          </Link>
+          <Link to="/approve">
+            <Button size="lg" variant="outline" className="gap-2">
+              Review Posts <Check className="h-4 w-4" />
+            </Button>
+          </Link>
+        </div>
+      </header>
+      
+      <section className="container mx-auto py-24 px-4">
+        <h3 className="text-2xl md:text-3xl font-bold mb-12 text-center">
+          Your 2-minute daily ritual for LinkedIn success
+        </h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Card className="border-2 border-linkedin-blue/10">
+            <CardHeader>
+              <div className="bg-linkedin-blue/10 w-12 h-12 rounded-full flex items-center justify-center mb-2">
+                <MessageSquarePlus className="h-6 w-6 text-linkedin-blue" />
+              </div>
+              <CardTitle>Generate</CardTitle>
+              <CardDescription>
+                Create AI-powered posts tailored to your style
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p>Enter a topic, select your preferred style and tone, and let AI create engaging post ideas for your LinkedIn profile.</p>
+            </CardContent>
+            <CardFooter>
+              <Link to="/generate">
+                <Button variant="ghost" size="sm" className="gap-1">
+                  Generate posts <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
+            </CardFooter>
+          </Card>
+          
+          <Card className="border-2 border-linkedin-blue/10">
+            <CardHeader>
+              <div className="bg-linkedin-blue/10 w-12 h-12 rounded-full flex items-center justify-center mb-2">
+                <Check className="h-6 w-6 text-linkedin-blue" />
+              </div>
+              <CardTitle>Approve</CardTitle>
+              <CardDescription>
+                Swipe to keep only the best content
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p>Review generated posts with our Tinder-style interface. Swipe right to approve great posts, left to discard ones that don't resonate.</p>
+            </CardContent>
+            <CardFooter>
+              <Link to="/approve">
+                <Button variant="ghost" size="sm" className="gap-1">
+                  Review posts <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
+            </CardFooter>
+          </Card>
+          
+          <Card className="border-2 border-linkedin-blue/10">
+            <CardHeader>
+              <div className="bg-linkedin-blue/10 w-12 h-12 rounded-full flex items-center justify-center mb-2">
+                <Calendar className="h-6 w-6 text-linkedin-blue" />
+              </div>
+              <CardTitle>Schedule</CardTitle>
+              <CardDescription>
+                Plan your posts for maximum engagement
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p>Schedule approved posts for optimal times or publish immediately. Connect with LinkedIn to automate your content strategy.</p>
+            </CardContent>
+            <CardFooter>
+              <Link to="/schedule">
+                <Button variant="ghost" size="sm" className="gap-1">
+                  Schedule posts <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
+            </CardFooter>
+          </Card>
+        </div>
+      </section>
     </div>
   );
 };
