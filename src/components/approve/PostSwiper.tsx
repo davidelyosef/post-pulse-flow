@@ -52,14 +52,45 @@ export const PostSwiper = () => {
       }
     }
     
-    approvePost(currentPost.id);
-    goToNextPost();
+    // Store the current post's ID before approval
+    const currentPostId = currentPost.id;
+    
+    // Approve the post
+    approvePost(currentPostId);
+    
+    // After approving, we need to handle the next post navigation properly
+    // The post will be removed from pendingPosts after approval
+    // so we don't need to increment the index
+    if (currentPostIndex >= pendingPosts.length - 1) {
+      // If this was the last post, reset to last available item in the updated list
+      // The useEffect will handle this edge case
+    } else {
+      // Even though we approved the post, we keep the same index
+      // because the next post will "slide in" to the current position
+      // No need to change currentPostIndex
+    }
   };
 
   const handleReject = () => {
     if (!currentPost) return;
-    rejectPost(currentPost.id);
-    goToNextPost();
+    
+    // Store the current post's ID before rejection
+    const currentPostId = currentPost.id;
+    
+    // Reject the post
+    rejectPost(currentPostId);
+    
+    // Similar logic as handleApprove
+    // The post will be removed from pendingPosts after rejection
+    // so we don't need to increment the index
+    if (currentPostIndex >= pendingPosts.length - 1) {
+      // If this was the last post, reset to last available item
+      // The useEffect will handle this edge case
+    } else {
+      // Even though we rejected the post, we keep the same index
+      // because the next post will "slide in" to the current position
+      // No need to change currentPostIndex
+    }
   };
 
   const goToNextPost = () => {
@@ -91,7 +122,6 @@ export const PostSwiper = () => {
     schedulePost(currentPost.id, scheduleDate);
     approvePost(currentPost.id); // Auto-approve scheduled posts
     setScheduleDialogOpen(false);
-    goToNextPost();
   };
 
   const handleTouchStart = (e: React.TouchEvent | React.MouseEvent) => {
