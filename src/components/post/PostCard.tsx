@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -35,8 +34,8 @@ export const PostCard = ({
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const { generateImagePrompts, selectImagePrompt, generateImage } = usePostContext();
   
-  // Add swipe functionality
-  const cardRef = useSwipe({
+  // Add swipe functionality with specific HTMLDivElement type
+  const cardRef = useSwipe<HTMLDivElement>({
     onSwipeLeft: () => {
       if (onReject) handleReject();
     },

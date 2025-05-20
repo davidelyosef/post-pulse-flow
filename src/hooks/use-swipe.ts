@@ -9,14 +9,14 @@ interface UseSwipeOptions {
   threshold?: number;
 }
 
-export function useSwipe({
+export function useSwipe<T extends HTMLElement = HTMLElement>({
   onSwipeLeft,
   onSwipeRight,
   onSwipeUp,
   onSwipeDown,
   threshold = 100,
 }: UseSwipeOptions = {}) {
-  const ref = useRef<HTMLElement | null>(null);
+  const ref = useRef<T | null>(null);
   const startX = useRef<number>(0);
   const startY = useRef<number>(0);
   const isSwiping = useRef<boolean>(false);
