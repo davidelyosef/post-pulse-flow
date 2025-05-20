@@ -100,13 +100,42 @@ export const generatePosts = async (
 
 export const generateImagePrompts = async (postContent: string): Promise<string[]> => {
   // In a real app, this would be an API call to OpenAI
-  // For now, we're returning mock prompts
   
-  return [
+  // Create some contextually relevant image prompts based on common LinkedIn themes
+  const basePrompts = [
     "A professional looking person writing on a laptop with a thoughtful expression",
     "Abstract visualization of networking connections with blue and white nodes",
     "A minimalist illustration showing growth and progress through simple graphs",
     "A person standing confidently at a podium presenting to an audience",
     "A clean, modern workspace with productivity tools and technology",
   ];
+
+  // For a real implementation, we would analyze the post content to create relevant prompts
+  
+  return basePrompts;
+};
+
+export const generateImage = async (prompt: string): Promise<string> => {
+  // In a real app, this would call an image generation API like DALL-E, Midjourney, etc.
+  console.log("Generating image for prompt:", prompt);
+  
+  // For demo purposes, return a placeholder image
+  // In production, this would call an AI image generation service
+  
+  const placeholderImages = [
+    "https://via.placeholder.com/800x450/0077B5/ffffff?text=Professional+LinkedIn+Post",
+    "https://via.placeholder.com/800x450/2867B2/ffffff?text=Career+Development",
+    "https://via.placeholder.com/800x450/0A66C2/ffffff?text=Networking+Connections",
+    "https://via.placeholder.com/800x450/0073B1/ffffff?text=Leadership+Insights",
+    "https://via.placeholder.com/800x450/004182/ffffff?text=Industry+Trends"
+  ];
+  
+  // Select a random placeholder image
+  const randomIndex = Math.floor(Math.random() * placeholderImages.length);
+  
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(placeholderImages[randomIndex]);
+    }, 2000); // Simulate API delay
+  });
 };

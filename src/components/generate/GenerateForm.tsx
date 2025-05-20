@@ -9,6 +9,7 @@ import { Loader2 } from "lucide-react";
 import { generatePosts } from "@/services/openAIService";
 import { usePostContext } from "@/contexts/PostContext";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 const writingTones = [
   { id: "professional", name: "Professional", description: "Formal and business-like" },
@@ -32,6 +33,7 @@ export const GenerateForm = () => {
   const [tone, setTone] = useState("professional");
   const [style, setStyle] = useState("concise");
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const { addPosts } = usePostContext();
 
@@ -50,6 +52,8 @@ export const GenerateForm = () => {
       toast.success(`Generated ${posts.length} posts!`);
       // Clear the form
       setTopic("");
+      // Redirect to approve page
+      navigate("/approve");
     } catch (error) {
       console.error("Error generating posts:", error);
       toast.error("Failed to generate posts. Please try again.");

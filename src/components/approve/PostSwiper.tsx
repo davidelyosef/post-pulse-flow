@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PostCard } from "@/components/post/PostCard";
@@ -12,7 +12,7 @@ import { format } from "date-fns";
 import { Calendar as CalendarIcon, Loader2 } from "lucide-react";
 
 export const PostSwiper = () => {
-  const { pendingPosts, approvePost, rejectPost, updatePost, schedulePost } = usePostContext();
+  const { pendingPosts, approvePost, rejectPost, updatePost, schedulePost, generateImagePrompts } = usePostContext();
   
   const [currentPostIndex, setCurrentPostIndex] = useState(0);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -25,8 +25,26 @@ export const PostSwiper = () => {
 
   const currentPost = pendingPosts[currentPostIndex];
 
-  const handleApprove = () => {
+  useEffect(() => {
+    // Reset index if we've run out of posts
+    if (currentPostIndex >= pendingPosts.length && pendingPosts.length > 0) {
+      setCurrentPostIndex(pendingPosts.length - 1);
+    }
+  }, [pendingPosts, currentPostIndex]);
+
+  const handleApprove = async () => {
     if (!currentPost) return;
+    
+    // If post doesn't have image prompts yet, generate them
+    if (!currentPost.imagePrompts) {
+      try {
+        setIsGeneratingImage(true);
+        await generateImagePrompts(currentPost.id);
+      } finally {
+        setIsGeneratingImage(false);
+      }
+    }
+    
     approvePost(currentPost.id);
     goToNextPost();
   };
@@ -82,7 +100,7 @@ export const PostSwiper = () => {
 
   return (
     <>
-      <div className="relative h-[500px] w-full max-w-md mx-auto">
+      <div className="relative h-[600px] w-full max-w-md mx-auto">
         {currentPost && (
           <PostCard
             post={currentPost}
@@ -90,7 +108,7 @@ export const PostSwiper = () => {
             onReject={handleReject}
             onEdit={openEditDialog}
             onSchedule={openScheduleDialog}
-            className="h-full"
+            className="h-full overflow-auto"
           />
         )}
         
