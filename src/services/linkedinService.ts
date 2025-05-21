@@ -1,3 +1,4 @@
+
 import { toast } from "sonner";
 
 export const connectToLinkedIn = async (): Promise<boolean> => {
@@ -148,14 +149,14 @@ export const deletePostAPI = async (postId: string, userId: string): Promise<boo
   }
 };
 
-// New function to save image for a post
-export const saveImageAPI = async (
+// Function to save an approved post to the database
+export const saveApprovedPostAPI = async (
   imageUrl: string,
   description: string,
   userId: string
-): Promise<{ success: boolean; imageUrl?: string; post?: any }> => {
+): Promise<{ success: boolean; post?: any }> => {
   try {
-    console.log("Saving image for post:", { imageUrl, description, userId });
+    console.log("Saving approved post:", { imageUrl, description, userId });
     
     const response = await fetch("https://34.226.170.38:3000/api/generate/saveimage", {
       method: "POST",
@@ -170,20 +171,19 @@ export const saveImageAPI = async (
     });
     
     if (!response.ok) {
-      throw new Error(`Failed to save image with status: ${response.status}`);
+      throw new Error(`Failed to save post with status: ${response.status}`);
     }
     
     const data = await response.json();
-    console.log("Save image response:", data);
+    console.log("Save post response:", data);
     
     return {
       success: true,
-      imageUrl: data.post?.imageUrl || imageUrl,
       post: data.post
     };
   } catch (error) {
-    console.error("Error saving image:", error);
-    toast.error("Failed to save image. Please try again.");
+    console.error("Error saving approved post:", error);
+    toast.error("Failed to save post. Please try again.");
     return { success: false };
   }
 };

@@ -1,9 +1,10 @@
+
 import React, { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { Post } from "@/types";
 import { toast } from "sonner";
 import { 
   generateImage as generateImageService, 
-  saveImageAPI, 
+  saveApprovedPostAPI, 
   updatePostAPI, 
   deletePostAPI,
   getUserPosts, 
@@ -65,20 +66,28 @@ export const PostProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       )
     );
     
-    // Check if we have a LinkedIn connection and the post has an image
-    if (isLinkedInConnected() && post.imageUrl) {
+    // Check if we have a LinkedIn connection
+    if (isLinkedInConnected()) {
       const user = getLinkedInUser();
       if (user) {
         const userId = user.userId || user._id?.$oid || user.linkedinId || "";
         
-        // Call the API to save the image and post information
-        const result = await saveImageAPI(post.imageUrl, post.content, userId);
+        // Call the API to save the approved post
+        const result = await saveApprovedPostAPI(
+          post.imageUrl || "", 
+          post.content,
+          userId
+        );
         
-        // If successful and we got back an image URL, update the post with it
-        if (result.success && result.imageUrl) {
+        // If successful and we got back updated post data, update our local post
+        if (result.success && result.post) {
           setPosts((prevPosts) =>
             prevPosts.map((p) =>
-              p.id === id ? { ...p, imageUrl: result.imageUrl } : p
+              p.id === id ? { 
+                ...p, 
+                imageUrl: result.post.imageUrl || p.imageUrl,
+                // Update any other fields returned from the API if needed
+              } : p
             )
           );
         }
