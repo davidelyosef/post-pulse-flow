@@ -11,9 +11,12 @@ export const connectToLinkedIn = async (): Promise<boolean> => {
     // Store connection state in localStorage first
     localStorage.setItem("linkedinConnected", "true");
     localStorage.setItem("linkedinUser", JSON.stringify({
-      name: "Demo User",
+      displayName: "Demo User",
       position: "Professional at Company",
-      profileImage: "https://thispersondoesnotexist.com/",
+      profileUrl: "https://thispersondoesnotexist.com/",
+      email: "demo@demo.com",
+      linkedinId: "",
+      accessToken: "",
       connectedAt: new Date().toISOString()
     }));
 

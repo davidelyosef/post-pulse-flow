@@ -27,6 +27,12 @@ const GeneratePage = () => {
           const data = await response.json();
           console.log("LinkedIn user data:", data);
           setUserData(data);
+
+          // Store connection state in localStorage first
+          if (!isLinkedInConnected) {
+            localStorage.setItem("linkedinConnected", "true");
+            localStorage.setItem("linkedinUser", JSON.stringify(data));
+          }
         } catch (error) {
           console.error("Error fetching LinkedIn user data:", error);
         }
@@ -75,15 +81,15 @@ const GeneratePage = () => {
             {connected ? (
               <div className="flex flex-col items-center">
                 <div className="flex items-center gap-3 mb-3">
-                  {userData?.profileImage && (
+                  {userData?.profileUrl && (
                     <img 
-                      src={userData.profileImage} 
+                      src={userData.profileUrl} 
                       alt="Profile" 
                       className="w-10 h-10 rounded-full"
                     />
                   )}
                   <div className="text-left">
-                    <p className="font-medium">{userData?.name || "Connected User"}</p>
+                    <p className="font-medium">{userData?.displayName || "Connected User"}</p>
                     <p className="text-sm text-muted-foreground">{userData?.position || "LinkedIn User"}</p>
                   </div>
                 </div>
