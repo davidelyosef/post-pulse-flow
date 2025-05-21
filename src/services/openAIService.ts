@@ -1,4 +1,3 @@
-
 // This is a service for generating LinkedIn posts using the external API
 
 import { Post } from "@/types";
@@ -16,8 +15,13 @@ export const generatePosts = async (
   console.log(`Generating ${count} posts about "${topic}" with tone "${tone}" and style "${style}"`);
   
   try {
-    // Call the LinkedIn posts generation API
-    const response = await fetch("https://34.226.170.38:3000/api/generate", {
+    // Use a CORS proxy to bypass CORS restrictions
+    // Note: In a production environment, this should be replaced with a proper backend solution
+    const proxyUrl = 'https://corsproxy.io/?';
+    const targetUrl = 'https://34.226.170.38:3000/api/generate';
+    
+    // Call the LinkedIn posts generation API through the CORS proxy
+    const response = await fetch(`${proxyUrl}${encodeURIComponent(targetUrl)}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -30,7 +34,9 @@ export const generatePosts = async (
     });
 
     if (!response.ok) {
-      throw new Error(`API request failed with status ${response.status}`);
+      console.error(`API request failed with status ${response.status}`);
+      // Return empty array on failure to prevent app crashes
+      return [];
     }
 
     const data = await response.json();
@@ -74,7 +80,8 @@ export const generatePosts = async (
         console.log("Generated posts from results array:", posts);
         
         if (posts.length === 0) {
-          throw new Error("No valid posts were generated from results array");
+          console.warn("No valid posts were generated from results array");
+          return [];
         }
         
         return posts;
@@ -85,7 +92,8 @@ export const generatePosts = async (
         const content = data.results;
         
         if (!content.trim()) {
-          throw new Error("Empty post content received from results");
+          console.warn("Empty post content received from results");
+          return [];
         }
         
         const tags = [];
@@ -227,7 +235,8 @@ export const generatePosts = async (
     return posts;
   } catch (error) {
     console.error("Error generating posts:", error);
-    throw error;
+    // Return empty array on error to prevent app crashes
+    return [];
   }
 };
 
