@@ -11,6 +11,8 @@ export const connectToLinkedIn = async (): Promise<boolean> => {
     // Store connection state in localStorage first
     localStorage.setItem("linkedinConnected", "true");
     localStorage.setItem("linkedinUser", JSON.stringify({
+      userId: "",
+      user_id: "",
       displayName: "Demo User",
       position: "Professional at Company",
       profileUrl: "https://thispersondoesnotexist.com/",
@@ -108,10 +110,10 @@ export const publishPost = async (
     const requestBody = {
       content: content,
       visibility: "PUBLIC",
-      user_id: userData.linkedinId || "",
+      user_id: userData.userId || userData._id.$oid,
       data: "", // Optional additional data
       imageUrl: imageUrl || "",
-      userId: userData.linkedinId || "",
+      userId: userData.userId || userData._id.$oid,
       scheduleTime: new Date().toISOString(),
       createdAt: new Date().toISOString()
     };
