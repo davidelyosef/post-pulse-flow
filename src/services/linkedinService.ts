@@ -111,7 +111,7 @@ export const publishPost = async (
       user_id: userData.linkedinId || "",
       data: "", // Optional additional data
       imageUrl: imageUrl || "",
-      userId: "682c65e996c62a2bca89a8ba", // Using the same userId as in other requests
+      userId: userData.linkedinId || "",
       scheduleTime: new Date().toISOString(),
       createdAt: new Date().toISOString()
     };
