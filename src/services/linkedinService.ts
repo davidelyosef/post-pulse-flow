@@ -1,4 +1,3 @@
-
 import { toast } from "sonner";
 
 export const connectToLinkedIn = async (): Promise<boolean> => {
@@ -50,6 +49,103 @@ export const disconnectLinkedIn = (): void => {
   localStorage.removeItem("linkedinConnected");
   localStorage.removeItem("linkedinUser");
   toast.success("LinkedIn account disconnected");
+};
+
+// New function to get all posts for a user
+export const getUserPosts = async (userId: string): Promise<any> => {
+  try {
+    console.log("Fetching posts for user:", userId);
+    
+    const response = await fetch(`https://34.226.170.38:3000/api/generate/user/${userId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch user posts with status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    console.log("User posts response:", data);
+    
+    return data;
+  } catch (error) {
+    console.error("Error fetching user posts:", error);
+    toast.error("Failed to fetch user posts. Please try again.");
+    return { success: false, count: 0, posts: [] };
+  }
+};
+
+// Function to update a post via API
+export const updatePostAPI = async (
+  postId: string,
+  content: string,
+  userId: string,
+  imageUrl?: string,
+  scheduledTime?: Date
+): Promise<boolean> => {
+  try {
+    console.log("Updating post:", postId);
+    
+    const requestBody = {
+      description: content,
+      userId,
+      imageUrl: imageUrl || "",
+      scheduleTime: scheduledTime ? scheduledTime.toISOString() : new Date().toISOString()
+    };
+    
+    const response = await fetch(`https://34.226.170.38:3000/api/generate/update/${postId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(requestBody),
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to update post with status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    console.log("Update post response:", data);
+    
+    toast.success("Post updated successfully!");
+    return true;
+  } catch (error) {
+    console.error("Error updating post:", error);
+    toast.error("Failed to update post. Please try again.");
+    return false;
+  }
+};
+
+// Function to delete a post via API
+export const deletePostAPI = async (postId: string, userId: string): Promise<boolean> => {
+  try {
+    console.log("Deleting post:", postId);
+    
+    const response = await fetch(`https://34.226.170.38:3000/api/generate/delete/${postId}?userId=${userId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to delete post with status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    console.log("Delete post response:", data);
+    
+    toast.success("Post deleted successfully!");
+    return true;
+  } catch (error) {
+    console.error("Error deleting post:", error);
+    toast.error("Failed to delete post. Please try again.");
+    return false;
+  }
 };
 
 // New function to generate an image based on a prompt

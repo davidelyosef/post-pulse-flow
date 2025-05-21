@@ -1,50 +1,70 @@
 
 import { useEffect } from "react";
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
-import GeneratePage from "./pages/GeneratePage";
-import ApprovePage from "./pages/ApprovePage";
-import SchedulePage from "./pages/SchedulePage";
-import NotFound from "./pages/NotFound";
-import { PostProvider } from "./contexts/PostContext";
-import { ThemeProvider } from "./components/theme/ThemeProvider";
+import { Toaster } from "sonner";
 
-const queryClient = new QueryClient();
+import ApprovePage from "@/pages/ApprovePage";
+import GeneratePage from "@/pages/GeneratePage";
+import IndexPage from "@/pages/Index";
+import NotFound from "@/pages/NotFound";
+import SchedulePage from "@/pages/SchedulePage";
+import { ThemeProvider } from "@/components/theme/ThemeProvider";
+import { PostProvider, usePostContext } from "@/contexts/PostContext";
+import { isLinkedInConnected } from "@/services/linkedinService";
+
+// Function to initialize LinkedIn-related functionality
+const AppInitializer = () => {
+  const { fetchUserPosts } = usePostContext();
+  
+  useEffect(() => {
+    // Check if user is connected to LinkedIn and fetch their posts if so
+    if (isLinkedInConnected()) {
+      fetchUserPosts();
+    }
+    
+    // Set up an interval to check local storage for connection changes
+    const checkConnectionInterval = setInterval(() => {
+      const wasConnected = localStorage.getItem("wasLinkedInConnected") === "true";
+      const isConnected = isLinkedInConnected();
+      
+      // If connection status changed from disconnected to connected
+      if (!wasConnected && isConnected) {
+        fetchUserPosts();
+        localStorage.setItem("wasLinkedInConnected", "true");
+      } else if (wasConnected && !isConnected) {
+        // Update the tracking variable if disconnected
+        localStorage.setItem("wasLinkedInConnected", "false");
+      }
+    }, 5000);
+    
+    // Initialize wasLinkedInConnected in localStorage
+    localStorage.setItem("wasLinkedInConnected", isLinkedInConnected() ? "true" : "false");
+    
+    return () => {
+      clearInterval(checkConnectionInterval);
+    };
+  }, [fetchUserPosts]);
+  
+  return null;
+};
 
 const App = () => {
-  useEffect(() => {
-    // Set document title
-    document.title = "LinkedAI";
-    
-    // Clean up by removing any Lovable badges
-    const badges = document.querySelectorAll('[data-lovable-badge]');
-    badges.forEach(badge => badge.remove());
-  }, []);
-  
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="system">
-        <TooltipProvider>
-          <PostProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/generate" element={<GeneratePage />} />
-                <Route path="/approve" element={<ApprovePage />} />
-                <Route path="/schedule" element={<SchedulePage />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
-          </PostProvider>
-        </TooltipProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
+    <ThemeProvider>
+      <PostProvider>
+        <BrowserRouter>
+          <AppInitializer />
+          <Routes>
+            <Route path="/" element={<IndexPage />} />
+            <Route path="/generate" element={<GeneratePage />} />
+            <Route path="/approve" element={<ApprovePage />} />
+            <Route path="/schedule" element={<SchedulePage />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+        <Toaster richColors closeButton position="top-right" />
+      </PostProvider>
+    </ThemeProvider>
   );
 };
 

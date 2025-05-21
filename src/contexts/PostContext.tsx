@@ -1,8 +1,15 @@
 
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { Post } from "@/types";
 import { toast } from "sonner";
-import { generateImage as generateImageService } from "@/services/linkedinService";
+import { 
+  generateImage as generateImageService, 
+  updatePostAPI, 
+  deletePostAPI,
+  getUserPosts, 
+  getLinkedInUser, 
+  isLinkedInConnected 
+} from "@/services/linkedinService";
 
 interface PostContextType {
   posts: Post[];
@@ -19,6 +26,7 @@ interface PostContextType {
   generateImagePrompts: (id: string) => Promise<string[]>;
   selectImagePrompt: (id: string, prompt: string) => void;
   generateImage: (id: string, prompt: string) => Promise<string>;
+  fetchUserPosts: () => Promise<void>;
 }
 
 const PostContext = createContext<PostContextType | undefined>(undefined);
@@ -30,6 +38,13 @@ export const PostProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const pendingPosts = posts.filter((post) => post.status === "pending");
   const approvedPosts = posts.filter((post) => post.status === "approved");
   const rejectedPosts = posts.filter((post) => post.status === "rejected");
+  
+  // Fetch user posts when component mounts
+  useEffect(() => {
+    if (isLinkedInConnected()) {
+      fetchUserPosts();
+    }
+  }, []);
 
   const addPost = (post: Post) => {
     setPosts((prevPosts) => [...prevPosts, post]);
@@ -57,27 +72,124 @@ export const PostProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     toast.info("Post rejected");
   };
 
-  const updatePost = (id: string, updatedPost: Partial<Post>) => {
+  const updatePost = async (id: string, updatedPost: Partial<Post>) => {
+    // Update local state first
     setPosts((prevPosts) =>
       prevPosts.map((post) =>
         post.id === id ? { ...post, ...updatedPost } : post
       )
     );
+    
+    // Then call API to update post if connected to LinkedIn
+    if (isLinkedInConnected()) {
+      const user = getLinkedInUser();
+      if (user) {
+        const post = posts.find(p => p.id === id);
+        if (post) {
+          const userId = user.userId || user._id?.$oid || user.linkedinId || "";
+          await updatePostAPI(
+            id, 
+            updatedPost.content || post.content, 
+            userId,
+            updatedPost.imageUrl || post.imageUrl,
+            updatedPost.scheduledFor || post.scheduledFor
+          );
+        }
+      }
+    }
+    
     toast.success("Post updated");
   };
 
-  const deletePost = (id: string) => {
+  const deletePost = async (id: string) => {
+    // If connected to LinkedIn, call API to delete post
+    if (isLinkedInConnected()) {
+      const user = getLinkedInUser();
+      if (user) {
+        const userId = user.userId || user._id?.$oid || user.linkedinId || "";
+        await deletePostAPI(id, userId);
+      }
+    }
+    
+    // Update local state after API call (regardless of result)
     setPosts((prevPosts) => prevPosts.filter((post) => post.id !== id));
     toast.info("Post deleted");
   };
 
-  const schedulePost = (id: string, date: Date) => {
+  const schedulePost = async (id: string, date: Date) => {
+    // Update local state first
     setPosts((prevPosts) =>
       prevPosts.map((post) =>
         post.id === id ? { ...post, scheduledFor: date } : post
       )
     );
+    
+    // Call API to update post with new schedule time if connected
+    if (isLinkedInConnected()) {
+      const user = getLinkedInUser();
+      if (user) {
+        const post = posts.find(p => p.id === id);
+        if (post) {
+          const userId = user.userId || user._id?.$oid || user.linkedinId || "";
+          await updatePostAPI(
+            id, 
+            post.content, 
+            userId,
+            post.imageUrl,
+            date
+          );
+        }
+      }
+    }
+    
     toast.success("Post scheduled");
+  };
+
+  // Fetch user posts from API
+  const fetchUserPosts = async (): Promise<void> => {
+    if (!isLinkedInConnected()) return;
+    
+    const user = getLinkedInUser();
+    if (!user) return;
+    
+    const userId = user.userId || user._id?.$oid || user.linkedinId || "";
+    if (!userId) {
+      console.error("No user ID found in LinkedIn user data");
+      return;
+    }
+    
+    try {
+      const result = await getUserPosts(userId);
+      
+      if (result.success && Array.isArray(result.posts) && result.posts.length > 0) {
+        // Transform API posts to our Post format
+        const apiPosts = result.posts.map((apiPost: any) => ({
+          id: apiPost._id || apiPost.id || String(Math.random()),
+          content: apiPost.content || apiPost.description || "",
+          createdAt: new Date(apiPost.createdAt || Date.now()),
+          scheduledFor: apiPost.scheduleTime ? new Date(apiPost.scheduleTime) : undefined,
+          tags: apiPost.tags || [],
+          status: "approved",
+          imageUrl: apiPost.imageUrl || "",
+        }));
+        
+        // Add retrieved posts to state
+        setPosts(prevPosts => {
+          // Filter out duplicates by checking IDs
+          const existingIds = new Set(prevPosts.map(post => post.id));
+          const newPosts = apiPosts.filter(post => !existingIds.has(post.id));
+          
+          return [...prevPosts, ...newPosts];
+        });
+        
+        if (apiPosts.length > 0) {
+          toast.success(`Loaded ${apiPosts.length} posts from your account`);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching user posts:", error);
+      toast.error("Failed to load your posts");
+    }
   };
 
   // Mock function that would call an API to generate image prompts
@@ -175,6 +287,7 @@ export const PostProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     generateImagePrompts,
     selectImagePrompt,
     generateImage,
+    fetchUserPosts,
   };
 
   return <PostContext.Provider value={value}>{children}</PostContext.Provider>;
