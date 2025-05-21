@@ -1,4 +1,3 @@
-
 import { toast } from "sonner";
 
 export const connectToLinkedIn = async (): Promise<boolean> => {
@@ -62,16 +61,7 @@ export const getUserPosts = async (userId: string): Promise<any> => {
       headers: {
         "Content-Type": "application/json",
       }
-    }).catch(error => {
-      console.error("Network error fetching posts:", error);
-      return null;
     });
-    
-    // If fetch failed completely, return empty response
-    if (!response) {
-      console.log("Fetch failed, returning empty posts array");
-      return { success: false, count: 0, posts: [] };
-    }
     
     if (!response.ok) {
       throw new Error(`Failed to fetch user posts with status: ${response.status}`);
@@ -83,8 +73,7 @@ export const getUserPosts = async (userId: string): Promise<any> => {
     return data;
   } catch (error) {
     console.error("Error fetching user posts:", error);
-    toast.error("Failed to fetch user posts");
-    // Return empty array on error to prevent app from crashing
+    toast.error("Failed to fetch user posts. Please try again.");
     return { success: false, count: 0, posts: [] };
   }
 };
@@ -156,45 +145,6 @@ export const deletePostAPI = async (postId: string, userId: string): Promise<boo
     console.error("Error deleting post:", error);
     toast.error("Failed to delete post. Please try again.");
     return false;
-  }
-};
-
-// Function to save an approved post to the database
-export const saveApprovedPostAPI = async (
-  imageUrl: string,
-  description: string,
-  userId: string
-): Promise<{ success: boolean; post?: any }> => {
-  try {
-    console.log("Saving approved post:", { imageUrl, description, userId });
-    
-    const response = await fetch("https://34.226.170.38:3000/api/generate/saveimage", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        imageUrl,
-        description,
-        userId
-      }),
-    });
-    
-    if (!response.ok) {
-      throw new Error(`Failed to save post with status: ${response.status}`);
-    }
-    
-    const data = await response.json();
-    console.log("Save post response:", data);
-    
-    return {
-      success: true,
-      post: data.post
-    };
-  } catch (error) {
-    console.error("Error saving approved post:", error);
-    toast.error("Failed to save post. Please try again.");
-    return { success: false };
   }
 };
 

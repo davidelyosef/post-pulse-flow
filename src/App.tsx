@@ -19,34 +19,21 @@ const AppInitializer = () => {
   useEffect(() => {
     // Check if user is connected to LinkedIn and fetch their posts if so
     if (isLinkedInConnected()) {
-      try {
-        fetchUserPosts().catch(error => {
-          console.error("Error fetching user posts in AppInitializer:", error);
-          // Error is handled inside fetchUserPosts, no need to handle it here
-        });
-      } catch (error) {
-        console.error("Unexpected error in AppInitializer:", error);
-      }
+      fetchUserPosts();
     }
     
     // Set up an interval to check local storage for connection changes
     const checkConnectionInterval = setInterval(() => {
-      try {
-        const wasConnected = localStorage.getItem("wasLinkedInConnected") === "true";
-        const isConnected = isLinkedInConnected();
-        
-        // If connection status changed from disconnected to connected
-        if (!wasConnected && isConnected) {
-          fetchUserPosts().catch(error => {
-            console.error("Error fetching user posts in interval:", error);
-          });
-          localStorage.setItem("wasLinkedInConnected", "true");
-        } else if (wasConnected && !isConnected) {
-          // Update the tracking variable if disconnected
-          localStorage.setItem("wasLinkedInConnected", "false");
-        }
-      } catch (error) {
-        console.error("Error in connection check interval:", error);
+      const wasConnected = localStorage.getItem("wasLinkedInConnected") === "true";
+      const isConnected = isLinkedInConnected();
+      
+      // If connection status changed from disconnected to connected
+      if (!wasConnected && isConnected) {
+        fetchUserPosts();
+        localStorage.setItem("wasLinkedInConnected", "true");
+      } else if (wasConnected && !isConnected) {
+        // Update the tracking variable if disconnected
+        localStorage.setItem("wasLinkedInConnected", "false");
       }
     }, 5000);
     

@@ -1,9 +1,9 @@
+
 import React, { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { Post } from "@/types";
 import { toast } from "sonner";
 import { 
   generateImage as generateImageService, 
-  saveApprovedPostAPI, 
   updatePostAPI, 
   deletePostAPI,
   getUserPosts, 
@@ -42,9 +42,7 @@ export const PostProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   // Fetch user posts when component mounts
   useEffect(() => {
     if (isLinkedInConnected()) {
-      fetchUserPosts().catch(error => {
-        console.error("Error in initial posts fetch:", error);
-      });
+      fetchUserPosts();
     }
   }, []);
 
@@ -56,45 +54,12 @@ export const PostProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setPosts((prevPosts) => [...prevPosts, ...newPosts]);
   };
 
-  const approvePost = async (id: string) => {
-    const post = posts.find(p => p.id === id);
-    if (!post) return;
-
-    // First update local state to provide immediate feedback
+  const approvePost = (id: string) => {
     setPosts((prevPosts) =>
       prevPosts.map((post) =>
         post.id === id ? { ...post, status: "approved" } : post
       )
     );
-    
-    // Check if we have a LinkedIn connection
-    if (isLinkedInConnected()) {
-      const user = getLinkedInUser();
-      if (user) {
-        const userId = user.userId || user._id?.$oid || user.linkedinId || "";
-        
-        // Call the API to save the approved post
-        const result = await saveApprovedPostAPI(
-          post.imageUrl || "", 
-          post.content,
-          userId
-        );
-        
-        // If successful and we got back updated post data, update our local post
-        if (result.success && result.post) {
-          setPosts((prevPosts) =>
-            prevPosts.map((p) =>
-              p.id === id ? { 
-                ...p, 
-                imageUrl: result.post.imageUrl || p.imageUrl,
-                // Update any other fields returned from the API if needed
-              } : p
-            )
-          );
-        }
-      }
-    }
-    
     toast.success("Post approved");
   };
 
@@ -196,7 +161,7 @@ export const PostProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       const result = await getUserPosts(userId);
       
-      if (result && result.success && Array.isArray(result.posts) && result.posts.length > 0) {
+      if (result.success && Array.isArray(result.posts) && result.posts.length > 0) {
         // Transform API posts to our Post format
         const apiPosts = result.posts.map((apiPost: any) => ({
           id: apiPost._id || apiPost.id || String(Math.random()),
@@ -220,13 +185,10 @@ export const PostProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         if (apiPosts.length > 0) {
           toast.success(`Loaded ${apiPosts.length} posts from your account`);
         }
-      } else {
-        console.log("No posts found or invalid response format:", result);
       }
     } catch (error) {
       console.error("Error fetching user posts:", error);
-      // Don't show an error toast here since we already show one in getUserPosts
-      // Just silently handle the error to prevent app crash
+      toast.error("Failed to load your posts");
     }
   };
 
