@@ -1,3 +1,4 @@
+
 // This is a service for generating LinkedIn posts using the external API
 
 import { Post } from "@/types";
@@ -15,13 +16,8 @@ export const generatePosts = async (
   console.log(`Generating ${count} posts about "${topic}" with tone "${tone}" and style "${style}"`);
   
   try {
-    // Use a different approach - try HTTP instead of HTTPS and a different proxy
-    // Note: In a production environment, this should be replaced with a proper backend solution
-    const apiUrl = 'http://34.226.170.38:3000/api/generate';
-    const proxyUrl = 'https://api.allorigins.win/raw?url=';
-    
-    // Call the LinkedIn posts generation API through the CORS proxy
-    const response = await fetch(`${proxyUrl}${encodeURIComponent(apiUrl)}`, {
+    // Call the LinkedIn posts generation API
+    const response = await fetch("https://34.226.170.38:3000/api/generate", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -34,9 +30,7 @@ export const generatePosts = async (
     });
 
     if (!response.ok) {
-      console.error(`API request failed with status ${response.status}`);
-      // Return empty array on failure to prevent app crashes
-      return [];
+      throw new Error(`API request failed with status ${response.status}`);
     }
 
     const data = await response.json();
@@ -80,8 +74,7 @@ export const generatePosts = async (
         console.log("Generated posts from results array:", posts);
         
         if (posts.length === 0) {
-          console.warn("No valid posts were generated from results array");
-          return [];
+          throw new Error("No valid posts were generated from results array");
         }
         
         return posts;
@@ -92,8 +85,7 @@ export const generatePosts = async (
         const content = data.results;
         
         if (!content.trim()) {
-          console.warn("Empty post content received from results");
-          return [];
+          throw new Error("Empty post content received from results");
         }
         
         const tags = [];
@@ -151,8 +143,7 @@ export const generatePosts = async (
           console.log("Generated posts from results object array:", posts);
           
           if (posts.length === 0) {
-            console.warn("No valid posts were generated from results object array");
-            return [];
+            throw new Error("No valid posts were generated from results object array");
           }
           
           return posts;
@@ -192,7 +183,7 @@ export const generatePosts = async (
     
     if (postsContent.length === 0) {
       console.error("Could not extract post content from API response");
-      return [];
+      throw new Error("Invalid response format from API");
     }
     
     // Map the processed content to our Post type
@@ -230,14 +221,13 @@ export const generatePosts = async (
     console.log("Generated posts (fallback):", posts);
     
     if (posts.length === 0) {
-      return [];
+      throw new Error("No valid posts were generated");
     }
     
     return posts;
   } catch (error) {
     console.error("Error generating posts:", error);
-    // Return empty array on error to prevent app crashes
-    return [];
+    throw error;
   }
 };
 
