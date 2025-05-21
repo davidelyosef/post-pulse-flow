@@ -1,9 +1,9 @@
-
 import React, { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { Post } from "@/types";
 import { toast } from "sonner";
 import { 
   generateImage as generateImageService, 
+  saveImageAPI, 
   updatePostAPI, 
   deletePostAPI,
   getUserPosts, 
@@ -54,12 +54,37 @@ export const PostProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setPosts((prevPosts) => [...prevPosts, ...newPosts]);
   };
 
-  const approvePost = (id: string) => {
+  const approvePost = async (id: string) => {
+    const post = posts.find(p => p.id === id);
+    if (!post) return;
+
+    // First update local state to provide immediate feedback
     setPosts((prevPosts) =>
       prevPosts.map((post) =>
         post.id === id ? { ...post, status: "approved" } : post
       )
     );
+    
+    // Check if we have a LinkedIn connection and the post has an image
+    if (isLinkedInConnected() && post.imageUrl) {
+      const user = getLinkedInUser();
+      if (user) {
+        const userId = user.userId || user._id?.$oid || user.linkedinId || "";
+        
+        // Call the API to save the image and post information
+        const result = await saveImageAPI(post.imageUrl, post.content, userId);
+        
+        // If successful and we got back an image URL, update the post with it
+        if (result.success && result.imageUrl) {
+          setPosts((prevPosts) =>
+            prevPosts.map((p) =>
+              p.id === id ? { ...p, imageUrl: result.imageUrl } : p
+            )
+          );
+        }
+      }
+    }
+    
     toast.success("Post approved");
   };
 

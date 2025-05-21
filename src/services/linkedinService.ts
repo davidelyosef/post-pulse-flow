@@ -148,6 +148,46 @@ export const deletePostAPI = async (postId: string, userId: string): Promise<boo
   }
 };
 
+// New function to save image for a post
+export const saveImageAPI = async (
+  imageUrl: string,
+  description: string,
+  userId: string
+): Promise<{ success: boolean; imageUrl?: string; post?: any }> => {
+  try {
+    console.log("Saving image for post:", { imageUrl, description, userId });
+    
+    const response = await fetch("https://34.226.170.38:3000/api/generate/saveimage", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        imageUrl,
+        description,
+        userId
+      }),
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to save image with status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    console.log("Save image response:", data);
+    
+    return {
+      success: true,
+      imageUrl: data.post?.imageUrl || imageUrl,
+      post: data.post
+    };
+  } catch (error) {
+    console.error("Error saving image:", error);
+    toast.error("Failed to save image. Please try again.");
+    return { success: false };
+  }
+};
+
 // New function to generate an image based on a prompt
 export const generateImage = async (prompt: string, content: string): Promise<string | null> => {
   try {
