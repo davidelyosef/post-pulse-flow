@@ -96,13 +96,48 @@ export const publishPost = async (
   console.log("Publishing to LinkedIn:", { content, imageUrl });
   
   try {
-    // Mock successful publishing
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        toast.success("Post published to LinkedIn successfully!");
-        resolve(true);
-      }, 1500);
+    // Get user data from localStorage
+    const userData = getLinkedInUser();
+    
+    if (!userData) {
+      toast.error("LinkedIn user data not found. Please reconnect your account.");
+      return false;
+    }
+    
+    // Prepare request body
+    const requestBody = {
+      content: content,
+      visibility: "PUBLIC",
+      user_id: userData.linkedinId || "",
+      data: "", // Optional additional data
+      imageUrl: imageUrl || "",
+      userId: "682c65e996c62a2bca89a8ba", // Using the same userId as in other requests
+      scheduleTime: new Date().toISOString(),
+      createdAt: new Date().toISOString()
+    };
+    
+    console.log("Sending LinkedIn post request:", requestBody);
+    
+    // Make POST request to publish endpoint
+    const response = await fetch("https://34.226.170.38:3000/api/linkedin/create", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(requestBody),
     });
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      console.error("LinkedIn publishing error:", response.status, errorData);
+      throw new Error(`Failed to publish with status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    console.log("LinkedIn publish response:", data);
+    
+    toast.success("Post published to LinkedIn successfully!");
+    return true;
   } catch (error) {
     console.error("LinkedIn publishing error:", error);
     toast.error("Failed to publish to LinkedIn. Please try again.");
