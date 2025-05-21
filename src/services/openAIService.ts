@@ -15,13 +15,13 @@ export const generatePosts = async (
   console.log(`Generating ${count} posts about "${topic}" with tone "${tone}" and style "${style}"`);
   
   try {
-    // Use a CORS proxy to bypass CORS restrictions
+    // Use a different approach - try HTTP instead of HTTPS and a different proxy
     // Note: In a production environment, this should be replaced with a proper backend solution
-    const proxyUrl = 'https://corsproxy.io/?';
-    const targetUrl = 'https://34.226.170.38:3000/api/generate';
+    const apiUrl = 'http://34.226.170.38:3000/api/generate';
+    const proxyUrl = 'https://api.allorigins.win/raw?url=';
     
     // Call the LinkedIn posts generation API through the CORS proxy
-    const response = await fetch(`${proxyUrl}${encodeURIComponent(targetUrl)}`, {
+    const response = await fetch(`${proxyUrl}${encodeURIComponent(apiUrl)}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -151,7 +151,8 @@ export const generatePosts = async (
           console.log("Generated posts from results object array:", posts);
           
           if (posts.length === 0) {
-            throw new Error("No valid posts were generated from results object array");
+            console.warn("No valid posts were generated from results object array");
+            return [];
           }
           
           return posts;
@@ -191,7 +192,7 @@ export const generatePosts = async (
     
     if (postsContent.length === 0) {
       console.error("Could not extract post content from API response");
-      throw new Error("Invalid response format from API");
+      return [];
     }
     
     // Map the processed content to our Post type
@@ -229,7 +230,7 @@ export const generatePosts = async (
     console.log("Generated posts (fallback):", posts);
     
     if (posts.length === 0) {
-      throw new Error("No valid posts were generated");
+      return [];
     }
     
     return posts;
