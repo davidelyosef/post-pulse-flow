@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { PostCard } from "@/components/post/PostCard";
 import { usePostContext } from "@/contexts/PostContext";
 import { SwipeableCard } from "./SwipeableCard";
@@ -19,12 +18,16 @@ export const PostSwiper = () => {
   // For image generation
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   
-  const currentPost = pendingPosts[currentPostIndex];
-
-  // Reset index if we've run out of posts
-  if (currentPostIndex >= pendingPosts.length && pendingPosts.length > 0) {
-    setCurrentPostIndex(pendingPosts.length - 1);
-  }
+  // This effect ensures the currentPostIndex stays within bounds when posts change
+  useEffect(() => {
+    if (pendingPosts.length > 0 && currentPostIndex >= pendingPosts.length) {
+      setCurrentPostIndex(pendingPosts.length - 1);
+    } else if (pendingPosts.length === 0) {
+      setCurrentPostIndex(0);
+    }
+  }, [pendingPosts, currentPostIndex]);
+  
+  const currentPost = pendingPosts.length > 0 ? pendingPosts[currentPostIndex] : null;
 
   const handleApprove = async () => {
     if (!currentPost) return;
@@ -42,11 +45,18 @@ export const PostSwiper = () => {
     // Store the current post's ID before approval
     const currentPostId = currentPost.id;
     
+    // Keep track of the current index
+    const currentIndex = currentPostIndex;
+    
     // Approve the post
     approvePost(currentPostId);
     
-    // After approving, we don't need to increment the index
-    // because the next post will "slide in" to the current position
+    // Adjust the index if needed
+    if (currentIndex >= pendingPosts.length - 1) {
+      // If it was the last post, go to the new last post
+      setCurrentPostIndex(Math.max(0, pendingPosts.length - 2));
+    }
+    // If it wasn't the last post, index stays the same as next post slides in
   };
 
   const handleReject = () => {
@@ -55,11 +65,18 @@ export const PostSwiper = () => {
     // Store the current post's ID before rejection
     const currentPostId = currentPost.id;
     
+    // Keep track of the current index
+    const currentIndex = currentPostIndex;
+    
     // Reject the post
     rejectPost(currentPostId);
     
-    // Similar logic as handleApprove
-    // The post will be removed from pendingPosts after rejection
+    // Adjust the index if needed
+    if (currentIndex >= pendingPosts.length - 1) {
+      // If it was the last post, go to the new last post
+      setCurrentPostIndex(Math.max(0, pendingPosts.length - 2));
+    }
+    // If it wasn't the last post, index stays the same as next post slides in
   };
 
   const handleEditSave = (content: string, tags: string[]) => {
