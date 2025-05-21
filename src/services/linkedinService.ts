@@ -62,7 +62,16 @@ export const getUserPosts = async (userId: string): Promise<any> => {
       headers: {
         "Content-Type": "application/json",
       }
+    }).catch(error => {
+      console.error("Network error fetching posts:", error);
+      return null;
     });
+    
+    // If fetch failed completely, return empty response
+    if (!response) {
+      console.log("Fetch failed, returning empty posts array");
+      return { success: false, count: 0, posts: [] };
+    }
     
     if (!response.ok) {
       throw new Error(`Failed to fetch user posts with status: ${response.status}`);
@@ -74,7 +83,8 @@ export const getUserPosts = async (userId: string): Promise<any> => {
     return data;
   } catch (error) {
     console.error("Error fetching user posts:", error);
-    toast.error("Failed to fetch user posts. Please try again.");
+    toast.error("Failed to fetch user posts");
+    // Return empty array on error to prevent app from crashing
     return { success: false, count: 0, posts: [] };
   }
 };

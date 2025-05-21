@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { Post } from "@/types";
 import { toast } from "sonner";
@@ -43,7 +42,9 @@ export const PostProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   // Fetch user posts when component mounts
   useEffect(() => {
     if (isLinkedInConnected()) {
-      fetchUserPosts();
+      fetchUserPosts().catch(error => {
+        console.error("Error in initial posts fetch:", error);
+      });
     }
   }, []);
 
@@ -195,7 +196,7 @@ export const PostProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       const result = await getUserPosts(userId);
       
-      if (result.success && Array.isArray(result.posts) && result.posts.length > 0) {
+      if (result && result.success && Array.isArray(result.posts) && result.posts.length > 0) {
         // Transform API posts to our Post format
         const apiPosts = result.posts.map((apiPost: any) => ({
           id: apiPost._id || apiPost.id || String(Math.random()),
@@ -219,10 +220,13 @@ export const PostProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         if (apiPosts.length > 0) {
           toast.success(`Loaded ${apiPosts.length} posts from your account`);
         }
+      } else {
+        console.log("No posts found or invalid response format:", result);
       }
     } catch (error) {
       console.error("Error fetching user posts:", error);
-      toast.error("Failed to load your posts");
+      // Don't show an error toast here since we already show one in getUserPosts
+      // Just silently handle the error to prevent app crash
     }
   };
 
