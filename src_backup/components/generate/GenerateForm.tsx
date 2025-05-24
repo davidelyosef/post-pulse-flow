@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,18 +39,18 @@ export const GenerateForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    
     if (!topic.trim()) {
       toast.error("Please enter a topic");
       return;
     }
 
     setIsLoading(true);
-
+    
     try {
       // Pass the parameters to the generatePosts function
       const posts = await generatePosts(count, topic, tone, style);
-
+      
       // Validate posts before adding to context
       if (posts && Array.isArray(posts) && posts.length > 0) {
         console.log("Adding posts to context:", posts);
@@ -84,7 +85,7 @@ export const GenerateForm = () => {
           required
         />
       </div>
-
+      
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="count">Number of posts to generate</Label>
@@ -97,7 +98,7 @@ export const GenerateForm = () => {
             onChange={(e) => setCount(Math.min(5, Math.max(1, parseInt(e.target.value) || 1)))}
           />
         </div>
-
+        
         <div className="space-y-2">
           <Label htmlFor="tone">Writing tone</Label>
           <Select value={tone} onValueChange={setTone}>
@@ -113,7 +114,7 @@ export const GenerateForm = () => {
             </SelectContent>
           </Select>
         </div>
-
+        
         <div className="space-y-2 md:col-span-2">
           <Label htmlFor="style">Writing style</Label>
           <Select value={style} onValueChange={setStyle}>
@@ -130,7 +131,7 @@ export const GenerateForm = () => {
           </Select>
         </div>
       </div>
-
+      
       <Button type="submit" className="w-full" disabled={isLoading}>
         {isLoading ? (
           <>

@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -18,29 +19,12 @@ const App = () => {
   useEffect(() => {
     // Set document title
     document.title = "LinkedAI";
-
+    
     // Clean up by removing any Lovable badges
-    const badges = document.querySelectorAll("[data-lovable-badge]");
-    badges.forEach((badge) => badge.remove());
+    const badges = document.querySelectorAll('[data-lovable-badge]');
+    badges.forEach(badge => badge.remove());
   }, []);
-
-  useEffect(() => {
-    const init = async () => {
-      try {
-        const response = await fetch("https://34.226.170.38:3000/api/auth/success", { credentials: "include" });
-        const data = await response.json();
-        if (data && data.user) {
-          localStorage.setItem("linkedinUser", JSON.stringify(data.user));
-          localStorage.setItem("linkedinConnected", "true");
-        }
-      } catch (error) {
-        console.error("Error fetching LinkedIn user data:", error);
-      }
-    };
-
-    init();
-  }, []);
-
+  
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="system">

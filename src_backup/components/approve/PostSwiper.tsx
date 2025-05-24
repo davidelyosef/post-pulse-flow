@@ -7,18 +7,17 @@ import { ScheduleDialog } from "./ScheduleDialog";
 import { EmptyPostsView } from "./EmptyPostsView";
 import { PostSwiperCounter } from "./PostSwiperCounter";
 import { SwipeInstructions } from "./SwipeInstructions";
-import { toast } from "sonner";
 
 export const PostSwiper = () => {
   const { pendingPosts, approvePost, rejectPost, updatePost, schedulePost, generateImagePrompts } = usePostContext();
-
+  
   const [currentPostIndex, setCurrentPostIndex] = useState(0);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [scheduleDialogOpen, setScheduleDialogOpen] = useState(false);
-
+  
   // For image generation
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
-
+  
   // This effect ensures the currentPostIndex stays within bounds when posts change
   useEffect(() => {
     if (pendingPosts.length > 0 && currentPostIndex >= pendingPosts.length) {
@@ -27,36 +26,12 @@ export const PostSwiper = () => {
       setCurrentPostIndex(0);
     }
   }, [pendingPosts, currentPostIndex]);
-
+  
   const currentPost = pendingPosts.length > 0 ? pendingPosts[currentPostIndex] : null;
 
   const handleApprove = async () => {
     if (!currentPost) return;
-
-    let user: any = localStorage.getItem("linkedinUser");
-
-    if (!user) {
-      toast.error("Please connect to LinkedIn first");
-      return;
-    } else {
-      user = JSON.parse(user);
-    }
-
-    try {
-      const response = await fetch("https://34.226.170.38:3000/api/generate/saveimage", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          description: currentPost.content,
-          userId: user.id,
-        }),
-      });
-    } catch (err) {
-      console.log("Error approving post", err);
-    }
-
+    
     // If post doesn't have image prompts yet, generate them
     if (!currentPost.imagePrompts) {
       try {
@@ -66,16 +41,16 @@ export const PostSwiper = () => {
         setIsGeneratingImage(false);
       }
     }
-
+    
     // Store the current post's ID before approval
     const currentPostId = currentPost.id;
-
+    
     // Keep track of the current index
     const currentIndex = currentPostIndex;
-
+    
     // Approve the post
     approvePost(currentPostId);
-
+    
     // Adjust the index if needed
     if (currentIndex >= pendingPosts.length - 1) {
       // If it was the last post, go to the new last post
@@ -86,16 +61,16 @@ export const PostSwiper = () => {
 
   const handleReject = () => {
     if (!currentPost) return;
-
+    
     // Store the current post's ID before rejection
     const currentPostId = currentPost.id;
-
+    
     // Keep track of the current index
     const currentIndex = currentPostIndex;
-
+    
     // Reject the post
     rejectPost(currentPostId);
-
+    
     // Adjust the index if needed
     if (currentIndex >= pendingPosts.length - 1) {
       // If it was the last post, go to the new last post
@@ -125,7 +100,10 @@ export const PostSwiper = () => {
     <>
       <div className="relative h-[600px] w-full max-w-md mx-auto">
         {currentPost && (
-          <SwipeableCard onSwipeLeft={handleReject} onSwipeRight={handleApprove}>
+          <SwipeableCard
+            onSwipeLeft={handleReject}
+            onSwipeRight={handleApprove}
+          >
             <PostCard
               post={currentPost}
               onApprove={handleApprove}
@@ -136,15 +114,27 @@ export const PostSwiper = () => {
             />
           </SwipeableCard>
         )}
-
-        <PostSwiperCounter currentIndex={currentPostIndex} totalCount={pendingPosts.length} />
+        
+        <PostSwiperCounter 
+          currentIndex={currentPostIndex} 
+          totalCount={pendingPosts.length} 
+        />
       </div>
 
       <SwipeInstructions show={pendingPosts.length > 0} />
 
-      <EditPostDialog post={currentPost} isOpen={editDialogOpen} onClose={() => setEditDialogOpen(false)} onSave={handleEditSave} />
+      <EditPostDialog
+        post={currentPost} 
+        isOpen={editDialogOpen}
+        onClose={() => setEditDialogOpen(false)}
+        onSave={handleEditSave}
+      />
 
-      <ScheduleDialog isOpen={scheduleDialogOpen} onClose={() => setScheduleDialogOpen(false)} onSave={handleScheduleSave} />
+      <ScheduleDialog
+        isOpen={scheduleDialogOpen}
+        onClose={() => setScheduleDialogOpen(false)}
+        onSave={handleScheduleSave}
+      />
     </>
   );
 };

@@ -1,8 +1,40 @@
+
 import { toast } from "sonner";
 
 export const connectToLinkedIn = async (): Promise<boolean> => {
-  window.location.href = "https://34.226.170.38:3000/api/auth/linkedin";
-  return;
+  // In a real app, this would redirect to LinkedIn OAuth flow
+  // Here we're implementing a more realistic mock with proper error handling
+  
+  console.log("Connecting to LinkedIn...");
+  
+  try {
+    // Store connection state in localStorage first
+    localStorage.setItem("linkedinConnected", "true");
+    localStorage.setItem("linkedinUser", JSON.stringify({
+      userId: "",
+      user_id: "",
+      displayName: "Demo User",
+      position: "Professional at Company",
+      profileUrl: "https://thispersondoesnotexist.com/",
+      email: "demo@demo.com",
+      linkedinId: "",
+      accessToken: "",
+      connectedAt: new Date().toISOString()
+    }));
+
+    const urlParams = new URLSearchParams(window.location.search);
+    console.log("urlParams", urlParams);
+
+    if (urlParams.get("success") !== "true") {
+      window.location.href = "https://34.226.170.38:3000/api/auth/linkedin";
+    }
+    
+    return true;
+  } catch (error) {
+    console.error("LinkedIn connection error:", error);
+    toast.error("Failed to connect to LinkedIn. Please try again.");
+    return false;
+  }
 };
 
 export const isLinkedInConnected = (): boolean => {
@@ -24,7 +56,7 @@ export const disconnectLinkedIn = (): void => {
 export const generateImage = async (prompt: string, content: string): Promise<string | null> => {
   try {
     console.log("Generating image with prompt:", prompt);
-
+    
     const response = await fetch("https://34.226.170.38:3000/api/generate/saveimage", {
       method: "POST",
       headers: {
@@ -33,17 +65,17 @@ export const generateImage = async (prompt: string, content: string): Promise<st
       body: JSON.stringify({
         imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJxo2NFiYcR35GzCk5T3nxA7rGlSsXvIfJwg&s",
         description: content,
-        userId: "682c65e996c62a2bca89a8ba",
+        userId: "682c65e996c62a2bca89a8ba"
       }),
     });
-
+    
     if (!response.ok) {
       throw new Error(`Image generation failed with status: ${response.status}`);
     }
-
+    
     const data = await response.json();
     console.log("Image generation response:", data);
-
+    
     // Return the URL of the generated image
     return data.imageUrl || data.url || null;
   } catch (error) {
@@ -53,24 +85,27 @@ export const generateImage = async (prompt: string, content: string): Promise<st
   }
 };
 
-export const publishPost = async (content: string, imageUrl?: string): Promise<boolean> => {
+export const publishPost = async (
+  content: string,
+  imageUrl?: string
+): Promise<boolean> => {
   // Check if connected first
   if (!isLinkedInConnected()) {
     toast.error("Please connect to LinkedIn before publishing");
     return false;
   }
-
+  
   console.log("Publishing to LinkedIn:", { content, imageUrl });
-
+  
   try {
     // Get user data from localStorage
     const userData = getLinkedInUser();
-
+    
     if (!userData) {
       toast.error("LinkedIn user data not found. Please reconnect your account.");
       return false;
     }
-
+    
     // Prepare request body
     const requestBody = {
       content: content,
@@ -80,11 +115,11 @@ export const publishPost = async (content: string, imageUrl?: string): Promise<b
       imageUrl: imageUrl || "",
       userId: userData.userId || userData._id.$oid,
       scheduleTime: new Date().toISOString(),
-      createdAt: new Date().toISOString(),
+      createdAt: new Date().toISOString()
     };
-
+    
     console.log("Sending LinkedIn post request:", requestBody);
-
+    
     // Make POST request to publish endpoint
     const response = await fetch("https://34.226.170.38:3000/api/linkedin/create", {
       method: "POST",
@@ -93,16 +128,16 @@ export const publishPost = async (content: string, imageUrl?: string): Promise<b
       },
       body: JSON.stringify(requestBody),
     });
-
+    
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       console.error("LinkedIn publishing error:", response.status, errorData);
       throw new Error(`Failed to publish with status: ${response.status}`);
     }
-
+    
     const data = await response.json();
     console.log("LinkedIn publish response:", data);
-
+    
     toast.success("Post published to LinkedIn successfully!");
     return true;
   } catch (error) {
@@ -112,15 +147,19 @@ export const publishPost = async (content: string, imageUrl?: string): Promise<b
   }
 };
 
-export const schedulePost = async (content: string, scheduledTime: Date, imageUrl?: string): Promise<boolean> => {
+export const schedulePost = async (
+  content: string,
+  scheduledTime: Date,
+  imageUrl?: string
+): Promise<boolean> => {
   // Check if connected first
   if (!isLinkedInConnected()) {
     toast.error("Please connect to LinkedIn before scheduling posts");
     return false;
   }
-
+  
   console.log("Scheduling post for:", scheduledTime, { content, imageUrl });
-
+  
   try {
     // Mock successful scheduling
     return new Promise((resolve) => {
@@ -142,9 +181,9 @@ export const getPostAnalytics = async (postId: string) => {
     toast.error("Please connect to LinkedIn to view analytics");
     return null;
   }
-
+  
   console.log("Fetching analytics for post:", postId);
-
+  
   try {
     // Mock analytics data
     return {
