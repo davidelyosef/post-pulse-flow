@@ -125,3 +125,29 @@ export const deletePost = async (postId: string, userId: string): Promise<boolea
     throw error;
   }
 };
+
+export const removeSchedule = async (postId: string, userId: string): Promise<any> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/remove-schedule/${postId}?userId=${userId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Remove schedule failed with status ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    if (!data.success) {
+      throw new Error(data.error || "Failed to remove schedule");
+    }
+
+    return data.post;
+  } catch (error) {
+    handleApiError(error, "Remove schedule");
+    throw error;
+  }
+};

@@ -1,7 +1,7 @@
 
 import { Post } from "@/types";
 import { toast } from "sonner";
-import { savePostWithImage, updatePost as updatePostAPI, deletePost as deletePostAPI } from "@/services/postService";
+import { savePostWithImage, updatePost as updatePostAPI, deletePost as deletePostAPI, removeSchedule as removeScheduleAPI } from "@/services/postService";
 
 export const usePostOperations = (
   posts: Post[],
@@ -175,11 +175,7 @@ export const usePostOperations = (
       if (post.status === "approved") {
         console.log('Removing schedule time on server for post:', id);
         
-        const updates = {
-          scheduleTime: null
-        };
-        
-        await updatePostAPI(id, getUserId(), updates);
+        await removeScheduleAPI(id, getUserId());
         console.log('Schedule time removed on server successfully');
       }
 

@@ -27,6 +27,9 @@ export const PostScheduleDialog = ({
   onRemoveSchedule,
   isScheduled = false,
 }: PostScheduleDialogProps) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg">
@@ -42,7 +45,7 @@ export const PostScheduleDialog = ({
               selected={scheduledDate}
               onSelect={onDateChange}
               initialFocus
-              disabled={(date) => date < new Date()}
+              disabled={(date) => date < today}
               className="rounded-md border mx-auto"
             />
           </div>
