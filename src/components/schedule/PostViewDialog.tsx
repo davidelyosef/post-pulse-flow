@@ -17,6 +17,11 @@ interface PostViewDialogProps {
   getUserId: () => string;
 }
 
+// Helper function to check if a string is a valid MongoDB ObjectId
+const isValidObjectId = (id: string): boolean => {
+  return /^[0-9a-fA-F]{24}$/.test(id);
+};
+
 export const PostViewDialog = ({
   post,
   isOpen,
@@ -56,6 +61,13 @@ export const PostViewDialog = ({
   const handleSavePost = async () => {
     if (!post) return;
     
+    // Check if the post ID is a valid MongoDB ObjectId
+    if (!isValidObjectId(post.id)) {
+      toast.error("Cannot update post: Invalid post ID format");
+      console.error("Invalid ObjectId format:", post.id);
+      return;
+    }
+    
     setIsSaving(true);
     try {
       await updatePostAPI(post.id, getUserId(), {
@@ -82,7 +94,7 @@ export const PostViewDialog = ({
     setImageRegeneratedPosts(prev => new Set([...prev, postId]));
   };
 
-  const shouldShowSaveButton = post && imageRegeneratedPosts.has(post.id);
+  const shouldShowSaveButton = post && imageRegeneratedPosts.has(post.id) && isValidObjectId(post.id);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
