@@ -1,3 +1,4 @@
+
 import { toast } from "sonner";
 
 export const connectToLinkedIn = async (): Promise<boolean> => {
@@ -71,21 +72,17 @@ export const publishPost = async (content: string, imageUrl?: string): Promise<b
       return false;
     }
 
-    // Prepare request body
+    // Prepare request body according to the backend API
     const requestBody = {
       content: content,
-      visibility: "PUBLIC",
-      user_id: userData.userId || userData._id.$oid,
-      data: "", // Optional additional data
       imageUrl: imageUrl || "",
-      userId: userData.userId || userData._id.$oid,
-      scheduleTime: new Date().toISOString(),
-      createdAt: new Date().toISOString(),
+      visibility: "PUBLIC",
+      user_id: userData.id || userData.userId || userData._id?.$oid || userData._id,
     };
 
     console.log("Sending LinkedIn post request:", requestBody);
 
-    // Make POST request to publish endpoint
+    // Make POST request to the correct endpoint
     const response = await fetch("https://34.226.170.38:3000/api/linkedin/create", {
       method: "POST",
       headers: {
@@ -103,8 +100,12 @@ export const publishPost = async (content: string, imageUrl?: string): Promise<b
     const data = await response.json();
     console.log("LinkedIn publish response:", data);
 
-    toast.success("Post published to LinkedIn successfully!");
-    return true;
+    if (data.success) {
+      toast.success("Post published to LinkedIn successfully!");
+      return true;
+    } else {
+      throw new Error(data.message || "Failed to publish post");
+    }
   } catch (error) {
     console.error("LinkedIn publishing error:", error);
     toast.error("Failed to publish to LinkedIn. Please try again.");
