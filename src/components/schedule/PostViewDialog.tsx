@@ -35,16 +35,25 @@ export const PostViewDialog = ({
   const [originalImageUrl, setOriginalImageUrl] = useState<string | undefined>(undefined);
   const [hasImageChanged, setHasImageChanged] = useState(false);
   const [currentImageUrl, setCurrentImageUrl] = useState<string | undefined>(undefined);
+  const [displayPost, setDisplayPost] = useState<Post | null>(null);
   const { updatePost } = usePostContext();
 
-  // Track the original image URL when dialog opens
+  // Track the original image URL when dialog opens and create display post
   useEffect(() => {
     if (isOpen && post) {
       setOriginalImageUrl(post.imageUrl);
       setCurrentImageUrl(post.imageUrl);
       setHasImageChanged(false);
+      setDisplayPost({...post, imageUrl: post.imageUrl});
     }
   }, [isOpen, post?.id]);
+
+  // Update display post when currentImageUrl changes
+  useEffect(() => {
+    if (post && currentImageUrl !== undefined) {
+      setDisplayPost({...post, imageUrl: currentImageUrl});
+    }
+  }, [currentImageUrl, post]);
 
   // Check if image has changed whenever post.imageUrl changes
   useEffect(() => {
@@ -110,7 +119,7 @@ export const PostViewDialog = ({
         const serverResponse = await savePostWithImage(post.content, getUserId(), currentImageUrl);
         
         // Update the post in context with the new server ID and approved status
-        const serverId = serverResponse._id || serverResponse.id || post.id;
+        const serverId = serverResponse.id || post.id;
         updatePost(post.id, {
           id: serverId,
           status: "approved",
@@ -132,7 +141,9 @@ export const PostViewDialog = ({
   };
 
   const handleImageRegenerated = (newImageUrl: string) => {
-    // Update local state without automatically saving or calling API
+    console.log("Image regenerated with URL:", newImageUrl);
+    
+    // Update local state
     setCurrentImageUrl(newImageUrl);
     if (originalImageUrl !== undefined) {
       setHasImageChanged(newImageUrl !== originalImageUrl);
@@ -151,10 +162,10 @@ export const PostViewDialog = ({
           <DialogTitle className="text-2xl">Post Details</DialogTitle>
         </DialogHeader>
         
-        {post && (
+        {displayPost && (
           <div className="py-4">
             <PostCard 
-              post={{...post, imageUrl: currentImageUrl}} 
+              post={displayPost} 
               showActions={false}
               onImageRegenerated={handleImageRegenerated}
             />
