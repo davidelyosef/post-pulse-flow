@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Image, Loader2 } from "lucide-react";
+import { Image, Loader2, RefreshCw } from "lucide-react";
 import { Post } from "@/types";
 import { generateImageFromPrompt } from "@/services/openAIService";
 import { usePostContext } from "@/contexts/PostContext";
@@ -9,7 +9,6 @@ import { useUser } from "@/contexts/UserContext";
 interface PostCardImageProps {
   post: Post;
   isGeneratingPrompts: boolean;
-  isGeneratingImage: boolean;
   onGeneratePrompts: () => void;
   onSelectPrompt: (prompt: string) => void;
 }
@@ -17,11 +16,10 @@ interface PostCardImageProps {
 export const PostCardImage = ({ 
   post, 
   isGeneratingPrompts, 
-  isGeneratingImage, 
   onGeneratePrompts, 
   onSelectPrompt 
 }: PostCardImageProps) => {
-  const { updatePost } = usePostContext();
+  const { updatePost, regenerateImage, isGeneratingImage } = usePostContext();
   const { getUserId } = useUser();
 
   const handleSelectPrompt = async (prompt: string) => {
@@ -40,14 +38,52 @@ export const PostCardImage = ({
     }
   };
 
+  const handleRegenerateImage = async () => {
+    if (post.selectedImagePrompt) {
+      try {
+        await regenerateImage(post.id, post.selectedImagePrompt);
+      } catch (error) {
+        console.error("Error regenerating image:", error);
+      }
+    }
+  };
+
   if (post.imageUrl) {
     return (
       <div className="mt-6">
-        <img 
-          src={post.imageUrl} 
-          alt="Post visual" 
-          className="rounded-lg w-full h-auto object-cover shadow-md"
-        />
+        <div className="relative">
+          <img 
+            src={post.imageUrl} 
+            alt="Post visual" 
+            className="rounded-lg w-full h-auto object-cover shadow-md"
+          />
+          {isGeneratingImage && (
+            <div className="absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center">
+              <Loader2 className="h-8 w-8 animate-spin text-white" />
+            </div>
+          )}
+        </div>
+        {post.selectedImagePrompt && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="mt-2 w-full"
+            onClick={handleRegenerateImage}
+            disabled={isGeneratingImage}
+          >
+            {isGeneratingImage ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                Generating...
+              </>
+            ) : (
+              <>
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Generate Different Image
+              </>
+            )}
+          </Button>
+        )}
       </div>
     );
   }
@@ -74,6 +110,7 @@ export const PostCardImage = ({
                 variant="outline" 
                 className="justify-start text-left h-auto py-2 font-normal break-words whitespace-normal"
                 onClick={() => handleSelectPrompt(prompt)}
+                disabled={isGeneratingImage}
               >
                 {prompt}
               </Button>

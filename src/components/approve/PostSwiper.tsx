@@ -16,7 +16,7 @@ export const PostSwiper = () => {
   const [scheduleDialogOpen, setScheduleDialogOpen] = useState(false);
 
   // For image generation
-  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
+  const [isGeneratingPrompts, setIsGeneratingPrompts] = useState(false);
 
   // This effect ensures the currentPostIndex stays within bounds when posts change
   useEffect(() => {
@@ -35,10 +35,10 @@ export const PostSwiper = () => {
     // If post doesn't have image prompts yet, generate them
     if (!currentPost.imagePrompts) {
       try {
-        setIsGeneratingImage(true);
+        setIsGeneratingPrompts(true);
         await generateImagePrompts(currentPost.id);
       } finally {
-        setIsGeneratingImage(false);
+        setIsGeneratingPrompts(false);
       }
     }
 
@@ -48,7 +48,7 @@ export const PostSwiper = () => {
     // Keep track of the current index
     const currentIndex = currentPostIndex;
 
-    // Approve the post (this now handles the API call)
+    // Approve the post (this now handles the API call and keeps the post)
     await approvePost(currentPostId);
 
     // Adjust the index if needed

@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { Post } from "@/types";
 import { toast } from "sonner";
@@ -21,8 +20,10 @@ interface PostContextType {
   generateImagePrompts: (id: string) => Promise<string[]>;
   selectImagePrompt: (id: string, prompt: string) => void;
   generateImage: (id: string, prompt: string) => Promise<string>;
+  regenerateImage: (id: string, prompt: string) => Promise<string>;
   loadUserPosts: () => Promise<void>;
   isLoading: boolean;
+  isGeneratingImage: boolean;
 }
 
 const PostContext = createContext<PostContextType | undefined>(undefined);
@@ -30,6 +31,7 @@ const PostContext = createContext<PostContextType | undefined>(undefined);
 export const PostProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const { user, getUserId } = useUser();
 
   // Load user posts when user changes
@@ -197,10 +199,12 @@ export const PostProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     );
   };
 
-  // Updated to use the real API
+  // Updated to use the real API with loading state
   const generateImage = async (id: string, prompt: string): Promise<string> => {
     const post = posts.find((p) => p.id === id);
     if (!post) return "";
+    
+    setIsGeneratingImage(true);
     
     try {
       // Call the real API service to generate an image
@@ -241,7 +245,14 @@ export const PostProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       );
       
       return fallbackUrl;
+    } finally {
+      setIsGeneratingImage(false);
     }
+  };
+
+  // New function to regenerate image
+  const regenerateImage = async (id: string, prompt: string): Promise<string> => {
+    return generateImage(id, prompt);
   };
 
   const value = {
@@ -259,8 +270,10 @@ export const PostProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     generateImagePrompts,
     selectImagePrompt,
     generateImage,
+    regenerateImage,
     loadUserPosts,
     isLoading,
+    isGeneratingImage,
   };
 
   return <PostContext.Provider value={value}>{children}</PostContext.Provider>;
