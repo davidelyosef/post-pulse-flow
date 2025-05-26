@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { toast } from 'sonner';
 import { getUserPosts } from '@/services/postService';
@@ -21,7 +20,7 @@ interface UserContextType {
   isAuthenticated: boolean;
   updateUserLinkedInStatus: (connected: boolean) => void;
   updateUserFromLinkedInAuth: (authData: any) => void;
-  loadUserPosts: () => Promise<void>;
+  loadUserPosts: () => Promise<any[]>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
