@@ -1,3 +1,4 @@
+
 import { Post } from "@/types";
 import { toast } from "sonner";
 import { savePostWithImage, updatePost as updatePostAPI, deletePost as deletePostAPI } from "@/services/postService";
@@ -120,13 +121,42 @@ export const usePostOperations = (
     }
   };
 
-  const schedulePost = (id: string, date: Date) => {
-    setPosts((prevPosts) =>
-      prevPosts.map((post) =>
-        post.id === id ? { ...post, scheduledFor: date } : post
-      )
-    );
-    toast.success("Post scheduled");
+  const schedulePost = async (id: string, date: Date) => {
+    const post = posts.find(p => p.id === id);
+    if (!post) return;
+
+    try {
+      // Update local state immediately
+      setPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post.id === id ? { ...post, scheduledFor: date } : post
+        )
+      );
+
+      // If post is approved (exists on server), update the schedule time on backend
+      if (post.status === "approved") {
+        console.log('Updating schedule time on server for post:', id, 'date:', date.toISOString());
+        
+        const updates = {
+          scheduleTime: date.toISOString()
+        };
+        
+        await updatePostAPI(id, getUserId(), updates);
+        console.log('Schedule time updated on server successfully');
+      }
+
+      toast.success("Post scheduled");
+    } catch (error) {
+      console.error('Error scheduling post:', error);
+      toast.error("Failed to update schedule on server");
+      
+      // Revert local changes on error
+      setPosts((prevPosts) =>
+        prevPosts.map((p) =>
+          p.id === id ? post : p
+        )
+      );
+    }
   };
 
   return {
