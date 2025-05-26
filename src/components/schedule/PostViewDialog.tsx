@@ -62,7 +62,6 @@ export const PostViewDialog = ({
     try {
       const success = await publishPost(post.content, post.imageUrl);
       if (success) {
-        onDelete(post.id);
         onClose();
         toast.success("Post published to LinkedIn successfully!");
       }
