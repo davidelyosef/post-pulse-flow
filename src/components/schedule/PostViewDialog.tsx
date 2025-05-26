@@ -123,9 +123,6 @@ export const PostViewDialog = ({
     }
   };
 
-  // Determine if save button should be enabled
-  const isSaveEnabled = post && (hasImageChanged || post.status !== "approved");
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg">
@@ -155,7 +152,7 @@ export const PostViewDialog = ({
             variant="outline"
             className="w-full sm:w-auto gap-2"
             onClick={handleSavePost}
-            disabled={isSaving || !isSaveEnabled}
+            disabled={isSaving}
           >
             {isSaving ? (
               <>
