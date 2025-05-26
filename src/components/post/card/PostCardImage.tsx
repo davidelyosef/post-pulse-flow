@@ -9,6 +9,7 @@ import { useUser } from "@/contexts/UserContext";
 interface PostCardImageProps {
   post: Post;
   isGeneratingPrompts: boolean;
+  isGeneratingImage: boolean;
   onGeneratePrompts: () => void;
   onSelectPrompt: (prompt: string) => void;
 }
