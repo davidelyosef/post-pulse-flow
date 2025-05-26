@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Image, Loader2, RefreshCw } from "lucide-react";
 import { Post } from "@/types";
@@ -12,7 +11,7 @@ interface PostCardImageProps {
   isGeneratingImage: boolean;
   onGeneratePrompts: () => void;
   onSelectPrompt: (prompt: string) => void;
-  onImageRegenerated?: () => void;
+  onImageRegenerated?: (newImageUrl: string) => void;
 }
 
 export const PostCardImage = ({ 
@@ -22,7 +21,7 @@ export const PostCardImage = ({
   onSelectPrompt,
   onImageRegenerated
 }: PostCardImageProps) => {
-  const { updatePost, regenerateImage, isGeneratingImage } = usePostContext();
+  const { updatePost, isGeneratingImage } = usePostContext();
   const { getUserId } = useUser();
 
   const handleSelectPrompt = async (prompt: string) => {
@@ -34,6 +33,8 @@ export const PostCardImage = ({
         
         if (imageUrl) {
           updatePost(post.id, { imageUrl });
+          // Notify parent component if callback provided
+          onImageRegenerated?.(imageUrl);
         }
       } catch (error) {
         console.error("Error generating image:", error);
@@ -46,9 +47,12 @@ export const PostCardImage = ({
     const prompt = post.selectedImagePrompt || `Professional illustration related to ${post.content.substring(0, 100)}`;
     
     try {
-      await regenerateImage(post.id, prompt);
-      // Notify parent component that image was regenerated
-      onImageRegenerated?.();
+      const imageUrl = await generateImageFromPrompt(prompt, getUserId());
+      
+      if (imageUrl) {
+        // Only notify parent component, don't automatically update the post
+        onImageRegenerated?.(imageUrl);
+      }
     } catch (error) {
       console.error("Error regenerating image:", error);
     }

@@ -33,11 +33,13 @@ export const PostViewDialog = ({
   const [isSaving, setIsSaving] = useState(false);
   const [originalImageUrl, setOriginalImageUrl] = useState<string | undefined>(undefined);
   const [hasImageChanged, setHasImageChanged] = useState(false);
+  const [currentImageUrl, setCurrentImageUrl] = useState<string | undefined>(undefined);
 
   // Track the original image URL when dialog opens
   useEffect(() => {
     if (isOpen && post) {
       setOriginalImageUrl(post.imageUrl);
+      setCurrentImageUrl(post.imageUrl);
       setHasImageChanged(false);
     }
   }, [isOpen, post?.id]);
@@ -46,6 +48,7 @@ export const PostViewDialog = ({
   useEffect(() => {
     if (post && originalImageUrl !== undefined) {
       setHasImageChanged(post.imageUrl !== originalImageUrl);
+      setCurrentImageUrl(post.imageUrl);
     }
   }, [post?.imageUrl, originalImageUrl]);
 
@@ -60,7 +63,7 @@ export const PostViewDialog = ({
     
     setIsPublishing(true);
     try {
-      const success = await publishPost(post.content, post.imageUrl);
+      const success = await publishPost(post.content, currentImageUrl);
       if (success) {
         onClose();
         toast.success("Post published to LinkedIn successfully!");
@@ -76,7 +79,7 @@ export const PostViewDialog = ({
   const handleSavePost = async () => {
     if (!post) return;
     
-    // Check if the post ID is a valid MongoDB ObjectId
+    // Check if the post ID is a valid MongoDB ObjectId for server updates
     if (!isValidObjectId(post.id)) {
       toast.error("Cannot update post: Invalid post ID format");
       console.error("Invalid ObjectId format:", post.id);
@@ -91,13 +94,13 @@ export const PostViewDialog = ({
       
       // Only include imageUrl if it has actually changed
       if (hasImageChanged) {
-        updates.imageUrl = post.imageUrl;
+        updates.imageUrl = currentImageUrl;
       }
       
       await updatePostAPI(post.id, getUserId(), updates);
       
       // Reset the change tracking after successful save
-      setOriginalImageUrl(post.imageUrl);
+      setOriginalImageUrl(currentImageUrl);
       setHasImageChanged(false);
       
       toast.success("Post updated successfully!");
@@ -109,11 +112,13 @@ export const PostViewDialog = ({
     }
   };
 
-  const handleImageRegenerated = (postId: string) => {
-    // Image regeneration will be tracked automatically through useEffect
+  const handleImageRegenerated = (newImageUrl: string) => {
+    // Update local state without automatically saving
+    setCurrentImageUrl(newImageUrl);
+    if (originalImageUrl !== undefined) {
+      setHasImageChanged(newImageUrl !== originalImageUrl);
+    }
   };
-
-  const shouldShowSaveButton = post && isValidObjectId(post.id);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -125,9 +130,9 @@ export const PostViewDialog = ({
         {post && (
           <div className="py-4">
             <PostCard 
-              post={post} 
+              post={{...post, imageUrl: currentImageUrl}} 
               showActions={false}
-              onImageRegenerated={() => handleImageRegenerated(post.id)}
+              onImageRegenerated={handleImageRegenerated}
             />
           </div>
         )}
@@ -140,26 +145,24 @@ export const PostViewDialog = ({
           >
             Close
           </Button>
-          {shouldShowSaveButton && (
-            <Button
-              variant="outline"
-              className="w-full sm:w-auto gap-2"
-              onClick={handleSavePost}
-              disabled={isSaving}
-            >
-              {isSaving ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <Save className="h-4 w-4" />
-                  Save Post
-                </>
-              )}
-            </Button>
-          )}
+          <Button
+            variant="outline"
+            className="w-full sm:w-auto gap-2"
+            onClick={handleSavePost}
+            disabled={isSaving || !isValidObjectId(post?.id || "")}
+          >
+            {isSaving ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              <>
+                <Save className="h-4 w-4" />
+                Save Post
+              </>
+            )}
+          </Button>
           <Button
             className="w-full sm:w-auto gap-2"
             onClick={handlePublishNow}
