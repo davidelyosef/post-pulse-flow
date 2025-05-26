@@ -107,11 +107,12 @@ export const PostViewDialog = ({
       } else if (post.status === "pending") {
         // For new posts, we need to save them and get the server ID
         const { savePostWithImage } = await import("@/services/postService");
-        savedPost = await savePostWithImage(post.content, getUserId(), currentImageUrl);
+        const serverResponse = await savePostWithImage(post.content, getUserId(), currentImageUrl);
         
         // Update the post in context with the new server ID and approved status
+        const serverId = serverResponse._id || serverResponse.id || post.id;
         updatePost(post.id, {
-          id: savedPost._id || savedPost.id,
+          id: serverId,
           status: "approved",
           imageUrl: currentImageUrl
         });
