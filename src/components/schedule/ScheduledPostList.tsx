@@ -7,14 +7,17 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { PostCard } from "@/components/post/PostCard";
-import { Calendar as CalendarIcon, Clock, Loader2, Edit, Trash2, Share2 } from "lucide-react";
+import { Calendar as CalendarIcon, Clock, Loader2, Edit, Trash2, Share2, Save } from "lucide-react";
 import { publishPost, schedulePost as scheduleLinkedInPost, isLinkedInConnected } from "@/services/linkedinService";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { EditPostDialog } from "@/components/approve/EditPostDialog";
+import { savePostWithImage } from "@/services/postService";
+import { useUser } from "@/contexts/UserContext";
 
 export const ScheduledPostList = () => {
   const { approvedPosts, deletePost, updatePost, schedulePost } = usePostContext();
+  const { getUserId } = useUser();
   const scheduledPosts = approvedPosts.filter(post => post.scheduledFor);
   const unscheduledPosts = approvedPosts.filter(post => !post.scheduledFor);
   
@@ -26,6 +29,7 @@ export const ScheduledPostList = () => {
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
   const [editedContent, setEditedContent] = useState("");
   const [isPublishing, setIsPublishing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [scheduledDate, setScheduledDate] = useState<Date | undefined>(undefined);
   const [scheduledTime, setScheduledTime] = useState("12:00");
 
@@ -55,7 +59,6 @@ export const ScheduledPostList = () => {
     }
   };
   
-  // Updating the handleEditSave function to include tags
   const handleEditSave = (content: string, tags: string[]) => {
     if (!selectedPostId) return;
     updatePost(selectedPostId, { content, tags });
@@ -73,7 +76,6 @@ export const ScheduledPostList = () => {
         `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
       );
     } else {
-      // Default to tomorrow at noon
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
       tomorrow.setHours(12, 0, 0, 0);
@@ -89,10 +91,8 @@ export const ScheduledPostList = () => {
       const dateTime = new Date(scheduledDate);
       dateTime.setHours(hours, minutes, 0, 0);
       
-      // Update local state
       schedulePost(selectedPostId, dateTime);
       
-      // If connected to LinkedIn, also schedule there
       if (isLinkedInConnected()) {
         const post = approvedPosts.find(p => p.id === selectedPostId);
         if (post) {
@@ -140,6 +140,21 @@ export const ScheduledPostList = () => {
       console.error("Error publishing post:", error);
     } finally {
       setIsPublishing(false);
+    }
+  };
+
+  const handleSavePost = async () => {
+    if (!selectedPost) return;
+    
+    setIsSaving(true);
+    try {
+      await savePostWithImage(selectedPost.content, getUserId(), selectedPost.imageUrl);
+      toast.success("Post saved successfully!");
+    } catch (error) {
+      toast.error("Failed to save post");
+      console.error("Error saving post:", error);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -278,6 +293,24 @@ export const ScheduledPostList = () => {
               onClick={() => setViewPostDialogOpen(false)}
             >
               Close
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full sm:w-auto gap-2"
+              onClick={handleSavePost}
+              disabled={isSaving}
+            >
+              {isSaving ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="h-4 w-4" />
+                  Save Post
+                </>
+              )}
             </Button>
             <Button
               className="w-full sm:w-auto gap-2"
