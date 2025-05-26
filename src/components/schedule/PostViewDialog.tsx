@@ -79,8 +79,8 @@ export const PostViewDialog = ({
   const handleSavePost = async () => {
     if (!post) return;
     
-    // Check if the post ID is a valid MongoDB ObjectId for server updates
-    if (!isValidObjectId(post.id)) {
+    // Only check for valid ObjectId if the post has approved status (exists on server)
+    if (post.status === "approved" && !isValidObjectId(post.id)) {
       toast.error("Cannot update post: Invalid post ID format");
       console.error("Invalid ObjectId format:", post.id);
       return;
@@ -97,7 +97,10 @@ export const PostViewDialog = ({
         updates.imageUrl = currentImageUrl;
       }
       
-      await updatePostAPI(post.id, getUserId(), updates);
+      // Only call API if post is approved (exists on server)
+      if (post.status === "approved") {
+        await updatePostAPI(post.id, getUserId(), updates);
+      }
       
       // Reset the change tracking after successful save
       setOriginalImageUrl(currentImageUrl);
@@ -113,12 +116,15 @@ export const PostViewDialog = ({
   };
 
   const handleImageRegenerated = (newImageUrl: string) => {
-    // Update local state without automatically saving
+    // Update local state without automatically saving or calling API
     setCurrentImageUrl(newImageUrl);
     if (originalImageUrl !== undefined) {
       setHasImageChanged(newImageUrl !== originalImageUrl);
     }
   };
+
+  // Determine if save button should be enabled
+  const isSaveEnabled = post && (hasImageChanged || post.status !== "approved");
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -149,7 +155,7 @@ export const PostViewDialog = ({
             variant="outline"
             className="w-full sm:w-auto gap-2"
             onClick={handleSavePost}
-            disabled={isSaving || !isValidObjectId(post?.id || "")}
+            disabled={isSaving || !isSaveEnabled}
           >
             {isSaving ? (
               <>

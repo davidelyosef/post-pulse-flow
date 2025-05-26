@@ -1,8 +1,8 @@
+
 import { Button } from "@/components/ui/button";
 import { Image, Loader2, RefreshCw } from "lucide-react";
 import { Post } from "@/types";
 import { generateImageFromPrompt } from "@/services/openAIService";
-import { usePostContext } from "@/contexts/PostContext";
 import { useUser } from "@/contexts/UserContext";
 
 interface PostCardImageProps {
@@ -21,7 +21,7 @@ export const PostCardImage = ({
   onSelectPrompt,
   onImageRegenerated
 }: PostCardImageProps) => {
-  const { updatePost, isGeneratingImage } = usePostContext();
+  const { isGeneratingImage } = { isGeneratingImage: false }; // Use local loading state instead
   const { getUserId } = useUser();
 
   const handleSelectPrompt = async (prompt: string) => {
@@ -32,8 +32,7 @@ export const PostCardImage = ({
         const imageUrl = await generateImageFromPrompt(prompt, getUserId());
         
         if (imageUrl) {
-          updatePost(post.id, { imageUrl });
-          // Notify parent component if callback provided
+          // Only notify parent component, don't update the post automatically
           onImageRegenerated?.(imageUrl);
         }
       } catch (error) {
