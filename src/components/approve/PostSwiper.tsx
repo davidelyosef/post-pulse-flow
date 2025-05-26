@@ -2,18 +2,14 @@ import { useState, useEffect } from "react";
 import { PostCard } from "@/components/post/PostCard";
 import { usePostContext } from "@/contexts/PostContext";
 import { SwipeableCard } from "./SwipeableCard";
-import { EditPostDialog } from "./EditPostDialog";
-import { ScheduleDialog } from "./ScheduleDialog";
 import { EmptyPostsView } from "./EmptyPostsView";
 import { PostSwiperCounter } from "./PostSwiperCounter";
 import { SwipeInstructions } from "./SwipeInstructions";
 
 export const PostSwiper = () => {
-  const { pendingPosts, approvePost, rejectPost, updatePost, schedulePost, generateImagePrompts } = usePostContext();
+  const { pendingPosts, approvePost, rejectPost, generateImagePrompts } = usePostContext();
 
   const [currentPostIndex, setCurrentPostIndex] = useState(0);
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [scheduleDialogOpen, setScheduleDialogOpen] = useState(false);
 
   // For image generation
   const [isGeneratingPrompts, setIsGeneratingPrompts] = useState(false);
@@ -79,19 +75,6 @@ export const PostSwiper = () => {
     // If it wasn't the last post, index stays the same as next post slides in
   };
 
-  const handleEditSave = (content: string, tags: string[]) => {
-    if (!currentPost) return;
-    updatePost(currentPost.id, { content, tags });
-    setEditDialogOpen(false);
-  };
-
-  const handleScheduleSave = (date: Date) => {
-    if (!currentPost) return;
-    schedulePost(currentPost.id, date);
-    approvePost(currentPost.id); // Auto-approve scheduled posts
-    setScheduleDialogOpen(false);
-  };
-
   if (pendingPosts.length === 0) {
     return <EmptyPostsView />;
   }
@@ -105,9 +88,8 @@ export const PostSwiper = () => {
               post={currentPost}
               onApprove={handleApprove}
               onReject={handleReject}
-              onEdit={() => setEditDialogOpen(true)}
-              onSchedule={() => setScheduleDialogOpen(true)}
               className="h-full overflow-auto"
+              showEditAndScheduleActions={false}
             />
           </SwipeableCard>
         )}
@@ -116,10 +98,6 @@ export const PostSwiper = () => {
       </div>
 
       <SwipeInstructions show={pendingPosts.length > 0} />
-
-      <EditPostDialog post={currentPost} isOpen={editDialogOpen} onClose={() => setEditDialogOpen(false)} onSave={handleEditSave} />
-
-      <ScheduleDialog isOpen={scheduleDialogOpen} onClose={() => setScheduleDialogOpen(false)} onSave={handleScheduleSave} />
     </>
   );
 };

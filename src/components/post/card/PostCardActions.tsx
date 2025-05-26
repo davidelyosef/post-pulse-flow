@@ -8,6 +8,7 @@ interface PostCardActionsProps {
   onEdit: () => void;
   onSchedule: () => void;
   showActions: boolean;
+  showEditAndScheduleActions?: boolean;
 }
 
 export const PostCardActions = ({ 
@@ -15,7 +16,8 @@ export const PostCardActions = ({
   onReject, 
   onEdit, 
   onSchedule, 
-  showActions 
+  showActions,
+  showEditAndScheduleActions = true
 }: PostCardActionsProps) => {
   if (!showActions) return null;
   
@@ -30,26 +32,30 @@ export const PostCardActions = ({
       >
         <X className="h-5 w-5 sm:h-6 sm:w-6 text-destructive" />
       </Button>
-      <div className="flex gap-2">
-        <Button 
-          variant="outline" 
-          size="icon" 
-          className="rounded-full" 
-          onClick={onEdit}
-          aria-label="Edit post"
-        >
-          <Edit className="h-4 w-4 sm:h-5 sm:w-5" />
-        </Button>
-        <Button 
-          variant="outline" 
-          size="icon" 
-          className="rounded-full" 
-          onClick={onSchedule}
-          aria-label="Schedule post"
-        >
-          <Calendar className="h-4 w-4 sm:h-5 sm:w-5" />
-        </Button>
-      </div>
+      
+      {showEditAndScheduleActions && (
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            size="icon" 
+            className="rounded-full" 
+            onClick={onEdit}
+            aria-label="Edit post"
+          >
+            <Edit className="h-4 w-4 sm:h-5 sm:w-5" />
+          </Button>
+          <Button 
+            variant="outline" 
+            size="icon" 
+            className="rounded-full" 
+            onClick={onSchedule}
+            aria-label="Schedule post"
+          >
+            <Calendar className="h-4 w-4 sm:h-5 sm:w-5" />
+          </Button>
+        </div>
+      )}
+      
       <Button 
         size="lg" 
         variant="outline" 

@@ -20,6 +20,7 @@ interface PostCardProps {
   className?: string;
   showActions?: boolean;
   showTags?: boolean;
+  showEditAndScheduleActions?: boolean;
   onImageRegenerated?: (newImageUrl: string) => void;
 }
 
@@ -32,6 +33,7 @@ export const PostCard = ({
   className,
   showActions = true,
   showTags = true,
+  showEditAndScheduleActions = true,
   onImageRegenerated,
 }: PostCardProps) => {
   const [direction, setDirection] = useState<"" | "swipe-left" | "swipe-right">("");
@@ -114,6 +116,7 @@ export const PostCard = ({
       <CardFooter className="pt-2 pb-4 px-5">
         <PostCardActions 
           showActions={showActions}
+          showEditAndScheduleActions={showEditAndScheduleActions}
           onApprove={handleApprove}
           onReject={handleReject}
           onEdit={onEdit || (() => {})}
