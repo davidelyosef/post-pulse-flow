@@ -1,0 +1,99 @@
+
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { toast } from 'sonner';
+
+interface User {
+  id: string;
+  name?: string;
+  email?: string;
+  linkedinConnected: boolean;
+}
+
+interface UserContextType {
+  user: User | null;
+  setUser: (user: User | null) => void;
+  getUserId: () => string;
+  isAuthenticated: boolean;
+  updateUserLinkedInStatus: (connected: boolean) => void;
+}
+
+const UserContext = createContext<UserContextType | undefined>(undefined);
+
+interface UserProviderProps {
+  children: ReactNode;
+}
+
+export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    // Try to get user from localStorage on mount
+    const storedUser = localStorage.getItem('user');
+    const linkedinUser = localStorage.getItem('linkedinUser');
+    const linkedinConnected = localStorage.getItem('linkedinConnected') === 'true';
+
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    } else if (linkedinUser) {
+      // Create user from LinkedIn data
+      const userData = JSON.parse(linkedinUser);
+      const newUser: User = {
+        id: userData.userId || userData._id?.$oid || 'default-user-id',
+        name: userData.displayName || userData.name,
+        email: userData.email,
+        linkedinConnected,
+      };
+      setUser(newUser);
+      localStorage.setItem('user', JSON.stringify(newUser));
+    } else {
+      // Create default user if none exists
+      const defaultUser: User = {
+        id: 'default-user-id',
+        linkedinConnected: false,
+      };
+      setUser(defaultUser);
+      localStorage.setItem('user', JSON.stringify(defaultUser));
+    }
+  }, []);
+
+  useEffect(() => {
+    // Save user to localStorage whenever it changes
+    if (user) {
+      localStorage.setItem('user', JSON.stringify(user));
+    }
+  }, [user]);
+
+  const getUserId = (): string => {
+    return user?.id || 'default-user-id';
+  };
+
+  const updateUserLinkedInStatus = (connected: boolean) => {
+    if (user) {
+      setUser({ ...user, linkedinConnected: connected });
+    }
+  };
+
+  const isAuthenticated = user !== null;
+
+  return (
+    <UserContext.Provider
+      value={{
+        user,
+        setUser,
+        getUserId,
+        isAuthenticated,
+        updateUserLinkedInStatus,
+      }}
+    >
+      {children}
+    </UserContext.Provider>
+  );
+};
+
+export const useUser = (): UserContextType => {
+  const context = useContext(UserContext);
+  if (context === undefined) {
+    throw new Error('useUser must be used within a UserProvider');
+  }
+  return context;
+};

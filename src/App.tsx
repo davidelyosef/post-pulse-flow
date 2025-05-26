@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -10,6 +11,7 @@ import ApprovePage from "./pages/ApprovePage";
 import SchedulePage from "./pages/SchedulePage";
 import NotFound from "./pages/NotFound";
 import { PostProvider } from "./contexts/PostContext";
+import { UserProvider } from "./contexts/UserContext";
 import { ThemeProvider } from "./components/theme/ThemeProvider";
 
 const queryClient = new QueryClient();
@@ -45,19 +47,21 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="system">
         <TooltipProvider>
-          <PostProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/generate" element={<GeneratePage />} />
-                <Route path="/approve" element={<ApprovePage />} />
-                <Route path="/schedule" element={<SchedulePage />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
-          </PostProvider>
+          <UserProvider>
+            <PostProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/generate" element={<GeneratePage />} />
+                  <Route path="/approve" element={<ApprovePage />} />
+                  <Route path="/schedule" element={<SchedulePage />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </BrowserRouter>
+            </PostProvider>
+          </UserProvider>
         </TooltipProvider>
       </ThemeProvider>
     </QueryClientProvider>
