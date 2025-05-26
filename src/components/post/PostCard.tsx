@@ -20,6 +20,7 @@ interface PostCardProps {
   className?: string;
   showActions?: boolean;
   showTags?: boolean;
+  onImageRegenerated?: () => void;
 }
 
 export const PostCard = ({
@@ -31,6 +32,7 @@ export const PostCard = ({
   className,
   showActions = true,
   showTags = true,
+  onImageRegenerated,
 }: PostCardProps) => {
   const [direction, setDirection] = useState<"" | "swipe-left" | "swipe-right">("");
   const [isGeneratingPrompts, setIsGeneratingPrompts] = useState(false);
@@ -106,6 +108,7 @@ export const PostCard = ({
           isGeneratingImage={isGeneratingImage}
           onGeneratePrompts={handleGenerateImagePrompts}
           onSelectPrompt={handleSelectImagePrompt}
+          onImageRegenerated={onImageRegenerated}
         />
       </CardContent>
       <CardFooter className="pt-2 pb-4 px-5">
