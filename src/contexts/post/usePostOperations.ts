@@ -66,6 +66,7 @@ export const usePostOperations = (
         if (updatedPost.content) updates.description = updatedPost.content;
         if (updatedPost.imageUrl) updates.imageUrl = updatedPost.imageUrl;
         if (updatedPost.scheduledFor) updates.scheduleTime = updatedPost.scheduledFor.toISOString();
+        if (updatedPost.tags) updates.tags = updatedPost.tags;
         
         const serverPost = await updatePostAPI(id, getUserId(), updates);
         
