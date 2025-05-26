@@ -3,9 +3,8 @@ import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Edit, Save, Tags, X, Plus } from "lucide-react";
+import { Edit, Save, Tags } from "lucide-react";
 import { Post } from "@/types";
 import { extractHashtags } from "@/lib/hashtag-utils";
 
@@ -19,7 +18,6 @@ interface EditPostDialogProps {
 export const EditPostDialog = ({ post, isOpen, onClose, onSave }: EditPostDialogProps) => {
   const [editContent, setEditContent] = useState("");
   const [editTags, setEditTags] = useState<string[]>([]);
-  const [newTag, setNewTag] = useState("");
 
   // Set initial values when dialog opens with a post
   useEffect(() => {
@@ -34,21 +32,6 @@ export const EditPostDialog = ({ post, isOpen, onClose, onSave }: EditPostDialog
       setEditTags(allTags);
     }
   }, [post, isOpen]);
-
-  const addTag = () => {
-    if (newTag.trim() && !editTags.includes(newTag.trim())) {
-      const updatedTags = [...editTags, newTag.trim()];
-      console.log('EditPostDialog: Adding tag, new tags array:', updatedTags);
-      setEditTags(updatedTags);
-      setNewTag("");
-    }
-  };
-
-  const removeTag = (tagToRemove: string) => {
-    const updatedTags = editTags.filter(tag => tag !== tagToRemove);
-    console.log('EditPostDialog: Removing tag, new tags array:', updatedTags);
-    setEditTags(updatedTags);
-  };
 
   const handleSave = () => {
     console.log('EditPostDialog: Saving with content:', editContent, 'and tags:', editTags);
@@ -84,45 +67,23 @@ export const EditPostDialog = ({ post, isOpen, onClose, onSave }: EditPostDialog
             </p>
           </div>
           
-          {/* Tags editing */}
-          <div className="space-y-2">
-            <label className="flex items-center gap-2 text-sm font-medium">
-              <Tags className="h-4 w-4" />
-              Tags
-            </label>
-            
-            <div className="flex flex-wrap gap-2 mb-2">
-              {editTags.map(tag => (
-                <Badge key={tag} className="flex items-center gap-1 bg-primary/20 hover:bg-primary/30 text-foreground">
-                  {tag}
-                  <button 
-                    onClick={() => removeTag(tag)} 
-                    className="ml-1 rounded-full hover:bg-muted p-0.5"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </Badge>
-              ))}
+          {/* Tags display (read-only) */}
+          {editTags.length > 0 && (
+            <div className="space-y-2">
+              <label className="flex items-center gap-2 text-sm font-medium">
+                <Tags className="h-4 w-4" />
+                Tags
+              </label>
+              
+              <div className="flex flex-wrap gap-2">
+                {editTags.map(tag => (
+                  <Badge key={tag} className="bg-primary/20 text-foreground">
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
             </div>
-            
-            <div className="flex gap-2">
-              <Input 
-                value={newTag}
-                onChange={(e) => setNewTag(e.target.value)}
-                placeholder="Add new tag..." 
-                className="flex-1"
-                onKeyPress={(e) => e.key === 'Enter' && addTag()}
-              />
-              <Button 
-                onClick={addTag} 
-                size="sm" 
-                variant="outline"
-              >
-                <Plus className="h-4 w-4 mr-1" />
-                Add
-              </Button>
-            </div>
-          </div>
+          )}
         </div>
         
         <DialogFooter className="border-t pt-4 mt-2">
