@@ -1,4 +1,3 @@
-
 import { Post } from "@/types";
 import { toast } from "sonner";
 import { savePostWithImage, updatePost as updatePostAPI, deletePost as deletePostAPI } from "@/services/postService";
@@ -52,6 +51,8 @@ export const usePostOperations = (
     const post = posts.find(p => p.id === id);
     if (!post) return;
 
+    console.log('Updating post:', id, 'with data:', updatedPost);
+
     try {
       // Update local state immediately for UI responsiveness
       setPosts((prevPosts) =>
@@ -63,12 +64,16 @@ export const usePostOperations = (
       // Only call API if post is approved (exists on server)
       if (post.status === "approved") {
         const updates: any = {};
-        if (updatedPost.content) updates.description = updatedPost.content;
-        if (updatedPost.imageUrl) updates.imageUrl = updatedPost.imageUrl;
-        if (updatedPost.scheduledFor) updates.scheduleTime = updatedPost.scheduledFor.toISOString();
-        if (updatedPost.tags) updates.tags = updatedPost.tags;
+        if (updatedPost.content !== undefined) updates.description = updatedPost.content;
+        if (updatedPost.imageUrl !== undefined) updates.imageUrl = updatedPost.imageUrl;
+        if (updatedPost.scheduledFor !== undefined) updates.scheduleTime = updatedPost.scheduledFor.toISOString();
+        if (updatedPost.tags !== undefined) updates.tags = updatedPost.tags;
+        
+        console.log('Sending API update for approved post:', id, 'updates:', updates);
         
         const serverPost = await updatePostAPI(id, getUserId(), updates);
+        
+        console.log('Server response:', serverPost);
         
         // Update with server response if available
         if (serverPost) {

@@ -24,6 +24,7 @@ export const EditPostDialog = ({ post, isOpen, onClose, onSave }: EditPostDialog
   // Set initial values when dialog opens with a post
   useEffect(() => {
     if (post && isOpen) {
+      console.log('EditPostDialog: Setting initial values for post:', post.id, 'tags:', post.tags);
       setEditContent(post.content);
       
       // Extract hashtags from content and combine with existing tags
@@ -36,16 +37,21 @@ export const EditPostDialog = ({ post, isOpen, onClose, onSave }: EditPostDialog
 
   const addTag = () => {
     if (newTag.trim() && !editTags.includes(newTag.trim())) {
-      setEditTags([...editTags, newTag.trim()]);
+      const updatedTags = [...editTags, newTag.trim()];
+      console.log('EditPostDialog: Adding tag, new tags array:', updatedTags);
+      setEditTags(updatedTags);
       setNewTag("");
     }
   };
 
   const removeTag = (tagToRemove: string) => {
-    setEditTags(editTags.filter(tag => tag !== tagToRemove));
+    const updatedTags = editTags.filter(tag => tag !== tagToRemove);
+    console.log('EditPostDialog: Removing tag, new tags array:', updatedTags);
+    setEditTags(updatedTags);
   };
 
   const handleSave = () => {
+    console.log('EditPostDialog: Saving with content:', editContent, 'and tags:', editTags);
     onSave(editContent, editTags);
   };
 
