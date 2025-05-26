@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Image, Loader2, RefreshCw } from "lucide-react";
 import { Post } from "@/types";
@@ -21,22 +22,25 @@ export const PostCardImage = ({
   onSelectPrompt,
   onImageRegenerated
 }: PostCardImageProps) => {
-  const { isGeneratingImage } = { isGeneratingImage: false }; // Use local loading state instead
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const { getUserId } = useUser();
 
   const handleSelectPrompt = async (prompt: string) => {
     onSelectPrompt(prompt);
     
     if (!post.imageUrl) {
+      setIsGeneratingImage(true);
       try {
         const imageUrl = await generateImageFromPrompt(prompt, getUserId());
         
         if (imageUrl) {
-          // Only notify parent component, don't update the post automatically
+          // Notify parent component with the new image URL
           onImageRegenerated?.(imageUrl);
         }
       } catch (error) {
         console.error("Error generating image:", error);
+      } finally {
+        setIsGeneratingImage(false);
       }
     }
   };
@@ -45,15 +49,18 @@ export const PostCardImage = ({
     // Use the selected prompt if available, otherwise use a default prompt
     const prompt = post.selectedImagePrompt || `Professional illustration related to ${post.content.substring(0, 100)}`;
     
+    setIsGeneratingImage(true);
     try {
       const imageUrl = await generateImageFromPrompt(prompt, getUserId());
       
       if (imageUrl) {
-        // Only notify parent component, don't automatically update the post
+        // Notify parent component with the new image URL
         onImageRegenerated?.(imageUrl);
       }
     } catch (error) {
       console.error("Error regenerating image:", error);
+    } finally {
+      setIsGeneratingImage(false);
     }
   };
 

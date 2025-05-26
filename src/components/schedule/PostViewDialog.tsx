@@ -7,6 +7,7 @@ import { Loader2, Save, Share2 } from "lucide-react";
 import { Post } from "@/types";
 import { publishPost, isLinkedInConnected } from "@/services/linkedinService";
 import { updatePost as updatePostAPI } from "@/services/postService";
+import { usePostContext } from "@/contexts/PostContext";
 import { toast } from "sonner";
 
 interface PostViewDialogProps {
@@ -34,6 +35,7 @@ export const PostViewDialog = ({
   const [originalImageUrl, setOriginalImageUrl] = useState<string | undefined>(undefined);
   const [hasImageChanged, setHasImageChanged] = useState(false);
   const [currentImageUrl, setCurrentImageUrl] = useState<string | undefined>(undefined);
+  const { updatePost } = usePostContext();
 
   // Track the original image URL when dialog opens
   useEffect(() => {
@@ -92,24 +94,37 @@ export const PostViewDialog = ({
         description: post.content
       };
       
-      // Only include imageUrl if it has actually changed
-      if (hasImageChanged) {
+      // Only include imageUrl if it has actually changed or if it's a new post with an image
+      if (hasImageChanged || (post.status === "pending" && currentImageUrl)) {
         updates.imageUrl = currentImageUrl;
       }
       
-      // Only call API if post is approved (exists on server)
+      let savedPost = post;
+      
+      // Only call API if post is approved (exists on server) or if it's a new post that needs saving
       if (post.status === "approved") {
-        await updatePostAPI(post.id, getUserId(), updates);
+        savedPost = await updatePostAPI(post.id, getUserId(), updates);
+      } else if (post.status === "pending") {
+        // For new posts, we need to save them and get the server ID
+        const { savePostWithImage } = await import("@/services/postService");
+        savedPost = await savePostWithImage(post.content, getUserId(), currentImageUrl);
+        
+        // Update the post in context with the new server ID and approved status
+        updatePost(post.id, {
+          id: savedPost._id || savedPost.id,
+          status: "approved",
+          imageUrl: currentImageUrl
+        });
       }
       
       // Reset the change tracking after successful save
       setOriginalImageUrl(currentImageUrl);
       setHasImageChanged(false);
       
-      toast.success("Post updated successfully!");
+      toast.success("Post saved successfully!");
     } catch (error) {
-      toast.error("Failed to update post");
-      console.error("Error updating post:", error);
+      toast.error("Failed to save post");
+      console.error("Error saving post:", error);
     } finally {
       setIsSaving(false);
     }
@@ -120,6 +135,11 @@ export const PostViewDialog = ({
     setCurrentImageUrl(newImageUrl);
     if (originalImageUrl !== undefined) {
       setHasImageChanged(newImageUrl !== originalImageUrl);
+    }
+    
+    // Update the post in context with the new image
+    if (post) {
+      updatePost(post.id, { imageUrl: newImageUrl });
     }
   };
 

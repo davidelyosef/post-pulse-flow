@@ -21,11 +21,15 @@ export const usePostOperations = (
     if (!post) return;
 
     try {
-      await savePostWithImage(post.content, getUserId(), post.imageUrl);
+      const savedPost = await savePostWithImage(post.content, getUserId(), post.imageUrl);
       
       setPosts((prevPosts) =>
         prevPosts.map((post) =>
-          post.id === id ? { ...post, status: "approved" } : post
+          post.id === id ? { 
+            ...post, 
+            status: "approved",
+            id: savedPost._id || savedPost.id || post.id // Use server ID if available
+          } : post
         )
       );
       toast.success("Post approved and saved");
@@ -49,24 +53,47 @@ export const usePostOperations = (
     if (!post) return;
 
     try {
+      // Update local state immediately for UI responsiveness
+      setPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post.id === id ? { ...post, ...updatedPost } : post
+        )
+      );
+
+      // Only call API if post is approved (exists on server)
       if (post.status === "approved") {
         const updates: any = {};
         if (updatedPost.content) updates.description = updatedPost.content;
         if (updatedPost.imageUrl) updates.imageUrl = updatedPost.imageUrl;
         if (updatedPost.scheduledFor) updates.scheduleTime = updatedPost.scheduledFor.toISOString();
         
-        await updatePostAPI(id, getUserId(), updates);
+        const serverPost = await updatePostAPI(id, getUserId(), updates);
+        
+        // Update with server response if available
+        if (serverPost) {
+          setPosts((prevPosts) =>
+            prevPosts.map((post) =>
+              post.id === id ? { 
+                ...post, 
+                ...updatedPost,
+                id: serverPost._id || serverPost.id || post.id
+              } : post
+            )
+          );
+        }
       }
-
-      setPosts((prevPosts) =>
-        prevPosts.map((post) =>
-          post.id === id ? { ...post, ...updatedPost } : post
-        )
-      );
+      
       toast.success("Post updated");
     } catch (error) {
       console.error('Error updating post:', error);
       toast.error("Failed to update post on server");
+      
+      // Revert local changes on error
+      setPosts((prevPosts) =>
+        prevPosts.map((p) =>
+          p.id === id ? post : p
+        )
+      );
     }
   };
 
