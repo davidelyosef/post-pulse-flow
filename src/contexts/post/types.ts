@@ -17,6 +17,7 @@ export interface PostContextType {
   selectImagePrompt: (id: string, prompt: string) => void;
   generateImage: (id: string, prompt: string) => Promise<string>;
   regenerateImage: (id: string, prompt: string) => Promise<string>;
+  updatePostImage: (id: string, imageUrl: string) => void;
   loadUserPosts: () => Promise<void>;
   isLoading: boolean;
   isGeneratingImage: boolean;

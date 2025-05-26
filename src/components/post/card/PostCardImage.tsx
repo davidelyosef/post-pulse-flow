@@ -5,6 +5,7 @@ import { Image, Loader2, RefreshCw } from "lucide-react";
 import { Post } from "@/types";
 import { generateImageFromPrompt } from "@/services/openAIService";
 import { useUser } from "@/contexts/UserContext";
+import { usePostContext } from "@/contexts/PostContext";
 
 interface PostCardImageProps {
   post: Post;
@@ -24,6 +25,7 @@ export const PostCardImage = ({
 }: PostCardImageProps) => {
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const { getUserId } = useUser();
+  const { updatePostImage } = usePostContext();
 
   const handleSelectPrompt = async (prompt: string) => {
     console.log("PostCardImage: Selecting prompt:", prompt);
@@ -37,7 +39,10 @@ export const PostCardImage = ({
         console.log("PostCardImage: Generated image URL:", imageUrl);
         
         if (imageUrl) {
-          // Notify parent component with the new image URL
+          // Update the post in context immediately
+          updatePostImage(post.id, imageUrl);
+          
+          // Also notify parent component if callback is provided
           console.log("PostCardImage: Calling onImageRegenerated with:", imageUrl);
           onImageRegenerated?.(imageUrl);
         }
@@ -60,7 +65,10 @@ export const PostCardImage = ({
       console.log("PostCardImage: Regenerated image URL:", imageUrl);
       
       if (imageUrl) {
-        // Notify parent component with the new image URL
+        // Update the post in context immediately
+        updatePostImage(post.id, imageUrl);
+        
+        // Also notify parent component if callback is provided
         console.log("PostCardImage: Calling onImageRegenerated with:", imageUrl);
         onImageRegenerated?.(imageUrl);
       }

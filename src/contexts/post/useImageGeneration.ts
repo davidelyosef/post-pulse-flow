@@ -33,6 +33,7 @@ export const useImageGeneration = (
   };
 
   const selectImagePrompt = (id: string, prompt: string) => {
+    console.log("useImageGeneration: Selecting prompt for post", id, "prompt:", prompt);
     setPosts((prevPosts) =>
       prevPosts.map((post) =>
         post.id === id ? { ...post, selectedImagePrompt: prompt } : post
@@ -41,18 +42,22 @@ export const useImageGeneration = (
   };
 
   const generateImage = async (id: string, prompt: string): Promise<string> => {
+    console.log("useImageGeneration: Generating image for post", id, "with prompt:", prompt);
     setIsGeneratingImage(true);
     
     try {
       const imageUrl = await generateImageFromPrompt(prompt, getUserId());
+      console.log("useImageGeneration: Received image URL:", imageUrl);
       
       if (imageUrl) {
+        // Update the post with the new image URL immediately
         setPosts((prevPosts) =>
           prevPosts.map((p) =>
             p.id === id ? { ...p, imageUrl } : p
           )
         );
         
+        console.log("useImageGeneration: Updated post", id, "with imageUrl:", imageUrl);
         return imageUrl;
       } else {
         const fallbackUrl = "https://via.placeholder.com/800x450/0077B5/ffffff?text=LinkedIn+Image";
@@ -87,11 +92,22 @@ export const useImageGeneration = (
     return generateImage(id, prompt);
   };
 
+  // New function to update image URL directly for pending posts
+  const updatePostImage = (id: string, imageUrl: string) => {
+    console.log("useImageGeneration: Updating post", id, "with direct imageUrl:", imageUrl);
+    setPosts((prevPosts) =>
+      prevPosts.map((p) =>
+        p.id === id ? { ...p, imageUrl } : p
+      )
+    );
+  };
+
   return {
     isGeneratingImage,
     generateImagePrompts,
     selectImagePrompt,
     generateImage,
     regenerateImage,
+    updatePostImage,
   };
 };
