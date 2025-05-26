@@ -113,7 +113,14 @@ export const PostCardImage = ({
                 onClick={() => handleSelectPrompt(prompt)}
                 disabled={isGeneratingImage}
               >
-                {prompt}
+                {isGeneratingImage ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    Generating...
+                  </>
+                ) : (
+                  prompt
+                )}
               </Button>
             ))}
           </div>

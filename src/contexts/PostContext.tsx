@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { generateImage as generateImageService } from "@/services/linkedinService";
 import { savePostWithImage, getUserPosts, updatePost as updatePostAPI, deletePost as deletePostAPI } from "@/services/postService";
 import { useUser } from "./UserContext";
+import { generateImageFromPrompt } from "@/services/openAIService";
 
 interface PostContextType {
   posts: Post[];
@@ -199,16 +200,13 @@ export const PostProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     );
   };
 
-  // Updated to use the real API with loading state
+  // Updated to use the correct API endpoint for image generation
   const generateImage = async (id: string, prompt: string): Promise<string> => {
-    const post = posts.find((p) => p.id === id);
-    if (!post) return "";
-    
     setIsGeneratingImage(true);
     
     try {
-      // Call the real API service to generate an image
-      const imageUrl = await generateImageService(prompt, post.content);
+      // Call the image generation API
+      const imageUrl = await generateImageFromPrompt(prompt, getUserId());
       
       if (imageUrl) {
         // Update the post with the image URL
@@ -250,7 +248,7 @@ export const PostProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  // New function to regenerate image
+  // Regenerate image using the same API endpoint
   const regenerateImage = async (id: string, prompt: string): Promise<string> => {
     return generateImage(id, prompt);
   };
