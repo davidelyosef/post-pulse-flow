@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { format } from "date-fns";
 import { usePostContext } from "@/contexts/PostContext";
@@ -12,11 +13,11 @@ import { publishPost, schedulePost as scheduleLinkedInPost, isLinkedInConnected 
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { EditPostDialog } from "@/components/approve/EditPostDialog";
-import { savePostWithImage } from "@/services/postService";
+import { updatePost as updatePostAPI } from "@/services/postService";
 import { useUser } from "@/contexts/UserContext";
 
 export const ScheduledPostList = () => {
-  const { approvedPosts, deletePost, updatePost, schedulePost } = usePostContext();
+  const { approvedPosts, deletePost, updatePost, schedulePost, isGeneratingImage } = usePostContext();
   const { getUserId } = useUser();
   const scheduledPosts = approvedPosts.filter(post => post.scheduledFor);
   const unscheduledPosts = approvedPosts.filter(post => !post.scheduledFor);
@@ -32,6 +33,7 @@ export const ScheduledPostList = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [scheduledDate, setScheduledDate] = useState<Date | undefined>(undefined);
   const [scheduledTime, setScheduledTime] = useState("12:00");
+  const [imageRegeneratedPosts, setImageRegeneratedPosts] = useState<Set<string>>(new Set());
 
   const selectedPost = selectedPostId 
     ? approvedPosts.find(post => post.id === selectedPostId) 
@@ -148,15 +150,35 @@ export const ScheduledPostList = () => {
     
     setIsSaving(true);
     try {
-      await savePostWithImage(selectedPost.content, getUserId(), selectedPost.imageUrl);
-      toast.success("Post saved successfully!");
+      // Update the existing post instead of creating a new one
+      await updatePostAPI(selectedPost.id, getUserId(), {
+        description: selectedPost.content,
+        imageUrl: selectedPost.imageUrl
+      });
+      
+      // Remove from regenerated posts set since it's now saved
+      setImageRegeneratedPosts(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(selectedPost.id);
+        return newSet;
+      });
+      
+      toast.success("Post updated successfully!");
     } catch (error) {
-      toast.error("Failed to save post");
-      console.error("Error saving post:", error);
+      toast.error("Failed to update post");
+      console.error("Error updating post:", error);
     } finally {
       setIsSaving(false);
     }
   };
+
+  // Track when an image is regenerated
+  const handleImageRegenerated = (postId: string) => {
+    setImageRegeneratedPosts(prev => new Set([...prev, postId]));
+  };
+
+  // Check if the save button should be shown
+  const shouldShowSaveButton = selectedPost && imageRegeneratedPosts.has(selectedPost.id);
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -282,7 +304,11 @@ export const ScheduledPostList = () => {
           
           {selectedPost && (
             <div className="py-4">
-              <PostCard post={selectedPost} showActions={false} />
+              <PostCard 
+                post={selectedPost} 
+                showActions={false}
+                onImageRegenerated={() => handleImageRegenerated(selectedPost.id)}
+              />
             </div>
           )}
           
@@ -294,24 +320,26 @@ export const ScheduledPostList = () => {
             >
               Close
             </Button>
-            <Button
-              variant="outline"
-              className="w-full sm:w-auto gap-2"
-              onClick={handleSavePost}
-              disabled={isSaving}
-            >
-              {isSaving ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <Save className="h-4 w-4" />
-                  Save Post
-                </>
-              )}
-            </Button>
+            {shouldShowSaveButton && (
+              <Button
+                variant="outline"
+                className="w-full sm:w-auto gap-2"
+                onClick={handleSavePost}
+                disabled={isSaving}
+              >
+                {isSaving ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-4 w-4" />
+                    Save Post
+                  </>
+                )}
+              </Button>
+            )}
             <Button
               className="w-full sm:w-auto gap-2"
               onClick={handlePublishNow}

@@ -12,13 +12,15 @@ interface PostCardImageProps {
   isGeneratingImage: boolean;
   onGeneratePrompts: () => void;
   onSelectPrompt: (prompt: string) => void;
+  onImageRegenerated?: () => void;
 }
 
 export const PostCardImage = ({ 
   post, 
   isGeneratingPrompts, 
   onGeneratePrompts, 
-  onSelectPrompt 
+  onSelectPrompt,
+  onImageRegenerated
 }: PostCardImageProps) => {
   const { updatePost, regenerateImage, isGeneratingImage } = usePostContext();
   const { getUserId } = useUser();
@@ -43,6 +45,8 @@ export const PostCardImage = ({
     if (post.selectedImagePrompt) {
       try {
         await regenerateImage(post.id, post.selectedImagePrompt);
+        // Notify parent component that image was regenerated
+        onImageRegenerated?.();
       } catch (error) {
         console.error("Error regenerating image:", error);
       }
