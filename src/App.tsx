@@ -11,12 +11,14 @@ import ApprovePage from "./pages/ApprovePage";
 import SchedulePage from "./pages/SchedulePage";
 import NotFound from "./pages/NotFound";
 import { PostProvider } from "./contexts/PostContext";
-import { UserProvider } from "./contexts/UserContext";
+import { UserProvider, useUser } from "./contexts/UserContext";
 import { ThemeProvider } from "./components/theme/ThemeProvider";
 
 const queryClient = new QueryClient();
 
-const App = () => {
+const AppContent = () => {
+  const { updateUserFromLinkedInAuth } = useUser();
+
   useEffect(() => {
     // Set document title
     document.title = "LinkedAI";
@@ -31,9 +33,11 @@ const App = () => {
       try {
         const response = await fetch("https://34.226.170.38:3000/api/auth/success", { credentials: "include" });
         const data = await response.json();
+        console.log("LinkedIn auth response:", data);
+        
         if (data && data.user) {
-          localStorage.setItem("linkedinUser", JSON.stringify(data.user));
-          localStorage.setItem("linkedinConnected", "true");
+          // Update user context with the authentication data
+          updateUserFromLinkedInAuth(data);
         }
       } catch (error) {
         console.error("Error fetching LinkedIn user data:", error);
@@ -41,26 +45,32 @@ const App = () => {
     };
 
     init();
-  }, []);
+  }, [updateUserFromLinkedInAuth]);
 
+  return (
+    <PostProvider>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/generate" element={<GeneratePage />} />
+          <Route path="/approve" element={<ApprovePage />} />
+          <Route path="/schedule" element={<SchedulePage />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
+    </PostProvider>
+  );
+};
+
+const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="system">
         <TooltipProvider>
           <UserProvider>
-            <PostProvider>
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/generate" element={<GeneratePage />} />
-                  <Route path="/approve" element={<ApprovePage />} />
-                  <Route path="/schedule" element={<SchedulePage />} />
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </BrowserRouter>
-            </PostProvider>
+            <AppContent />
           </UserProvider>
         </TooltipProvider>
       </ThemeProvider>

@@ -4,8 +4,12 @@ import { toast } from 'sonner';
 
 interface User {
   id: string;
+  linkedinId?: string;
   name?: string;
+  displayName?: string;
   email?: string;
+  profileUrl?: string;
+  lastLogin?: string;
   linkedinConnected: boolean;
 }
 
@@ -15,6 +19,7 @@ interface UserContextType {
   getUserId: () => string;
   isAuthenticated: boolean;
   updateUserLinkedInStatus: (connected: boolean) => void;
+  updateUserFromLinkedInAuth: (authData: any) => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -38,9 +43,13 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       // Create user from LinkedIn data
       const userData = JSON.parse(linkedinUser);
       const newUser: User = {
-        id: userData.userId || userData._id?.$oid || 'default-user-id',
+        id: userData.id || userData.userId || userData._id?.$oid || 'default-user-id',
+        linkedinId: userData.linkedinId,
         name: userData.displayName || userData.name,
+        displayName: userData.displayName,
         email: userData.email,
+        profileUrl: userData.profileUrl,
+        lastLogin: userData.lastLogin,
         linkedinConnected,
       };
       setUser(newUser);
@@ -73,6 +82,27 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     }
   };
 
+  const updateUserFromLinkedInAuth = (authData: any) => {
+    if (authData && authData.user) {
+      const userData = authData.user;
+      const newUser: User = {
+        id: userData.id || 'default-user-id',
+        linkedinId: userData.linkedinId,
+        name: userData.displayName,
+        displayName: userData.displayName,
+        email: userData.email,
+        profileUrl: userData.profileUrl,
+        lastLogin: userData.lastLogin,
+        linkedinConnected: true,
+      };
+      setUser(newUser);
+      localStorage.setItem('user', JSON.stringify(newUser));
+      localStorage.setItem('linkedinUser', JSON.stringify(userData));
+      localStorage.setItem('linkedinConnected', 'true');
+      console.log('User context updated with LinkedIn auth data:', newUser);
+    }
+  };
+
   const isAuthenticated = user !== null;
 
   return (
@@ -83,6 +113,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         getUserId,
         isAuthenticated,
         updateUserLinkedInStatus,
+        updateUserFromLinkedInAuth,
       }}
     >
       {children}
