@@ -39,9 +39,12 @@ export const PostViewDialog = ({
   // Get the current post from context to ensure we have the latest version
   const currentPost = posts.find(p => p.id === post?.id) || post;
 
+  console.log("PostViewDialog: Rendering with post:", post?.id, "currentPost imageUrl:", currentPost?.imageUrl);
+
   // Track the original image URL when dialog opens
   useEffect(() => {
     if (isOpen && currentPost) {
+      console.log("PostViewDialog: Dialog opened, setting original image URL:", currentPost.imageUrl);
       setOriginalImageUrl(currentPost.imageUrl);
       setHasImageChanged(false);
     }
@@ -50,7 +53,9 @@ export const PostViewDialog = ({
   // Check if image has changed whenever currentPost.imageUrl changes
   useEffect(() => {
     if (currentPost && originalImageUrl !== undefined) {
-      setHasImageChanged(currentPost.imageUrl !== originalImageUrl);
+      const hasChanged = currentPost.imageUrl !== originalImageUrl;
+      console.log("PostViewDialog: Image change check - original:", originalImageUrl, "current:", currentPost.imageUrl, "hasChanged:", hasChanged);
+      setHasImageChanged(hasChanged);
     }
   }, [currentPost?.imageUrl, originalImageUrl]);
 
@@ -132,10 +137,11 @@ export const PostViewDialog = ({
   };
 
   const handleImageRegenerated = (newImageUrl: string) => {
-    console.log("Image regenerated with URL:", newImageUrl);
+    console.log("PostViewDialog: Image regenerated callback with URL:", newImageUrl);
     
     // Update the post in context with the new image
     if (currentPost) {
+      console.log("PostViewDialog: Updating post in context with new image URL");
       updatePost(currentPost.id, { imageUrl: newImageUrl });
     }
   };

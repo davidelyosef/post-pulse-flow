@@ -26,15 +26,19 @@ export const PostCardImage = ({
   const { getUserId } = useUser();
 
   const handleSelectPrompt = async (prompt: string) => {
+    console.log("PostCardImage: Selecting prompt:", prompt);
     onSelectPrompt(prompt);
     
     if (!post.imageUrl) {
+      console.log("PostCardImage: No existing image, generating new one...");
       setIsGeneratingImage(true);
       try {
         const imageUrl = await generateImageFromPrompt(prompt, getUserId());
+        console.log("PostCardImage: Generated image URL:", imageUrl);
         
         if (imageUrl) {
           // Notify parent component with the new image URL
+          console.log("PostCardImage: Calling onImageRegenerated with:", imageUrl);
           onImageRegenerated?.(imageUrl);
         }
       } catch (error) {
@@ -48,13 +52,16 @@ export const PostCardImage = ({
   const handleRegenerateImage = async () => {
     // Use the selected prompt if available, otherwise use a default prompt
     const prompt = post.selectedImagePrompt || `Professional illustration related to ${post.content.substring(0, 100)}`;
+    console.log("PostCardImage: Regenerating image with prompt:", prompt);
     
     setIsGeneratingImage(true);
     try {
       const imageUrl = await generateImageFromPrompt(prompt, getUserId());
+      console.log("PostCardImage: Regenerated image URL:", imageUrl);
       
       if (imageUrl) {
         // Notify parent component with the new image URL
+        console.log("PostCardImage: Calling onImageRegenerated with:", imageUrl);
         onImageRegenerated?.(imageUrl);
       }
     } catch (error) {
@@ -63,6 +70,8 @@ export const PostCardImage = ({
       setIsGeneratingImage(false);
     }
   };
+
+  console.log("PostCardImage: Rendering with imageUrl:", post.imageUrl);
 
   if (post.imageUrl) {
     return (
