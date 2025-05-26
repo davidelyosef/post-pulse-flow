@@ -7,7 +7,6 @@ import { ScheduleDialog } from "./ScheduleDialog";
 import { EmptyPostsView } from "./EmptyPostsView";
 import { PostSwiperCounter } from "./PostSwiperCounter";
 import { SwipeInstructions } from "./SwipeInstructions";
-import { toast } from "sonner";
 
 export const PostSwiper = () => {
   const { pendingPosts, approvePost, rejectPost, updatePost, schedulePost, generateImagePrompts } = usePostContext();
@@ -33,30 +32,6 @@ export const PostSwiper = () => {
   const handleApprove = async () => {
     if (!currentPost) return;
 
-    let user: any = localStorage.getItem("linkedinUser");
-
-    if (!user) {
-      toast.error("Please connect to LinkedIn first");
-      return;
-    } else {
-      user = JSON.parse(user);
-    }
-
-    try {
-      const response = await fetch("https://34.226.170.38:3000/api/generate/saveimage", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          description: currentPost.content,
-          userId: user.id,
-        }),
-      });
-    } catch (err) {
-      console.log("Error approving post", err);
-    }
-
     // If post doesn't have image prompts yet, generate them
     if (!currentPost.imagePrompts) {
       try {
@@ -73,8 +48,8 @@ export const PostSwiper = () => {
     // Keep track of the current index
     const currentIndex = currentPostIndex;
 
-    // Approve the post
-    approvePost(currentPostId);
+    // Approve the post (this now handles the API call)
+    await approvePost(currentPostId);
 
     // Adjust the index if needed
     if (currentIndex >= pendingPosts.length - 1) {

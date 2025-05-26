@@ -1,6 +1,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { toast } from 'sonner';
+import { getUserPosts } from '@/services/postService';
 
 interface User {
   id: string;
@@ -20,6 +21,7 @@ interface UserContextType {
   isAuthenticated: boolean;
   updateUserLinkedInStatus: (connected: boolean) => void;
   updateUserFromLinkedInAuth: (authData: any) => void;
+  loadUserPosts: () => Promise<void>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -103,6 +105,22 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     }
   };
 
+  const loadUserPosts = async () => {
+    if (!user?.id) return;
+    
+    try {
+      console.log('Loading posts for user:', user.id);
+      const posts = await getUserPosts(user.id);
+      console.log('Loaded posts:', posts);
+      
+      // Posts will be handled by PostContext
+      return posts;
+    } catch (error) {
+      console.error('Error loading user posts:', error);
+      toast.error('Failed to load your posts');
+    }
+  };
+
   const isAuthenticated = user !== null;
 
   return (
@@ -114,6 +132,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         isAuthenticated,
         updateUserLinkedInStatus,
         updateUserFromLinkedInAuth,
+        loadUserPosts,
       }}
     >
       {children}
