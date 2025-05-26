@@ -45,7 +45,7 @@ const AppContent = () => {
     };
 
     init();
-  }, [updateUserFromLinkedInAuth]);
+  }, []); // Remove the dependency to prevent infinite loop
 
   return (
     <PostProvider>
