@@ -20,7 +20,7 @@ interface PostCardProps {
   className?: string;
   showActions?: boolean;
   showTags?: boolean;
-  onImageRegenerated?: () => void;
+  onImageRegenerated?: (newImageUrl: string) => void;
 }
 
 export const PostCard = ({
