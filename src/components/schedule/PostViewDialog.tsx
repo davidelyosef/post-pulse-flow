@@ -34,37 +34,28 @@ export const PostViewDialog = ({
   const [isSaving, setIsSaving] = useState(false);
   const [originalImageUrl, setOriginalImageUrl] = useState<string | undefined>(undefined);
   const [hasImageChanged, setHasImageChanged] = useState(false);
-  const [currentImageUrl, setCurrentImageUrl] = useState<string | undefined>(undefined);
-  const [displayPost, setDisplayPost] = useState<Post | null>(null);
-  const { updatePost } = usePostContext();
+  const { updatePost, posts } = usePostContext();
 
-  // Track the original image URL when dialog opens and create display post
+  // Get the current post from context to ensure we have the latest version
+  const currentPost = posts.find(p => p.id === post?.id) || post;
+
+  // Track the original image URL when dialog opens
   useEffect(() => {
-    if (isOpen && post) {
-      setOriginalImageUrl(post.imageUrl);
-      setCurrentImageUrl(post.imageUrl);
+    if (isOpen && currentPost) {
+      setOriginalImageUrl(currentPost.imageUrl);
       setHasImageChanged(false);
-      setDisplayPost({...post, imageUrl: post.imageUrl});
     }
-  }, [isOpen, post?.id]);
+  }, [isOpen, currentPost?.id]);
 
-  // Update display post when currentImageUrl changes
+  // Check if image has changed whenever currentPost.imageUrl changes
   useEffect(() => {
-    if (post && currentImageUrl !== undefined) {
-      setDisplayPost({...post, imageUrl: currentImageUrl});
+    if (currentPost && originalImageUrl !== undefined) {
+      setHasImageChanged(currentPost.imageUrl !== originalImageUrl);
     }
-  }, [currentImageUrl, post]);
-
-  // Check if image has changed whenever post.imageUrl changes
-  useEffect(() => {
-    if (post && originalImageUrl !== undefined) {
-      setHasImageChanged(post.imageUrl !== originalImageUrl);
-      setCurrentImageUrl(post.imageUrl);
-    }
-  }, [post?.imageUrl, originalImageUrl]);
+  }, [currentPost?.imageUrl, originalImageUrl]);
 
   const handlePublishNow = async () => {
-    if (!post) return;
+    if (!currentPost) return;
     
     if (!isLinkedInConnected()) {
       toast.error("Please connect to LinkedIn before publishing");
@@ -74,7 +65,7 @@ export const PostViewDialog = ({
     
     setIsPublishing(true);
     try {
-      const success = await publishPost(post.content, currentImageUrl);
+      const success = await publishPost(currentPost.content, currentPost.imageUrl);
       if (success) {
         onClose();
         toast.success("Post published to LinkedIn successfully!");
@@ -88,47 +79,47 @@ export const PostViewDialog = ({
   };
 
   const handleSavePost = async () => {
-    if (!post) return;
+    if (!currentPost) return;
     
     // Only check for valid ObjectId if the post has approved status (exists on server)
-    if (post.status === "approved" && !isValidObjectId(post.id)) {
+    if (currentPost.status === "approved" && !isValidObjectId(currentPost.id)) {
       toast.error("Cannot update post: Invalid post ID format");
-      console.error("Invalid ObjectId format:", post.id);
+      console.error("Invalid ObjectId format:", currentPost.id);
       return;
     }
     
     setIsSaving(true);
     try {
       const updates: any = {
-        description: post.content
+        description: currentPost.content
       };
       
       // Only include imageUrl if it has actually changed or if it's a new post with an image
-      if (hasImageChanged || (post.status === "pending" && currentImageUrl)) {
-        updates.imageUrl = currentImageUrl;
+      if (hasImageChanged || (currentPost.status === "pending" && currentPost.imageUrl)) {
+        updates.imageUrl = currentPost.imageUrl;
       }
       
-      let savedPost = post;
+      let savedPost = currentPost;
       
       // Only call API if post is approved (exists on server) or if it's a new post that needs saving
-      if (post.status === "approved") {
-        savedPost = await updatePostAPI(post.id, getUserId(), updates);
-      } else if (post.status === "pending") {
+      if (currentPost.status === "approved") {
+        savedPost = await updatePostAPI(currentPost.id, getUserId(), updates);
+      } else if (currentPost.status === "pending") {
         // For new posts, we need to save them and get the server ID
         const { savePostWithImage } = await import("@/services/postService");
-        const serverResponse = await savePostWithImage(post.content, getUserId(), currentImageUrl);
+        const serverResponse = await savePostWithImage(currentPost.content, getUserId(), currentPost.imageUrl);
         
         // Update the post in context with the new server ID and approved status
-        const serverId = serverResponse.id || post.id;
-        updatePost(post.id, {
+        const serverId = serverResponse.id || currentPost.id;
+        updatePost(currentPost.id, {
           id: serverId,
           status: "approved",
-          imageUrl: currentImageUrl
+          imageUrl: currentPost.imageUrl
         });
       }
       
       // Reset the change tracking after successful save
-      setOriginalImageUrl(currentImageUrl);
+      setOriginalImageUrl(currentPost.imageUrl);
       setHasImageChanged(false);
       
       toast.success("Post saved successfully!");
@@ -143,15 +134,9 @@ export const PostViewDialog = ({
   const handleImageRegenerated = (newImageUrl: string) => {
     console.log("Image regenerated with URL:", newImageUrl);
     
-    // Update local state
-    setCurrentImageUrl(newImageUrl);
-    if (originalImageUrl !== undefined) {
-      setHasImageChanged(newImageUrl !== originalImageUrl);
-    }
-    
     // Update the post in context with the new image
-    if (post) {
-      updatePost(post.id, { imageUrl: newImageUrl });
+    if (currentPost) {
+      updatePost(currentPost.id, { imageUrl: newImageUrl });
     }
   };
 
@@ -162,10 +147,10 @@ export const PostViewDialog = ({
           <DialogTitle className="text-2xl">Post Details</DialogTitle>
         </DialogHeader>
         
-        {displayPost && (
+        {currentPost && (
           <div className="py-4">
             <PostCard 
-              post={displayPost} 
+              post={currentPost} 
               showActions={false}
               onImageRegenerated={handleImageRegenerated}
             />
