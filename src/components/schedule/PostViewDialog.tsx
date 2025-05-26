@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { PostCard } from "@/components/post/PostCard";
@@ -31,7 +31,23 @@ export const PostViewDialog = ({
 }: PostViewDialogProps) => {
   const [isPublishing, setIsPublishing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [imageRegeneratedPosts, setImageRegeneratedPosts] = useState<Set<string>>(new Set());
+  const [originalImageUrl, setOriginalImageUrl] = useState<string | undefined>(undefined);
+  const [hasImageChanged, setHasImageChanged] = useState(false);
+
+  // Track the original image URL when dialog opens
+  useEffect(() => {
+    if (isOpen && post) {
+      setOriginalImageUrl(post.imageUrl);
+      setHasImageChanged(false);
+    }
+  }, [isOpen, post?.id]);
+
+  // Check if image has changed whenever post.imageUrl changes
+  useEffect(() => {
+    if (post && originalImageUrl !== undefined) {
+      setHasImageChanged(post.imageUrl !== originalImageUrl);
+    }
+  }, [post?.imageUrl, originalImageUrl]);
 
   const handlePublishNow = async () => {
     if (!post) return;
@@ -70,16 +86,20 @@ export const PostViewDialog = ({
     
     setIsSaving(true);
     try {
-      await updatePostAPI(post.id, getUserId(), {
-        description: post.content,
-        imageUrl: post.imageUrl
-      });
+      const updates: any = {
+        description: post.content
+      };
       
-      setImageRegeneratedPosts(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(post.id);
-        return newSet;
-      });
+      // Only include imageUrl if it has actually changed
+      if (hasImageChanged) {
+        updates.imageUrl = post.imageUrl;
+      }
+      
+      await updatePostAPI(post.id, getUserId(), updates);
+      
+      // Reset the change tracking after successful save
+      setOriginalImageUrl(post.imageUrl);
+      setHasImageChanged(false);
       
       toast.success("Post updated successfully!");
     } catch (error) {
@@ -91,10 +111,10 @@ export const PostViewDialog = ({
   };
 
   const handleImageRegenerated = (postId: string) => {
-    setImageRegeneratedPosts(prev => new Set([...prev, postId]));
+    // Image regeneration will be tracked automatically through useEffect
   };
 
-  const shouldShowSaveButton = post && imageRegeneratedPosts.has(post.id) && isValidObjectId(post.id);
+  const shouldShowSaveButton = post && isValidObjectId(post.id);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

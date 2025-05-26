@@ -42,14 +42,15 @@ export const PostCardImage = ({
   };
 
   const handleRegenerateImage = async () => {
-    if (post.selectedImagePrompt) {
-      try {
-        await regenerateImage(post.id, post.selectedImagePrompt);
-        // Notify parent component that image was regenerated
-        onImageRegenerated?.();
-      } catch (error) {
-        console.error("Error regenerating image:", error);
-      }
+    // Use the selected prompt if available, otherwise use a default prompt
+    const prompt = post.selectedImagePrompt || `Professional illustration related to ${post.content.substring(0, 100)}`;
+    
+    try {
+      await regenerateImage(post.id, prompt);
+      // Notify parent component that image was regenerated
+      onImageRegenerated?.();
+    } catch (error) {
+      console.error("Error regenerating image:", error);
     }
   };
 
@@ -68,27 +69,25 @@ export const PostCardImage = ({
             </div>
           )}
         </div>
-        {post.selectedImagePrompt && (
-          <Button
-            variant="outline"
-            size="sm"
-            className="mt-2 w-full"
-            onClick={handleRegenerateImage}
-            disabled={isGeneratingImage}
-          >
-            {isGeneratingImage ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                Generating...
-              </>
-            ) : (
-              <>
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Generate Different Image
-              </>
-            )}
-          </Button>
-        )}
+        <Button
+          variant="outline"
+          size="sm"
+          className="mt-2 w-full"
+          onClick={handleRegenerateImage}
+          disabled={isGeneratingImage}
+        >
+          {isGeneratingImage ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              Generating...
+            </>
+          ) : (
+            <>
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Generate Different Image
+            </>
+          )}
+        </Button>
       </div>
     );
   }
