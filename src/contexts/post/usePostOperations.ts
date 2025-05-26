@@ -159,6 +159,44 @@ export const usePostOperations = (
     }
   };
 
+  const removeSchedule = async (id: string) => {
+    const post = posts.find(p => p.id === id);
+    if (!post) return;
+
+    try {
+      // Update local state immediately
+      setPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post.id === id ? { ...post, scheduledFor: undefined } : post
+        )
+      );
+
+      // If post is approved (exists on server), remove the schedule time on backend
+      if (post.status === "approved") {
+        console.log('Removing schedule time on server for post:', id);
+        
+        const updates = {
+          scheduleTime: null
+        };
+        
+        await updatePostAPI(id, getUserId(), updates);
+        console.log('Schedule time removed on server successfully');
+      }
+
+      toast.success("Schedule removed");
+    } catch (error) {
+      console.error('Error removing schedule:', error);
+      toast.error("Failed to remove schedule on server");
+      
+      // Revert local changes on error
+      setPosts((prevPosts) =>
+        prevPosts.map((p) =>
+          p.id === id ? post : p
+        )
+      );
+    }
+  };
+
   return {
     addPost,
     addPosts,
@@ -167,5 +205,6 @@ export const usePostOperations = (
     updatePost,
     deletePost,
     schedulePost,
+    removeSchedule,
   };
 };

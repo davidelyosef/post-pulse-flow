@@ -16,7 +16,7 @@ export const PostProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   // Custom hooks for different functionalities
   const { isLoading, loadUserPosts } = usePostLoader(setPosts, user?.id);
   const { isGeneratingImage, generateImagePrompts, selectImagePrompt, generateImage, regenerateImage, updatePostImage } = useImageGeneration(posts, setPosts, getUserId);
-  const { addPost, addPosts, approvePost, rejectPost, updatePost, deletePost, schedulePost } = usePostOperations(posts, setPosts, getUserId);
+  const { addPost, addPosts, approvePost, rejectPost, updatePost, deletePost, schedulePost, removeSchedule } = usePostOperations(posts, setPosts, getUserId);
 
   // Load user posts when user changes
   useEffect(() => {
@@ -42,6 +42,7 @@ export const PostProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     updatePost,
     deletePost,
     schedulePost,
+    removeSchedule,
     generateImagePrompts,
     selectImagePrompt,
     generateImage,

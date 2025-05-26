@@ -12,7 +12,8 @@ export interface PostContextType {
   rejectPost: (id: string) => void;
   updatePost: (id: string, updatedPost: Partial<Post>) => Promise<void>;
   deletePost: (id: string) => Promise<void>;
-  schedulePost: (id: string, date: Date) => void;
+  schedulePost: (id: string, date: Date) => Promise<void>;
+  removeSchedule: (id: string) => Promise<void>;
   generateImagePrompts: (id: string) => Promise<string[]>;
   selectImagePrompt: (id: string, prompt: string) => void;
   generateImage: (id: string, prompt: string) => Promise<string>;

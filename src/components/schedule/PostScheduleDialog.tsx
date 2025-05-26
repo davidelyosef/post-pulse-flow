@@ -12,6 +12,8 @@ interface PostScheduleDialogProps {
   onDateChange: (date: Date | undefined) => void;
   onTimeChange: (time: string) => void;
   onSave: () => void;
+  onRemoveSchedule?: () => void;
+  isScheduled?: boolean;
 }
 
 export const PostScheduleDialog = ({
@@ -22,6 +24,8 @@ export const PostScheduleDialog = ({
   onDateChange,
   onTimeChange,
   onSave,
+  onRemoveSchedule,
+  isScheduled = false,
 }: PostScheduleDialogProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -57,6 +61,11 @@ export const PostScheduleDialog = ({
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
+          {isScheduled && onRemoveSchedule && (
+            <Button variant="destructive" onClick={onRemoveSchedule}>
+              Remove Schedule
+            </Button>
+          )}
           <Button onClick={onSave}>
             Schedule Post
           </Button>

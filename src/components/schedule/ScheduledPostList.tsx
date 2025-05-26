@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { format } from "date-fns";
 import { usePostContext } from "@/contexts/PostContext";
@@ -17,7 +16,7 @@ import { PostScheduleDialog } from "./PostScheduleDialog";
 import { PostDeleteDialog } from "./PostDeleteDialog";
 
 export const ScheduledPostList = () => {
-  const { approvedPosts, deletePost, updatePost, schedulePost } = usePostContext();
+  const { approvedPosts, deletePost, updatePost, schedulePost, removeSchedule } = usePostContext();
   const { getUserId } = useUser();
   const scheduledPosts = approvedPosts.filter(post => post.scheduledFor);
   const unscheduledPosts = approvedPosts.filter(post => !post.scheduledFor);
@@ -112,6 +111,14 @@ export const ScheduledPostList = () => {
       deletePost(selectedPostId);
       setDeleteDialogOpen(false);
       toast.success("Post deleted successfully");
+    }
+  };
+
+  const handleRemoveSchedule = () => {
+    if (selectedPostId) {
+      removeSchedule(selectedPostId);
+      setScheduleDialogOpen(false);
+      toast.success("Schedule removed successfully");
     }
   };
 
@@ -219,6 +226,8 @@ export const ScheduledPostList = () => {
         onDateChange={setScheduledDate}
         onTimeChange={setScheduledTime}
         onSave={handleSaveSchedule}
+        onRemoveSchedule={handleRemoveSchedule}
+        isScheduled={!!selectedPost?.scheduledFor}
       />
       
       <PostDeleteDialog
