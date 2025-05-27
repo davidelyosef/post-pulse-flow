@@ -46,14 +46,19 @@ export const PostSwiper = () => {
       }
     }
 
+    // Calculate what the new index should be after this post is removed
+    const newLength = pendingPosts.length - 1;
+    if (newLength === 0) {
+      // No posts left after this one
+      setCurrentPostIndex(0);
+    } else if (currentPostIndex >= newLength) {
+      // We're at the last post, go to the previous one
+      setCurrentPostIndex(newLength - 1);
+    }
+    // If we're not at the last post, the index stays the same (next post slides in)
+
     // Approve the post (this will remove it from pendingPosts)
     await approvePost(currentPost.id);
-    
-    // After approval, if we were at the last post and there are still posts left,
-    // move to the previous index to show the next available post
-    if (currentPostIndex >= pendingPosts.length - 1 && pendingPosts.length > 1) {
-      setCurrentPostIndex(Math.max(0, currentPostIndex - 1));
-    }
   };
 
   const handleReject = () => {
@@ -61,14 +66,19 @@ export const PostSwiper = () => {
 
     console.log('Rejecting post:', currentPost.id, 'currentIndex:', currentPostIndex, 'total posts:', pendingPosts.length);
 
+    // Calculate what the new index should be after this post is removed
+    const newLength = pendingPosts.length - 1;
+    if (newLength === 0) {
+      // No posts left after this one
+      setCurrentPostIndex(0);
+    } else if (currentPostIndex >= newLength) {
+      // We're at the last post, go to the previous one
+      setCurrentPostIndex(newLength - 1);
+    }
+    // If we're not at the last post, the index stays the same (next post slides in)
+
     // Reject the post (this will remove it from pendingPosts)
     rejectPost(currentPost.id);
-    
-    // After rejection, if we were at the last post and there are still posts left,
-    // move to the previous index to show the next available post
-    if (currentPostIndex >= pendingPosts.length - 1 && pendingPosts.length > 1) {
-      setCurrentPostIndex(Math.max(0, currentPostIndex - 1));
-    }
   };
 
   console.log('Rendering PostSwiper - pendingPosts:', pendingPosts.length, 'currentIndex:', currentPostIndex, 'currentPost:', currentPost?.id);
