@@ -41,13 +41,18 @@ export const ScheduledPostCard = ({
           {post.content}
         </div>
         <div className="flex gap-2 mt-auto">
-          <Button variant="outline" size="sm" onClick={() => onView(post.id)} className="flex items-center gap-1">
+          <Button variant="outline" size="sm" onClick={() => onView(post.id)} className="flex items-center gap-1 flex-1">
             <Eye className="h-4 w-4" />
             View
           </Button>
           <Button variant="outline" size="sm" onClick={() => onEdit(post.id)} className="flex-grow-0">
             <Edit className="h-4 w-4" />
           </Button>
+          {!isScheduled && (
+            <Button variant="outline" size="sm" onClick={() => onSchedule(post.id)} className="flex-grow-0">
+              <CalendarIcon className="h-4 w-4" />
+            </Button>
+          )}
           <Button variant="outline" size="sm" onClick={() => onDelete(post.id)} className="flex-grow-0 text-destructive hover:text-destructive">
             <Trash2 className="h-4 w-4" />
           </Button>
