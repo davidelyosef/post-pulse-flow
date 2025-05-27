@@ -2,6 +2,7 @@
 import { Post } from "@/types";
 import { toast } from "sonner";
 import { updatePost as updatePostAPI, deletePost as deletePostAPI } from "@/services/postService";
+import { publishPost as publishToLinkedIn } from "@/services/linkedinService";
 
 export const usePostManagement = (
   posts: Post[],
@@ -89,17 +90,33 @@ export const usePostManagement = (
     }
   };
 
-  const publishPost = (id: string) => {
-    setPosts((prevPosts) =>
-      prevPosts.map((post) =>
-        post.id === id ? { 
-          ...post, 
-          status: "published" as const,
-          publishedAt: new Date()
-        } : post
-      )
-    );
-    toast.success("Post published");
+  const publishPost = async (id: string) => {
+    const post = posts.find(p => p.id === id);
+    if (!post) return;
+
+    console.log('Publishing post:', id, 'with content:', post.content);
+
+    try {
+      // Publish to LinkedIn with postId
+      const success = await publishToLinkedIn(post.content, post.imageUrl, id);
+      
+      if (success) {
+        // Update local state to mark as published
+        setPosts((prevPosts) =>
+          prevPosts.map((post) =>
+            post.id === id ? { 
+              ...post, 
+              status: "published" as const,
+              publishedAt: new Date()
+            } : post
+          )
+        );
+        toast.success("Post published to LinkedIn");
+      }
+    } catch (error) {
+      console.error('Error publishing post:', error);
+      toast.error("Failed to publish post");
+    }
   };
 
   return {

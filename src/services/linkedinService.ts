@@ -54,14 +54,14 @@ export const generateImage = async (prompt: string, content: string): Promise<st
   }
 };
 
-export const publishPost = async (content: string, imageUrl?: string): Promise<boolean> => {
+export const publishPost = async (content: string, imageUrl?: string, postId?: string): Promise<boolean> => {
   // Check if connected first
   if (!isLinkedInConnected()) {
     toast.error("Please connect to LinkedIn before publishing");
     return false;
   }
 
-  console.log("Publishing to LinkedIn:", { content, imageUrl });
+  console.log("Publishing to LinkedIn:", { content, imageUrl, postId });
 
   try {
     // Get user data from localStorage
@@ -78,6 +78,7 @@ export const publishPost = async (content: string, imageUrl?: string): Promise<b
       imageUrl: imageUrl || "",
       visibility: "PUBLIC",
       user_id: userData.id || userData.userId || userData._id?.$oid || userData._id,
+      postId: postId, // Include the postId in the request
     };
 
     console.log("Sending LinkedIn post request:", requestBody);
