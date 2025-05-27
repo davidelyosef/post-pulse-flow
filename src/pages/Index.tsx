@@ -10,10 +10,6 @@ const Index = () => {
   return (
     <PageLayout>
       <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 relative overflow-hidden">
-        {/* Add theme toggle in the corner */}
-        <div className="absolute top-4 right-4 z-50">
-          <ThemeToggle />
-        </div>
 
         <header className="container mx-auto pt-8 md:pt-12 lg:pt-24 px-4 relative z-10">
           <div className="flex items-center gap-3 mb-3">
