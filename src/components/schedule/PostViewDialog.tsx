@@ -183,7 +183,7 @@ export const PostViewDialog = ({
                 <div className="flex items-start space-x-3">
                   <Avatar className="w-12 h-12">
                     <AvatarImage 
-                      src={linkedinUser?.profilePicture || user?.avatar} 
+                      src={linkedinUser?.profileUrl || user?.avatar} 
                       alt={linkedinUser?.displayName || user?.name || "User"} 
                     />
                     <AvatarFallback className="bg-blue-600 text-white font-semibold">
