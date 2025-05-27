@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { format } from "date-fns";
 import { usePostContext } from "@/contexts/PostContext";
@@ -5,18 +6,19 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar as CalendarIcon, Send } from "lucide-react";
 import { schedulePost as scheduleLinkedInPost, isLinkedInConnected } from "@/services/linkedinService";
 import { toast } from "sonner";
 import { EditPostDialog } from "@/components/approve/EditPostDialog";
 import { useUser } from "@/contexts/UserContext";
 import { ScheduledPostCard } from "./ScheduledPostCard";
+import { PublishedPostCard } from "./PublishedPostCard";
 import { PostViewDialog } from "./PostViewDialog";
 import { PostScheduleDialog } from "./PostScheduleDialog";
 import { PostDeleteDialog } from "./PostDeleteDialog";
 
 export const ScheduledPostList = () => {
-  const { approvedPosts, deletePost, updatePost, schedulePost, removeSchedule } = usePostContext();
+  const { approvedPosts, publishedPosts, deletePost, updatePost, schedulePost, removeSchedule, publishPost } = usePostContext();
   const { getUserId } = useUser();
   const scheduledPosts = approvedPosts.filter(post => post.scheduledFor);
   const unscheduledPosts = approvedPosts.filter(post => !post.scheduledFor);
@@ -31,7 +33,7 @@ export const ScheduledPostList = () => {
   const [scheduledTime, setScheduledTime] = useState("12:00");
 
   const selectedPost = selectedPostId 
-    ? approvedPosts.find(post => post.id === selectedPostId) 
+    ? [...approvedPosts, ...publishedPosts].find(post => post.id === selectedPostId) 
     : null;
 
   const filteredScheduledPosts = selectedDate 
@@ -48,7 +50,7 @@ export const ScheduledPostList = () => {
   };
   
   const handleEditPost = (postId: string) => {
-    const post = approvedPosts.find(post => post.id === postId);
+    const post = [...approvedPosts, ...publishedPosts].find(post => post.id === postId);
     if (post) {
       setSelectedPostId(postId);
       setEditDialogOpen(true);
@@ -122,6 +124,10 @@ export const ScheduledPostList = () => {
     }
   };
 
+  const handlePublishPost = (postId: string) => {
+    publishPost(postId);
+  };
+
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -169,15 +175,24 @@ export const ScheduledPostList = () => {
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredScheduledPosts.map((post) => (
-          <ScheduledPostCard
-            key={post.id}
-            post={post}
-            onView={handleViewPost}
-            onEdit={handleEditPost}
-            onSchedule={handleScheduleDialog}
-            onDelete={handleDeleteDialog}
-            isScheduled={true}
-          />
+          <div key={post.id} className="relative">
+            <ScheduledPostCard
+              post={post}
+              onView={handleViewPost}
+              onEdit={handleEditPost}
+              onSchedule={handleScheduleDialog}
+              onDelete={handleDeleteDialog}
+              isScheduled={true}
+            />
+            <Button
+              size="sm"
+              onClick={() => handlePublishPost(post.id)}
+              className="absolute top-2 right-2 bg-green-600 hover:bg-green-700"
+            >
+              <Send className="h-4 w-4 mr-1" />
+              Publish
+            </Button>
+          </div>
         ))}
       </div>
       
@@ -191,14 +206,42 @@ export const ScheduledPostList = () => {
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {unscheduledPosts.map((post) => (
-          <ScheduledPostCard
+          <div key={post.id} className="relative">
+            <ScheduledPostCard
+              post={post}
+              onView={handleViewPost}
+              onEdit={handleEditPost}
+              onSchedule={handleScheduleDialog}
+              onDelete={handleDeleteDialog}
+              isScheduled={false}
+            />
+            <Button
+              size="sm"
+              onClick={() => handlePublishPost(post.id)}
+              className="absolute top-2 right-2 bg-green-600 hover:bg-green-700"
+            >
+              <Send className="h-4 w-4 mr-1" />
+              Publish
+            </Button>
+          </div>
+        ))}
+      </div>
+
+      <h2 className="text-2xl font-semibold mt-8">Published Posts</h2>
+      
+      {publishedPosts.length === 0 && (
+        <Card className="text-center p-6 animate-fade-in">
+          <p className="text-muted-foreground mb-4">No published posts yet</p>
+        </Card>
+      )}
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {publishedPosts.map((post) => (
+          <PublishedPostCard
             key={post.id}
             post={post}
             onView={handleViewPost}
-            onEdit={handleEditPost}
-            onSchedule={handleScheduleDialog}
             onDelete={handleDeleteDialog}
-            isScheduled={false}
           />
         ))}
       </div>

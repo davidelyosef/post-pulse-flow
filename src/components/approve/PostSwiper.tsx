@@ -5,9 +5,11 @@ import { SwipeableCard } from "./SwipeableCard";
 import { EmptyPostsView } from "./EmptyPostsView";
 import { PostSwiperCounter } from "./PostSwiperCounter";
 import { SwipeInstructions } from "./SwipeInstructions";
+import { useNavigate } from "react-router-dom";
 
 export const PostSwiper = () => {
   const { pendingPosts, approvePost, rejectPost, generateImagePrompts } = usePostContext();
+  const navigate = useNavigate();
 
   const [currentPostIndex, setCurrentPostIndex] = useState(0);
 
@@ -20,8 +22,10 @@ export const PostSwiper = () => {
       setCurrentPostIndex(pendingPosts.length - 1);
     } else if (pendingPosts.length === 0) {
       setCurrentPostIndex(0);
+      // Navigate to schedule page when no more posts to approve
+      navigate('/schedule');
     }
-  }, [pendingPosts, currentPostIndex]);
+  }, [pendingPosts, currentPostIndex, navigate]);
 
   const currentPost = pendingPosts.length > 0 ? pendingPosts[currentPostIndex] : null;
 
@@ -41,18 +45,10 @@ export const PostSwiper = () => {
     // Store the current post's ID before approval
     const currentPostId = currentPost.id;
 
-    // Keep track of the current index
-    const currentIndex = currentPostIndex;
-
     // Approve the post (this now handles the API call and keeps the post)
     await approvePost(currentPostId);
 
-    // Adjust the index if needed
-    if (currentIndex >= pendingPosts.length - 1) {
-      // If it was the last post, go to the new last post
-      setCurrentPostIndex(Math.max(0, pendingPosts.length - 2));
-    }
-    // If it wasn't the last post, index stays the same as next post slides in
+    // Don't need to manually adjust index - the useEffect will handle it when pendingPosts changes
   };
 
   const handleReject = () => {
@@ -61,18 +57,10 @@ export const PostSwiper = () => {
     // Store the current post's ID before rejection
     const currentPostId = currentPost.id;
 
-    // Keep track of the current index
-    const currentIndex = currentPostIndex;
-
     // Reject the post
     rejectPost(currentPostId);
 
-    // Adjust the index if needed
-    if (currentIndex >= pendingPosts.length - 1) {
-      // If it was the last post, go to the new last post
-      setCurrentPostIndex(Math.max(0, pendingPosts.length - 2));
-    }
-    // If it wasn't the last post, index stays the same as next post slides in
+    // Don't need to manually adjust index - the useEffect will handle it when pendingPosts changes
   };
 
   if (pendingPosts.length === 0) {

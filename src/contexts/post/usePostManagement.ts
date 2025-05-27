@@ -89,10 +89,24 @@ export const usePostManagement = (
     }
   };
 
+  const publishPost = (id: string) => {
+    setPosts((prevPosts) =>
+      prevPosts.map((post) =>
+        post.id === id ? { 
+          ...post, 
+          status: "published" as const,
+          publishedAt: new Date()
+        } : post
+      )
+    );
+    toast.success("Post published");
+  };
+
   return {
     addPost,
     addPosts,
     updatePost,
     deletePost,
+    publishPost,
   };
 };

@@ -23,7 +23,7 @@ export const ScheduledPostCard = ({
   isScheduled = true,
 }: ScheduledPostCardProps) => {
   return (
-    <Card className="overflow-hidden hover-scale">
+    <Card className="overflow-hidden hover-scale h-48">
       {isScheduled && (
         <CardHeader className="p-4 bg-muted/30">
           <div className="flex justify-between items-center">
@@ -36,11 +36,11 @@ export const ScheduledPostCard = ({
           </div>
         </CardHeader>
       )}
-      <CardContent className="p-4">
-        <div className="line-clamp-4 mb-4 h-20">
+      <CardContent className="p-4 flex flex-col h-full">
+        <div className="line-clamp-4 mb-4 flex-1">
           {post.content}
         </div>
-        <div className="flex gap-2 mt-3">
+        <div className="flex gap-2 mt-auto">
           <Button variant="outline" size="sm" onClick={() => onView(post.id)} className="flex-1">
             View
           </Button>

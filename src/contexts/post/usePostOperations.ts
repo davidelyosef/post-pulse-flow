@@ -10,7 +10,7 @@ export const usePostOperations = (
   getUserId: () => string
 ) => {
   const { approvePost, rejectPost } = usePostApproval(posts, setPosts, getUserId);
-  const { addPost, addPosts, updatePost, deletePost } = usePostManagement(posts, setPosts, getUserId);
+  const { addPost, addPosts, updatePost, deletePost, publishPost } = usePostManagement(posts, setPosts, getUserId);
   const { schedulePost, removeSchedule } = usePostScheduling(posts, setPosts, getUserId);
 
   return {
@@ -22,5 +22,6 @@ export const usePostOperations = (
     deletePost,
     schedulePost,
     removeSchedule,
+    publishPost,
   };
 };

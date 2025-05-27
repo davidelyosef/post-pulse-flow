@@ -5,11 +5,12 @@ export type Post = {
   createdAt: Date;
   subject?: string;
   tags: string[];
-  status: 'pending' | 'approved' | 'rejected';
+  status: 'pending' | 'approved' | 'rejected' | 'published';
   imagePrompts?: string[];
   selectedImagePrompt?: string;
   imageUrl?: string;
   scheduledFor?: Date;
+  publishedAt?: Date;
   tone?: string;
   style?: string;
   analytics?: {
