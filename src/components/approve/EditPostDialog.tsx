@@ -4,9 +4,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Edit, Save, Tags } from "lucide-react";
+import { Edit, Save, Tags, Image, Loader2, RefreshCw } from "lucide-react";
 import { Post } from "@/types";
 import { extractHashtags } from "@/lib/hashtag-utils";
+import { usePostContext } from "@/contexts/PostContext";
+import { PostCardImage } from "@/components/post/card/PostCardImage";
 
 interface EditPostDialogProps {
   post: Post | null;
@@ -18,24 +20,50 @@ interface EditPostDialogProps {
 export const EditPostDialog = ({ post, isOpen, onClose, onSave }: EditPostDialogProps) => {
   const [editContent, setEditContent] = useState("");
   const [editTags, setEditTags] = useState<string[]>([]);
+  const [isGeneratingPrompts, setIsGeneratingPrompts] = useState(false);
+  const { generateImagePrompts, selectImagePrompt, posts } = usePostContext();
+
+  // Get the current post from context to have the latest image data
+  const currentPost = post ? posts.find(p => p.id === post.id) || post : null;
 
   // Set initial values when dialog opens with a post
   useEffect(() => {
-    if (post && isOpen) {
-      console.log('EditPostDialog: Setting initial values for post:', post.id, 'tags:', post.tags);
-      setEditContent(post.content);
+    if (currentPost && isOpen) {
+      console.log('EditPostDialog: Setting initial values for post:', currentPost.id, 'tags:', currentPost.tags);
+      setEditContent(currentPost.content);
       
       // Extract hashtags from content and combine with existing tags
-      const extractedTags = extractHashtags(post.content);
-      const allTags = [...new Set([...(post.tags || []), ...extractedTags])];
+      const extractedTags = extractHashtags(currentPost.content);
+      const allTags = [...new Set([...(currentPost.tags || []), ...extractedTags])];
       
       setEditTags(allTags);
     }
-  }, [post, isOpen]);
+  }, [currentPost, isOpen]);
 
   const handleSave = () => {
     console.log('EditPostDialog: Saving with content:', editContent, 'and tags:', editTags);
     onSave(editContent, editTags);
+  };
+
+  const handleGenerateImagePrompts = async () => {
+    if (!currentPost || currentPost.imagePrompts) return;
+    
+    setIsGeneratingPrompts(true);
+    try {
+      await generateImagePrompts(currentPost.id);
+    } finally {
+      setIsGeneratingPrompts(false);
+    }
+  };
+
+  const handleSelectImagePrompt = async (prompt: string) => {
+    if (!currentPost) return;
+    await selectImagePrompt(currentPost.id, prompt);
+  };
+
+  const handleImageRegenerated = (newImageUrl: string) => {
+    // Image update is handled by the PostCardImage component and context
+    console.log('EditPostDialog: Image regenerated:', newImageUrl);
   };
 
   return (
@@ -82,6 +110,25 @@ export const EditPostDialog = ({ post, isOpen, onClose, onSave }: EditPostDialog
                   </Badge>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Image Generation Section */}
+          {currentPost && (
+            <div className="space-y-2">
+              <label className="flex items-center gap-2 text-sm font-medium">
+                <Image className="h-4 w-4" />
+                Post Image
+              </label>
+              
+              <PostCardImage 
+                post={currentPost}
+                isGeneratingPrompts={isGeneratingPrompts}
+                isGeneratingImage={false}
+                onGeneratePrompts={handleGenerateImagePrompts}
+                onSelectPrompt={handleSelectImagePrompt}
+                onImageRegenerated={handleImageRegenerated}
+              />
             </div>
           )}
         </div>

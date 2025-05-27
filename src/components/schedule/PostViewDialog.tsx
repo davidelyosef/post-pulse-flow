@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -172,6 +173,21 @@ export const PostViewDialog = ({
     ));
   };
 
+  // Generate higher engagement numbers
+  const generateEngagementStats = () => {
+    const baseViews = Math.floor(Math.random() * 5000) + 2000; // 2000-7000 views
+    const baseLikes = Math.floor(baseViews * 0.15) + Math.floor(Math.random() * 200); // ~15% engagement rate + random
+    const baseComments = Math.floor(baseLikes * 0.1) + Math.floor(Math.random() * 20); // ~10% of likes + random
+    
+    return {
+      likes: baseLikes,
+      comments: baseComments,
+      views: baseViews
+    };
+  };
+
+  const engagementStats = generateEngagementStats();
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-xl p-0 bg-white" size="large">
@@ -260,11 +276,11 @@ export const PostViewDialog = ({
                   <div className="w-4 h-4 bg-blue-600 rounded-full flex items-center justify-center">
                     <ThumbsUp className="w-2 h-2 text-white" />
                   </div>
-                  <span>{currentPost.analytics?.likes || Math.floor(Math.random() * 50)} likes</span>
+                  <span>{currentPost.analytics?.likes || engagementStats.likes} likes</span>
                 </div>
                 <div className="flex items-center space-x-4">
-                  <span>{currentPost.analytics?.comments || Math.floor(Math.random() * 10)} comments</span>
-                  <span>{currentPost.analytics?.views || Math.floor(Math.random() * 200)} views</span>
+                  <span>{currentPost.analytics?.comments || engagementStats.comments} comments</span>
+                  <span>{currentPost.analytics?.views || engagementStats.views} views</span>
                 </div>
               </div>
             </div>
