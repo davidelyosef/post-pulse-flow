@@ -23,7 +23,7 @@ export const ScheduledPostCard = ({
   isScheduled = true,
 }: ScheduledPostCardProps) => {
   return (
-    <Card className="overflow-hidden hover-scale h-48">
+    <Card className="overflow-hidden hover-scale">
       {isScheduled && (
         <CardHeader className="p-4 bg-muted/30">
           <div className="flex justify-between items-center">
@@ -47,9 +47,6 @@ export const ScheduledPostCard = ({
           </Button>
           <Button variant="outline" size="sm" onClick={() => onEdit(post.id)} className="flex-grow-0">
             <Edit className="h-4 w-4" />
-          </Button>
-          <Button variant="outline" size="sm" onClick={() => onSchedule(post.id)} className="flex-grow-0">
-            <CalendarIcon className="h-4 w-4" />
           </Button>
           <Button variant="outline" size="sm" onClick={() => onDelete(post.id)} className="flex-grow-0 text-destructive hover:text-destructive">
             <Trash2 className="h-4 w-4" />
