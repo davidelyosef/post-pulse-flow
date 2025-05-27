@@ -1,4 +1,3 @@
-
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Linkedin, Menu } from "lucide-react";
@@ -74,7 +73,7 @@ export const Navbar = () => {
       <div className="flex h-16 items-center px-4 sm:px-6 lg:px-8">
         <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
           <img src="/lovable-uploads/32e0f61b-66c1-46d2-b4a8-cb3c5d5c8757.png" alt="Moburst" className="h-8 w-8" />
-          <h1 className="text-2xl font-bold text-linkedin-blue">Moburst</h1>
+          <h1 className="text-2xl font-bold text-linkedin-blue">LinkedAI By Moburst</h1>
         </Link>
         
         <div className="ml-auto flex items-center space-x-2">
