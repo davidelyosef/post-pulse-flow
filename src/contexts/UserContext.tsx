@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { toast } from 'sonner';
 import { getUserPosts } from '@/services/postService';
@@ -9,6 +10,7 @@ interface User {
   displayName?: string;
   email?: string;
   profileUrl?: string;
+  avatar?: string;
   lastLogin?: string;
   linkedinConnected: boolean;
 }
