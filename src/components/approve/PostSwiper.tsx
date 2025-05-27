@@ -25,7 +25,7 @@ export const PostSwiper = () => {
 
     // Ensure currentPostIndex is always valid
     if (currentPostIndex >= pendingPosts.length) {
-      setCurrentPostIndex(Math.max(0, pendingPosts.length - 1));
+      setCurrentPostIndex(0);
     }
   }, [pendingPosts.length, currentPostIndex, navigate]);
 
@@ -46,17 +46,14 @@ export const PostSwiper = () => {
       }
     }
 
-    // Store current index before approval
-    const wasLastPost = currentPostIndex === pendingPosts.length - 1;
-
     // Approve the post (this will remove it from pendingPosts)
     await approvePost(currentPost.id);
     
-    // After approval, adjust index if we were viewing the last post
-    if (wasLastPost && pendingPosts.length > 1) {
-      setCurrentPostIndex(Math.max(0, pendingPosts.length - 2));
+    // After approval, if we were at the last post and there are still posts left,
+    // move to the previous index to show the next available post
+    if (currentPostIndex >= pendingPosts.length - 1 && pendingPosts.length > 1) {
+      setCurrentPostIndex(Math.max(0, currentPostIndex - 1));
     }
-    // If we weren't on the last post, the same index will show the next post
   };
 
   const handleReject = () => {
@@ -64,17 +61,14 @@ export const PostSwiper = () => {
 
     console.log('Rejecting post:', currentPost.id, 'currentIndex:', currentPostIndex, 'total posts:', pendingPosts.length);
 
-    // Store current index before rejection
-    const wasLastPost = currentPostIndex === pendingPosts.length - 1;
-
     // Reject the post (this will remove it from pendingPosts)
     rejectPost(currentPost.id);
     
-    // After rejection, adjust index if we were viewing the last post
-    if (wasLastPost && pendingPosts.length > 1) {
-      setCurrentPostIndex(Math.max(0, pendingPosts.length - 2));
+    // After rejection, if we were at the last post and there are still posts left,
+    // move to the previous index to show the next available post
+    if (currentPostIndex >= pendingPosts.length - 1 && pendingPosts.length > 1) {
+      setCurrentPostIndex(Math.max(0, currentPostIndex - 1));
     }
-    // If we weren't on the last post, the same index will show the next post
   };
 
   console.log('Rendering PostSwiper - pendingPosts:', pendingPosts.length, 'currentIndex:', currentPostIndex, 'currentPost:', currentPost?.id);
