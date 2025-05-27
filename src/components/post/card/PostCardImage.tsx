@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Image, Loader2, RefreshCw } from "lucide-react";
@@ -27,6 +26,10 @@ export const PostCardImage = ({
   const { getUserId } = useUser();
   const { updatePostImage } = usePostContext();
 
+  const createFullPrompt = (imageConcept: string) => {
+    return `${post.content} image concept: ${imageConcept}`;
+  };
+
   const handleSelectPrompt = async (prompt: string) => {
     console.log("PostCardImage: Selecting prompt:", prompt);
     onSelectPrompt(prompt);
@@ -35,7 +38,9 @@ export const PostCardImage = ({
       console.log("PostCardImage: No existing image, generating new one...");
       setIsGeneratingImage(true);
       try {
-        const imageUrl = await generateImageFromPrompt(prompt, getUserId());
+        const fullPrompt = createFullPrompt(prompt);
+        console.log("PostCardImage: Full prompt for image generation:", fullPrompt);
+        const imageUrl = await generateImageFromPrompt(fullPrompt, getUserId());
         console.log("PostCardImage: Generated image URL:", imageUrl);
         
         if (imageUrl) {
@@ -56,12 +61,13 @@ export const PostCardImage = ({
 
   const handleRegenerateImage = async () => {
     // Use the selected prompt if available, otherwise use a default prompt
-    const prompt = post.selectedImagePrompt || `Professional illustration related to ${post.content.substring(0, 100)}`;
-    console.log("PostCardImage: Regenerating image with prompt:", prompt);
+    const imageConcept = post.selectedImagePrompt || `Professional illustration related to ${post.content.substring(0, 100)}`;
+    const fullPrompt = createFullPrompt(imageConcept);
+    console.log("PostCardImage: Regenerating image with full prompt:", fullPrompt);
     
     setIsGeneratingImage(true);
     try {
-      const imageUrl = await generateImageFromPrompt(prompt, getUserId());
+      const imageUrl = await generateImageFromPrompt(fullPrompt, getUserId());
       console.log("PostCardImage: Regenerated image URL:", imageUrl);
       
       if (imageUrl) {
