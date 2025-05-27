@@ -1,5 +1,5 @@
 
-import { useState, ReactNode } from "react";
+import { useState, ReactNode, useEffect } from "react";
 
 interface SwipeableCardProps {
   onSwipeLeft: () => void;
@@ -19,6 +19,14 @@ export const SwipeableCard = ({
   
   // Swipe threshold (difference in px to trigger a swipe action)
   const swipeThreshold = 100;
+
+  // Reset animation state when children change (new post)
+  useEffect(() => {
+    setDragOffset(0);
+    setIsDragging(false);
+    setTouchStart(null);
+    setTouchEnd(null);
+  }, [children]);
 
   const handleTouchStart = (e: React.TouchEvent | React.MouseEvent) => {
     setIsDragging(true);
@@ -52,7 +60,13 @@ export const SwipeableCard = ({
   const handleTouchEnd = () => {
     setIsDragging(false);
     
-    if (!touchStart || !touchEnd) return;
+    if (!touchStart || !touchEnd) {
+      // Reset values if no complete swipe
+      setDragOffset(0);
+      setTouchStart(null);
+      setTouchEnd(null);
+      return;
+    }
     
     // Calculate swipe distance
     const distance = touchEnd - touchStart;
@@ -73,10 +87,11 @@ export const SwipeableCard = ({
 
   return (
     <div 
-      className="absolute top-0 left-0 right-0 bottom-0"
+      className="absolute top-0 left-0 right-0 bottom-0 opacity-100"
       style={{ 
         transform: `translateX(${dragOffset}px) rotate(${dragOffset / 20}deg)`,
-        transition: isDragging ? 'none' : 'transform 0.5s ease-out'
+        transition: isDragging ? 'none' : 'transform 0.3s ease-out',
+        opacity: 1
       }}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
