@@ -21,7 +21,7 @@ export const PublishedPostCard = ({
   onPublish,
 }: PublishedPostCardProps) => {
   return (
-    <Card className="overflow-hidden hover-scale h-48">
+    <Card className="overflow-hidden hover-scale">
       <CardHeader className="p-4 bg-green-50 dark:bg-green-900/20">
         <div className="flex justify-between items-center">
           <div className="flex items-center">
@@ -32,11 +32,11 @@ export const PublishedPostCard = ({
           </div>
         </div>
       </CardHeader>
-      <CardContent className="p-4 flex flex-col h-full">
-        <div className="line-clamp-4 mb-4 flex-1">
+      <CardContent className="p-4 flex flex-col">
+        <div className="line-clamp-4 mb-4 min-h-0 flex-shrink">
           {post.content}
         </div>
-        <div className="flex gap-2 mt-auto">
+        <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={() => onView(post.id)} className="flex-1">
             <Eye className="h-4 w-4 mr-2" />
             View
