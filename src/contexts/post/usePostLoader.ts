@@ -26,6 +26,7 @@ export const usePostLoader = (
         status: "approved",
         imageUrl: serverPost.imageUrl,
         scheduledFor: serverPost.scheduleTime ? new Date(serverPost.scheduleTime) : undefined,
+        publishedAt: serverPost.publishedAt ? new Date(serverPost.publishedAt) : undefined,
       }));
       
       setPosts(clientPosts);
