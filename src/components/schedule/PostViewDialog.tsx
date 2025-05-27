@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -6,7 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Save, Share2, MoreHorizontal, ThumbsUp, MessageCircle, Repeat2, Send, Globe } from "lucide-react";
 import { Post } from "@/types";
-import { publishPost, isLinkedInConnected } from "@/services/linkedinService";
+import { publishPost, isLinkedInConnected, getLinkedInUser } from "@/services/linkedinService";
 import { updatePost as updatePostAPI } from "@/services/postService";
 import { usePostContext } from "@/contexts/PostContext";
 import { useUser } from "@/contexts/UserContext";
@@ -39,6 +38,9 @@ export const PostViewDialog = ({
   const [hasImageChanged, setHasImageChanged] = useState(false);
   const { updatePost, posts } = usePostContext();
   const { user } = useUser();
+
+  // Get LinkedIn user data for profile image
+  const linkedinUser = getLinkedInUser();
 
   // Get the current post from context to ensure we have the latest version
   const currentPost = posts.find(p => p.id === post?.id) || post;
@@ -180,15 +182,18 @@ export const PostViewDialog = ({
               <div className="flex items-start justify-between">
                 <div className="flex items-start space-x-3">
                   <Avatar className="w-12 h-12">
-                    <AvatarImage src={user?.avatar} alt={user?.name || "User"} />
+                    <AvatarImage 
+                      src={linkedinUser?.profilePicture || user?.avatar} 
+                      alt={linkedinUser?.displayName || user?.name || "User"} 
+                    />
                     <AvatarFallback className="bg-blue-600 text-white font-semibold">
-                      {(user?.name || "U").charAt(0).toUpperCase()}
+                      {(linkedinUser?.displayName || user?.name || "U").charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1">
                     <div className="flex items-center space-x-2">
                       <h3 className="font-semibold text-gray-900 text-sm">
-                        {user?.name || "LinkedIn User"}
+                        {linkedinUser?.displayName || user?.name || "LinkedIn User"}
                       </h3>
                       <span className="text-xs text-gray-500">• 1st</span>
                     </div>
