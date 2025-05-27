@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { PostCard } from "@/components/post/PostCard";
 import { usePostContext } from "@/contexts/PostContext";
@@ -7,6 +6,7 @@ import { EmptyPostsView } from "./EmptyPostsView";
 import { PostSwiperCounter } from "./PostSwiperCounter";
 import { SwipeInstructions } from "./SwipeInstructions";
 import { useNavigate } from "react-router-dom";
+import { ApproveRejectButtons } from "./ApproveRejectButtons";
 
 export const PostSwiper = () => {
   const { pendingPosts, approvePost, rejectPost, generateImagePrompts } = usePostContext();
@@ -94,8 +94,6 @@ export const PostSwiper = () => {
           <SwipeableCard onSwipeLeft={handleReject} onSwipeRight={handleApprove}>
             <PostCard
               post={currentPost}
-              onApprove={handleApprove}
-              onReject={handleReject}
               className="h-full overflow-auto"
               showEditAndScheduleActions={false}
             />
@@ -104,6 +102,11 @@ export const PostSwiper = () => {
 
         <PostSwiperCounter currentIndex={currentPostIndex} totalCount={pendingPosts.length} />
       </div>
+
+      <ApproveRejectButtons 
+        onApprove={handleApprove}
+        onReject={handleReject}
+      />
 
       <SwipeInstructions show={pendingPosts.length > 0} />
     </>

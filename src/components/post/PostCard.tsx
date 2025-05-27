@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Post } from "@/types";
@@ -117,8 +116,6 @@ export const PostCard = ({
         <PostCardActions 
           showActions={showActions}
           showEditAndScheduleActions={showEditAndScheduleActions}
-          onApprove={handleApprove}
-          onReject={handleReject}
           onEdit={onEdit || (() => {})}
           onSchedule={onSchedule || (() => {})}
         />
