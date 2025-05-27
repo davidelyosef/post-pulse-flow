@@ -198,7 +198,7 @@ export const PostViewDialog = ({
                       <span className="text-xs text-gray-500">• 1st</span>
                     </div>
                     <p className="text-xs text-gray-600">
-                      Full Stack Developer at WebFlow
+                      LinkedIn User
                     </p>
                     <div className="flex items-center space-x-1 mt-1">
                       <span className="text-xs text-gray-500">
