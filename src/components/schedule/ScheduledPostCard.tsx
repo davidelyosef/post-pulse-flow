@@ -2,7 +2,7 @@
 import { format } from "date-fns";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar as CalendarIcon, Clock, Edit, Trash2 } from "lucide-react";
+import { Calendar as CalendarIcon, Clock, Edit, Trash2, Eye } from "lucide-react";
 import { Post } from "@/types";
 
 interface ScheduledPostCardProps {
@@ -41,7 +41,8 @@ export const ScheduledPostCard = ({
           {post.content}
         </div>
         <div className="flex gap-2 mt-auto">
-          <Button variant="outline" size="sm" onClick={() => onView(post.id)} className="flex-1">
+          <Button variant="outline" size="sm" onClick={() => onView(post.id)} className="flex items-center gap-1">
+            <Eye className="h-4 w-4" />
             View
           </Button>
           <Button variant="outline" size="sm" onClick={() => onEdit(post.id)} className="flex-grow-0">

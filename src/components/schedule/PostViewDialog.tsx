@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -190,11 +189,11 @@ export const PostViewDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-xl p-0 bg-white" size="large">
+      <DialogContent className="sm:max-w-xl p-0 bg-white dark:bg-card" size="large">
         {currentPost && (
-          <div className="bg-white rounded-lg overflow-hidden">
+          <div className="bg-white dark:bg-card rounded-lg overflow-hidden">
             {/* LinkedIn Post Header */}
-            <div className="p-4 border-b border-gray-100">
+            <div className="p-4 border-b border-gray-100 dark:border-border">
               <div className="flex items-start justify-between">
                 <div className="flex items-start space-x-3">
                   <Avatar className="w-12 h-12">
@@ -208,16 +207,16 @@ export const PostViewDialog = ({
                   </Avatar>
                   <div className="flex-1">
                     <div className="flex items-center space-x-2">
-                      <h3 className="font-semibold text-gray-900 text-sm">
+                      <h3 className="font-semibold text-gray-900 dark:text-foreground text-sm">
                         {linkedinUser?.displayName || user?.name || "LinkedIn User"}
                       </h3>
-                      <span className="text-xs text-gray-500">• 1st</span>
+                      <span className="text-xs text-gray-500 dark:text-muted-foreground">• 1st</span>
                     </div>
-                    <p className="text-xs text-gray-600">
+                    <p className="text-xs text-gray-600 dark:text-muted-foreground">
                       LinkedIn User
                     </p>
                     <div className="flex items-center space-x-1 mt-1">
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-gray-500 dark:text-muted-foreground">
                         {currentPost.publishedAt 
                           ? `Published ${new Date(currentPost.publishedAt).toLocaleDateString()}`
                           : currentPost.scheduledFor 
@@ -225,19 +224,19 @@ export const PostViewDialog = ({
                             : "Draft"
                         }
                       </span>
-                      <Globe className="w-3 h-3 text-gray-500" />
+                      <Globe className="w-3 h-3 text-gray-500 dark:text-muted-foreground" />
                     </div>
                   </div>
                 </div>
-                <Button variant="ghost" size="sm" className="p-2">
-                  <MoreHorizontal className="w-4 h-4 text-gray-600" />
+                <Button variant="ghost" size="sm" className="p-2 hover:bg-gray-100 dark:hover:bg-accent">
+                  <MoreHorizontal className="w-4 h-4 text-gray-600 dark:text-muted-foreground" />
                 </Button>
               </div>
             </div>
 
             {/* Post Content */}
             <div className="p-4">
-              <div className="text-sm text-gray-900 leading-relaxed whitespace-pre-wrap">
+              <div className="text-sm text-gray-900 dark:text-foreground leading-relaxed whitespace-pre-wrap">
                 {formatContentWithHashtags(currentPost.content)}
               </div>
               
@@ -245,12 +244,12 @@ export const PostViewDialog = ({
               {allTags.length > 0 && (
                 <div className="flex flex-wrap gap-1 mt-3">
                   {allTags.slice(0, 5).map((tag) => (
-                    <Badge key={tag} variant="secondary" className="text-xs px-2 py-1 bg-blue-50 text-blue-700 border-blue-200">
+                    <Badge key={tag} variant="secondary" className="text-xs px-2 py-1 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800">
                       {tag.startsWith('#') ? tag : `#${tag}`}
                     </Badge>
                   ))}
                   {allTags.length > 5 && (
-                    <Badge variant="secondary" className="text-xs px-2 py-1 bg-gray-50 text-gray-600">
+                    <Badge variant="secondary" className="text-xs px-2 py-1 bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300">
                       +{allTags.length - 5} more
                     </Badge>
                   )}
@@ -259,7 +258,7 @@ export const PostViewDialog = ({
 
               {/* Post Image */}
               {currentPost.imageUrl && (
-                <div className="mt-4 rounded-lg overflow-hidden border border-gray-200">
+                <div className="mt-4 rounded-lg overflow-hidden border border-gray-200 dark:border-border">
                   <img 
                     src={currentPost.imageUrl} 
                     alt="Post content" 
@@ -270,8 +269,8 @@ export const PostViewDialog = ({
             </div>
 
             {/* LinkedIn Engagement Stats */}
-            <div className="px-4 py-2 border-t border-gray-100">
-              <div className="flex items-center justify-between text-xs text-gray-600">
+            <div className="px-4 py-2 border-t border-gray-100 dark:border-border">
+              <div className="flex items-center justify-between text-xs text-gray-600 dark:text-muted-foreground">
                 <div className="flex items-center space-x-1">
                   <div className="w-4 h-4 bg-blue-600 rounded-full flex items-center justify-center">
                     <ThumbsUp className="w-2 h-2 text-white" />
@@ -286,21 +285,21 @@ export const PostViewDialog = ({
             </div>
 
             {/* LinkedIn Action Buttons */}
-            <div className="px-4 py-3 border-t border-gray-100">
+            <div className="px-4 py-3 border-t border-gray-100 dark:border-border">
               <div className="flex items-center justify-around">
-                <Button variant="ghost" size="sm" className="flex items-center space-x-2 text-gray-600 hover:bg-gray-50 flex-1">
+                <Button variant="ghost" size="sm" className="flex items-center space-x-2 text-gray-600 dark:text-muted-foreground hover:bg-gray-50 dark:hover:bg-accent flex-1">
                   <ThumbsUp className="w-4 h-4" />
                   <span className="text-sm font-medium">Like</span>
                 </Button>
-                <Button variant="ghost" size="sm" className="flex items-center space-x-2 text-gray-600 hover:bg-gray-50 flex-1">
+                <Button variant="ghost" size="sm" className="flex items-center space-x-2 text-gray-600 dark:text-muted-foreground hover:bg-gray-50 dark:hover:bg-accent flex-1">
                   <MessageCircle className="w-4 h-4" />
                   <span className="text-sm font-medium">Comment</span>
                 </Button>
-                <Button variant="ghost" size="sm" className="flex items-center space-x-2 text-gray-600 hover:bg-gray-50 flex-1">
+                <Button variant="ghost" size="sm" className="flex items-center space-x-2 text-gray-600 dark:text-muted-foreground hover:bg-gray-50 dark:hover:bg-accent flex-1">
                   <Repeat2 className="w-4 h-4" />
                   <span className="text-sm font-medium">Repost</span>
                 </Button>
-                <Button variant="ghost" size="sm" className="flex items-center space-x-2 text-gray-600 hover:bg-gray-50 flex-1">
+                <Button variant="ghost" size="sm" className="flex items-center space-x-2 text-gray-600 dark:text-muted-foreground hover:bg-gray-50 dark:hover:bg-accent flex-1">
                   <Send className="w-4 h-4" />
                   <span className="text-sm font-medium">Send</span>
                 </Button>
@@ -308,7 +307,7 @@ export const PostViewDialog = ({
             </div>
 
             {/* Action Buttons */}
-            <div className="flex justify-between p-4 border-t border-gray-100 bg-gray-50">
+            <div className="flex justify-between p-4 border-t border-gray-100 dark:border-border bg-gray-50 dark:bg-muted/30">
               <Button
                 variant="outline"
                 onClick={onClose}
