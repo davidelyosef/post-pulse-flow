@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Loader2 } from "lucide-react";
 import { generatePosts } from "@/services/openAIService";
 import { usePostContext } from "@/contexts/PostContext";
@@ -29,19 +28,11 @@ const writingStyles = [
   { id: "thought-leadership", name: "Thought Leadership", description: "Visionary and authoritative" },
 ];
 
-const imageModels = [
-  { id: "dalle3", name: "DALL-E 3", description: "High quality, latest model" },
-  { id: "dalle2", name: "DALL-E 2", description: "Fast and reliable" },
-  { id: "stability", name: "Stability AI", description: "Photographic style" },
-];
-
 export const GenerateForm = () => {
   const [topic, setTopic] = useState("");
   const [count, setCount] = useState(3);
   const [tone, setTone] = useState("professional");
   const [style, setStyle] = useState("concise");
-  const [generateImages, setGenerateImages] = useState(false);
-  const [imageModel, setImageModel] = useState("dalle3");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { addPosts } = usePostContext();
@@ -58,7 +49,7 @@ export const GenerateForm = () => {
     setIsLoading(true);
 
     try {
-      const posts = await generatePosts(count, topic, tone, style, generateImages, imageModel);
+      const posts = await generatePosts(count, topic, tone, style, false, "dalle3");
 
       if (posts && Array.isArray(posts) && posts.length > 0) {
         console.log("Adding posts to context:", posts);
@@ -136,35 +127,6 @@ export const GenerateForm = () => {
             </SelectContent>
           </Select>
         </div>
-      </div>
-
-      <div className="space-y-4">
-        <div className="flex items-center space-x-2">
-          <Checkbox
-            id="generateImages"
-            checked={generateImages}
-            onCheckedChange={(checked) => setGenerateImages(checked as boolean)}
-          />
-          <Label htmlFor="generateImages">Generate images with posts</Label>
-        </div>
-
-        {generateImages && (
-          <div className="space-y-2">
-            <Label htmlFor="imageModel">Image generation model</Label>
-            <Select value={imageModel} onValueChange={setImageModel}>
-              <SelectTrigger id="imageModel">
-                <SelectValue placeholder="Select image model" />
-              </SelectTrigger>
-              <SelectContent>
-                {imageModels.map((model) => (
-                  <SelectItem key={model.id} value={model.id}>
-                    {model.name} - {model.description}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        )}
       </div>
 
       <Button type="submit" className="w-full" disabled={isLoading}>

@@ -8,22 +8,6 @@ import { ThemeToggle } from "@/components/theme/ThemeToggle";
 const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 relative overflow-hidden">
-      {/* Animated Background */}
-      <div className="area">
-        <ul className="circles">
-          <li>in</li>
-          <li>in</li>
-          <li>in</li>
-          <li>in</li>
-          <li>in</li>
-          <li>in</li>
-          <li>in</li>
-          <li>in</li>
-          <li>in</li>
-          <li>in</li>
-        </ul>
-      </div>
-
       {/* Add theme toggle in the corner */}
       <div className="absolute top-4 right-4 z-50">
         <ThemeToggle />
