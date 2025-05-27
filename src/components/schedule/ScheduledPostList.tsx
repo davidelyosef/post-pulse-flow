@@ -18,10 +18,28 @@ import { PostScheduleDialog } from "./PostScheduleDialog";
 import { PostDeleteDialog } from "./PostDeleteDialog";
 
 export const ScheduledPostList = () => {
-  const { approvedPosts, publishedPosts, deletePost, updatePost, schedulePost, removeSchedule, publishPost } = usePostContext();
+  const { approvedPosts, deletePost, updatePost, schedulePost, removeSchedule, publishPost } = usePostContext();
   const { getUserId } = useUser();
-  const scheduledPosts = approvedPosts.filter(post => post.scheduledFor);
-  const unscheduledPosts = approvedPosts.filter(post => !post.scheduledFor);
+  
+  // Updated filtering logic based on the requirements
+  const scheduledPosts = approvedPosts.filter(post => {
+    // If post has both scheduleTime and publishedAt, it goes to scheduled list
+    if (post.scheduledFor && post.publishedAt) {
+      return true;
+    }
+    // If post only has scheduleTime (scheduledFor), it goes to scheduled list
+    if (post.scheduledFor && !post.publishedAt) {
+      return true;
+    }
+    return false;
+  });
+  
+  const publishedPosts = approvedPosts.filter(post => {
+    // Only posts that have publishedAt but no scheduleTime go to published list
+    return post.publishedAt && !post.scheduledFor;
+  });
+  
+  const unscheduledPosts = approvedPosts.filter(post => !post.scheduledFor && !post.publishedAt);
   
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [viewPostDialogOpen, setViewPostDialogOpen] = useState(false);
