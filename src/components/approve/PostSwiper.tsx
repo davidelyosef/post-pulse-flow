@@ -55,18 +55,28 @@ export const PostSwiper = () => {
     // Store the current post's ID and index before approval
     const currentPostId = currentPost.id;
     const currentIndex = currentPostIndex;
+    const totalPosts = pendingPosts.length;
 
     // Approve the post (this will remove it from pendingPosts)
     await approvePost(currentPostId);
 
-    // After approval, adjust the index if necessary
-    // If we were viewing the last post, go to the previous one
-    // Otherwise, the same index will show the next post (since the current one was removed)
-    if (currentIndex >= pendingPosts.length - 1 && pendingPosts.length > 1) {
-      console.log('Was last post, moving to previous index');
-      setCurrentPostIndex(currentIndex - 1);
-    }
-    // If there's only one post left (the one we just approved), it will be handled by useEffect
+    // After approval, adjust the index based on the new array length
+    // We need to wait for the next render cycle to get updated pendingPosts
+    setTimeout(() => {
+      const newTotalPosts = totalPosts - 1; // One post was removed
+      
+      if (newTotalPosts === 0) {
+        // No more posts, will be handled by useEffect
+        return;
+      }
+      
+      if (currentIndex >= newTotalPosts) {
+        // If we were viewing the last post, go to the previous one
+        console.log('Was last post, moving to previous index');
+        setCurrentPostIndex(Math.max(0, newTotalPosts - 1));
+      }
+      // If we weren't viewing the last post, keep the same index to show the next post
+    }, 0);
   };
 
   const handleReject = () => {
@@ -77,18 +87,28 @@ export const PostSwiper = () => {
     // Store the current post's ID and index before rejection
     const currentPostId = currentPost.id;
     const currentIndex = currentPostIndex;
+    const totalPosts = pendingPosts.length;
 
     // Reject the post (this will remove it from pendingPosts)
     rejectPost(currentPostId);
 
-    // After rejection, adjust the index if necessary
-    // If we were viewing the last post, go to the previous one
-    // Otherwise, the same index will show the next post (since the current one was removed)
-    if (currentIndex >= pendingPosts.length - 1 && pendingPosts.length > 1) {
-      console.log('Was last post, moving to previous index');
-      setCurrentPostIndex(currentIndex - 1);
-    }
-    // If there's only one post left (the one we just rejected), it will be handled by useEffect
+    // After rejection, adjust the index based on the new array length
+    // We need to wait for the next render cycle to get updated pendingPosts
+    setTimeout(() => {
+      const newTotalPosts = totalPosts - 1; // One post was removed
+      
+      if (newTotalPosts === 0) {
+        // No more posts, will be handled by useEffect
+        return;
+      }
+      
+      if (currentIndex >= newTotalPosts) {
+        // If we were viewing the last post, go to the previous one
+        console.log('Was last post, moving to previous index');
+        setCurrentPostIndex(Math.max(0, newTotalPosts - 1));
+      }
+      // If we weren't viewing the last post, keep the same index to show the next post
+    }, 0);
   };
 
   console.log('Rendering PostSwiper - pendingPosts:', pendingPosts.length, 'currentIndex:', currentPostIndex, 'currentPost:', currentPost?.id);
