@@ -9,7 +9,7 @@ import PageLayout from "@/components/layout/PageLayout";
 const Index = () => {
   return (
     <PageLayout>
-      <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 relative overflow-hidden">
+      <div className="min-h-screen bg-gradient-to-b from-background relative overflow-hidden">
 
         <header className="container mx-auto pt-8 md:pt-12 lg:pt-24 px-4 relative z-10">
           <div className="flex items-center gap-3 mb-3">

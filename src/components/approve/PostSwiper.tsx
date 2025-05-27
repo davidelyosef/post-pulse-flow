@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { PostCard } from "@/components/post/PostCard";
 import { usePostContext } from "@/contexts/PostContext";
@@ -35,17 +34,20 @@ export const PostSwiper = () => {
     
     // Only adjust if posts were removed (length decreased)
     if (lastPostsLength > pendingPosts.length && pendingPosts.length > 0) {
-      // If current index is out of bounds, adjust it
-      if (currentPostIndex >= pendingPosts.length) {
+      // If we were viewing the last post that was just removed
+      if (currentPostIndex >= lastPostsLength - 1) {
+        // Move to the new last post
         const newIndex = Math.max(0, pendingPosts.length - 1);
-        console.log('Adjusting currentPostIndex from', currentPostIndex, 'to', newIndex);
+        console.log('Was last post, moving to new last post at index:', newIndex);
         setCurrentPostIndex(newIndex);
       }
+      // If we weren't viewing the last post, keep the same index
+      // This will show the next post since the current one was removed
     }
     
     // Update the last known length
     setLastPostsLength(pendingPosts.length);
-  }, [pendingPosts.length, currentPostIndex]);
+  }, [pendingPosts.length, currentPostIndex, lastPostsLength]);
 
   const currentPost = pendingPosts.length > 0 ? pendingPosts[currentPostIndex] : null;
 
