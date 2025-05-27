@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { PostCard } from "@/components/post/PostCard";
 import { usePostContext } from "@/contexts/PostContext";
@@ -12,28 +13,39 @@ export const PostSwiper = () => {
   const navigate = useNavigate();
 
   const [currentPostIndex, setCurrentPostIndex] = useState(0);
+  const [lastPostsLength, setLastPostsLength] = useState(0);
 
   // For image generation
   const [isGeneratingPrompts, setIsGeneratingPrompts] = useState(false);
 
-  // This effect ensures the currentPostIndex stays within bounds when posts change
+  // This effect handles navigation when no posts are left
   useEffect(() => {
     console.log('PostSwiper useEffect - pendingPosts length:', pendingPosts.length, 'currentPostIndex:', currentPostIndex);
     
     if (pendingPosts.length === 0) {
       setCurrentPostIndex(0);
-      // Navigate to schedule page when no more posts to approve
       navigate('/schedule');
       return;
     }
-    
-    // If current index is out of bounds, adjust it
-    if (currentPostIndex >= pendingPosts.length) {
-      const newIndex = Math.max(0, pendingPosts.length - 1);
-      console.log('Adjusting currentPostIndex from', currentPostIndex, 'to', newIndex);
-      setCurrentPostIndex(newIndex);
-    }
   }, [pendingPosts.length, navigate]);
+
+  // This effect handles index adjustment when posts are removed
+  useEffect(() => {
+    console.log('Index adjustment effect - posts length changed from', lastPostsLength, 'to', pendingPosts.length);
+    
+    // Only adjust if posts were removed (length decreased)
+    if (lastPostsLength > pendingPosts.length && pendingPosts.length > 0) {
+      // If current index is out of bounds, adjust it
+      if (currentPostIndex >= pendingPosts.length) {
+        const newIndex = Math.max(0, pendingPosts.length - 1);
+        console.log('Adjusting currentPostIndex from', currentPostIndex, 'to', newIndex);
+        setCurrentPostIndex(newIndex);
+      }
+    }
+    
+    // Update the last known length
+    setLastPostsLength(pendingPosts.length);
+  }, [pendingPosts.length, currentPostIndex]);
 
   const currentPost = pendingPosts.length > 0 ? pendingPosts[currentPostIndex] : null;
 
@@ -52,28 +64,10 @@ export const PostSwiper = () => {
       }
     }
 
-    // Store the current post's ID and index before approval
-    const currentPostId = currentPost.id;
-    const currentIndex = currentPostIndex;
-    const totalPosts = pendingPosts.length;
-
     // Approve the post (this will remove it from pendingPosts)
-    await approvePost(currentPostId);
-
-    // Immediately adjust the index based on the expected new array length
-    const newTotalPosts = totalPosts - 1;
+    await approvePost(currentPost.id);
     
-    if (newTotalPosts === 0) {
-      // No more posts, useEffect will handle navigation
-      return;
-    }
-    
-    // If we were viewing the last post, go to the previous one
-    if (currentIndex >= newTotalPosts) {
-      console.log('Was last post, moving to previous index');
-      setCurrentPostIndex(Math.max(0, newTotalPosts - 1));
-    }
-    // If we weren't viewing the last post, keep the same index to show the next post
+    // The useEffect will handle index adjustment after state updates
   };
 
   const handleReject = () => {
@@ -81,28 +75,10 @@ export const PostSwiper = () => {
 
     console.log('Rejecting post:', currentPost.id, 'currentIndex:', currentPostIndex, 'total posts:', pendingPosts.length);
 
-    // Store the current post's ID and index before rejection
-    const currentPostId = currentPost.id;
-    const currentIndex = currentPostIndex;
-    const totalPosts = pendingPosts.length;
-
     // Reject the post (this will remove it from pendingPosts)
-    rejectPost(currentPostId);
-
-    // Immediately adjust the index based on the expected new array length
-    const newTotalPosts = totalPosts - 1;
+    rejectPost(currentPost.id);
     
-    if (newTotalPosts === 0) {
-      // No more posts, useEffect will handle navigation
-      return;
-    }
-    
-    // If we were viewing the last post, go to the previous one
-    if (currentIndex >= newTotalPosts) {
-      console.log('Was last post, moving to previous index');
-      setCurrentPostIndex(Math.max(0, newTotalPosts - 1));
-    }
-    // If we weren't viewing the last post, keep the same index to show the next post
+    // The useEffect will handle index adjustment after state updates
   };
 
   console.log('Rendering PostSwiper - pendingPosts:', pendingPosts.length, 'currentIndex:', currentPostIndex, 'currentPost:', currentPost?.id);
