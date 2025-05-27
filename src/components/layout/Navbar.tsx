@@ -73,8 +73,8 @@ export const Navbar = () => {
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur">
       <div className="flex h-16 items-center px-4 sm:px-6 lg:px-8">
         <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-          <Linkedin className="h-8 w-8 text-linkedin-blue" />
-          <h1 className="text-2xl font-bold text-linkedin-blue">LinkedAI</h1>
+          <img src="/lovable-uploads/32e0f61b-66c1-46d2-b4a8-cb3c5d5c8757.png" alt="Moburst" className="h-8 w-8" />
+          <h1 className="text-2xl font-bold text-linkedin-blue">Moburst</h1>
         </Link>
         
         <div className="ml-auto flex items-center space-x-2">

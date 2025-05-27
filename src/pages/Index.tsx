@@ -2,7 +2,7 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowRight, Calendar, Check, Linkedin, MessageSquarePlus } from "lucide-react";
+import { ArrowRight, Calendar, Check, MessageSquarePlus } from "lucide-react";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import PageLayout from "@/components/layout/PageLayout";
 
@@ -13,8 +13,8 @@ const Index = () => {
 
         <header className="container mx-auto pt-8 md:pt-12 lg:pt-24 px-4 relative z-10">
           <div className="flex items-center gap-3 mb-3">
-            <Linkedin className="h-8 w-8 md:h-10 md:w-10 text-linkedin-blue" />
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-linkedin-blue">LinkedAI - By Moburst</h1>
+            <img src="/lovable-uploads/32e0f61b-66c1-46d2-b4a8-cb3c5d5c8757.png" alt="Moburst" className="h-8 w-8 md:h-10 md:w-10" />
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-linkedin-blue">Moburst LinkedAI</h1>
           </div>
           <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 md:mb-6 max-w-2xl text-foreground">
             Create, filter, and schedule engaging LinkedIn posts in just 2 minutes a day
