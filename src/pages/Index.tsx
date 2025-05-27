@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,13 +7,29 @@ import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 relative overflow-hidden">
+      {/* Animated Background */}
+      <div className="area">
+        <ul className="circles">
+          <li>in</li>
+          <li>in</li>
+          <li>in</li>
+          <li>in</li>
+          <li>in</li>
+          <li>in</li>
+          <li>in</li>
+          <li>in</li>
+          <li>in</li>
+          <li>in</li>
+        </ul>
+      </div>
+
       {/* Add theme toggle in the corner */}
       <div className="absolute top-4 right-4 z-50">
         <ThemeToggle />
       </div>
 
-      <header className="container mx-auto pt-8 md:pt-12 lg:pt-24 px-4">
+      <header className="container mx-auto pt-8 md:pt-12 lg:pt-24 px-4 relative z-10">
         <div className="flex items-center gap-3 mb-3">
           <Linkedin className="h-8 w-8 md:h-10 md:w-10 text-linkedin-blue" />
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-linkedin-blue">LinkedAI - By Moburst</h1>
@@ -43,13 +60,13 @@ const Index = () => {
         </div>
       </header>
 
-      <section className="container mx-auto py-12 md:py-16 lg:py-24 px-4">
+      <section className="container mx-auto py-12 md:py-16 lg:py-24 px-4 relative z-10">
         <h3 className="text-xl md:text-2xl lg:text-3xl font-bold mb-8 md:mb-12 text-center text-foreground">
           Your 2-minute daily ritual for LinkedIn success
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="border-2 border-linkedin-blue/10">
+          <Card className="border-2 border-linkedin-blue/10 backdrop-blur-sm bg-background/80">
             <CardHeader>
               <div className="bg-linkedin-blue/10 w-12 h-12 rounded-full flex items-center justify-center mb-2">
                 <MessageSquarePlus className="h-6 w-6 text-linkedin-blue" />
@@ -71,7 +88,7 @@ const Index = () => {
             </CardFooter>
           </Card>
 
-          <Card className="border-2 border-linkedin-blue/10">
+          <Card className="border-2 border-linkedin-blue/10 backdrop-blur-sm bg-background/80">
             <CardHeader>
               <div className="bg-linkedin-blue/10 w-12 h-12 rounded-full flex items-center justify-center mb-2">
                 <Check className="h-6 w-6 text-linkedin-blue" />
@@ -94,7 +111,7 @@ const Index = () => {
             </CardFooter>
           </Card>
 
-          <Card className="border-2 border-linkedin-blue/10">
+          <Card className="border-2 border-linkedin-blue/10 backdrop-blur-sm bg-background/80">
             <CardHeader>
               <div className="bg-linkedin-blue/10 w-12 h-12 rounded-full flex items-center justify-center mb-2">
                 <Calendar className="h-6 w-6 text-linkedin-blue" />
