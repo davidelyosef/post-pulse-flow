@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { format } from "date-fns";
 import { usePostContext } from "@/contexts/PostContext";
@@ -23,19 +22,12 @@ export const ScheduledPostList = () => {
   
   // Updated filtering logic based on the requirements
   const scheduledPosts = approvedPosts.filter(post => {
-    // If post has both scheduleTime and publishedAt, it goes to scheduled list
-    if (post.scheduledFor && post.publishedAt) {
-      return true;
-    }
-    // If post only has scheduleTime (scheduledFor), it goes to scheduled list
-    if (post.scheduledFor && !post.publishedAt) {
-      return true;
-    }
-    return false;
+    // If post has scheduledFor property (regardless of whether they also have publishedAt)
+    return post.scheduledFor;
   });
   
   const publishedPosts = approvedPosts.filter(post => {
-    // Only posts that have publishedAt but no scheduleTime go to published list
+    // Only posts that have publishedAt but no scheduledFor go to published list
     return post.publishedAt && !post.scheduledFor;
   });
   
@@ -259,7 +251,9 @@ export const ScheduledPostList = () => {
             key={post.id}
             post={post}
             onView={handleViewPost}
+            onEdit={handleEditPost}
             onDelete={handleDeleteDialog}
+            onPublish={handlePublishPost}
           />
         ))}
       </div>

@@ -10,7 +10,7 @@ export const PageLayout = ({ children }: PageLayoutProps) => {
   return (
     <div className="min-h-screen flex flex-col bg-background relative overflow-hidden">
       {/* Animated Background */}
-      <div className="area">
+      <div className="area fixed inset-0 h-full w-full">
         <ul className="circles">
           <li>in</li>
           <li>in</li>
