@@ -28,12 +28,16 @@ export const usePostActions = () => {
     setEditDialogOpen(true);
   };
   
-  const handleEditSave = (content: string, tags: string[], imageUrl?: string) => {
+  const handleEditSave = (updates: { content?: string; tags?: string[]; imageUrl?: string }) => {
     if (!selectedPostId) return;
-    const updates: Partial<{ content: string; tags: string[]; imageUrl: string }> = { content, tags };
-    if (imageUrl !== undefined) {
-      updates.imageUrl = imageUrl;
+    
+    // Only update if there are actual changes
+    if (Object.keys(updates).length === 0) {
+      setEditDialogOpen(false);
+      return;
     }
+    
+    console.log('handleEditSave: Updating post', selectedPostId, 'with:', updates);
     updatePost(selectedPostId, updates);
     setEditDialogOpen(false);
     toast.success("Post updated successfully");

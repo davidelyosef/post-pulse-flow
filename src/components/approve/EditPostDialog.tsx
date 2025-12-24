@@ -14,7 +14,7 @@ interface EditPostDialogProps {
   post: Post | null;
   isOpen: boolean;
   onClose: () => void;
-  onSave: (content: string, tags: string[], imageUrl?: string) => void;
+  onSave: (updates: { content?: string; tags?: string[]; imageUrl?: string }) => void;
 }
 
 export const EditPostDialog = ({ post, isOpen, onClose, onSave }: EditPostDialogProps) => {
@@ -41,8 +41,30 @@ export const EditPostDialog = ({ post, isOpen, onClose, onSave }: EditPostDialog
   }, [currentPost, isOpen]);
 
   const handleSave = () => {
-    console.log('EditPostDialog: Saving with content:', editContent, 'tags:', editTags, 'imageUrl:', currentPost?.imageUrl);
-    onSave(editContent, editTags, currentPost?.imageUrl);
+    if (!currentPost) return;
+    
+    const updates: { content?: string; tags?: string[]; imageUrl?: string } = {};
+    
+    // Only include content if it changed
+    if (editContent !== currentPost.content) {
+      updates.content = editContent;
+    }
+    
+    // Only include tags if they changed
+    const originalTags = currentPost.tags || [];
+    const tagsChanged = editTags.length !== originalTags.length || 
+      editTags.some((tag, i) => tag !== originalTags[i]);
+    if (tagsChanged) {
+      updates.tags = editTags;
+    }
+    
+    // Only include imageUrl if it changed
+    if (currentPost.imageUrl !== post?.imageUrl) {
+      updates.imageUrl = currentPost.imageUrl;
+    }
+    
+    console.log('EditPostDialog: Saving updates:', updates);
+    onSave(updates);
   };
 
   const handleGenerateImagePrompts = async () => {
