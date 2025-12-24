@@ -17,10 +17,10 @@ export const generatePosts = async (
   console.log(`Generating ${count} posts about "${topic}" with tone "${tone}" and style "${style}"`);
   
   // Get user data from localStorage for linkedinProfileUrl and linkedinId
-  const storedUser = localStorage.getItem("linkedInUser");
+  const storedUser = localStorage.getItem("linkedinUser");
   const userData = storedUser ? JSON.parse(storedUser) : {};
-  const linkedinProfileUrl = userData.profileUrl || "";
-  const linkedinId = userData.linkedinId || userData.id || userData.userId || userData._id?.$oid || userData._id || "";
+  const linkedinProfileUrl = userData.linkedinProfileUrl || "";
+  const linkedinId = userData.linkedinId || "";
   
   try {
     // Call the LinkedIn posts generation API
