@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Loader2 } from "lucide-react";
 import { generatePosts } from "@/services/openAIService";
 import { usePostContext } from "@/contexts/PostContext";
@@ -28,15 +29,55 @@ const writingStyles = [
   { id: "thought-leadership", name: "Thought Leadership", description: "Visionary and authoritative" },
 ];
 
+const postGoals = [
+  { id: "networking", name: "Networking / Build relationships" },
+  { id: "job-search", name: "Job search / Open to opportunities" },
+  { id: "milestone", name: "Personal milestone / Achievement" },
+  { id: "portfolio", name: "Project showcase / Portfolio" },
+  { id: "educational", name: "Educational / Share learnings" },
+  { id: "gratitude", name: "Community / Give credit / Gratitude" },
+  { id: "company-update", name: "Company / Product update (value-first)" },
+  { id: "hiring", name: "Hiring / Recruiting" },
+  { id: "other-goal", name: "Other" },
+];
+
+const targetAudiences = [
+  { id: "hr-recruiters", name: "HR / Recruiters" },
+  { id: "hiring-managers", name: "Hiring Managers (Data / Product / Engineering)" },
+  { id: "data-analytics", name: "Data / Analytics community" },
+  { id: "product-pm", name: "Product / PM / Growth" },
+  { id: "founders", name: "Founders / Startups" },
+  { id: "students-juniors", name: "Students / Juniors" },
+  { id: "other-audience", name: "Other" },
+];
+
 export const GenerateForm = () => {
   const [topic, setTopic] = useState("");
   const [count, setCount] = useState(3);
   const [tone, setTone] = useState("professional");
   const [style, setStyle] = useState("concise");
+  const [selectedGoals, setSelectedGoals] = useState<string[]>([]);
+  const [selectedAudiences, setSelectedAudiences] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { addPosts } = usePostContext();
   const { getUserId } = useUser();
+
+  const toggleGoal = (goalId: string) => {
+    setSelectedGoals(prev => 
+      prev.includes(goalId) 
+        ? prev.filter(id => id !== goalId) 
+        : [...prev, goalId]
+    );
+  };
+
+  const toggleAudience = (audienceId: string) => {
+    setSelectedAudiences(prev => 
+      prev.includes(audienceId) 
+        ? prev.filter(id => id !== audienceId) 
+        : [...prev, audienceId]
+    );
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,14 +89,29 @@ export const GenerateForm = () => {
 
     setIsLoading(true);
 
+    // Build the enriched description with goals and audience
+    const goalNames = selectedGoals.map(id => postGoals.find(g => g.id === id)?.name).filter(Boolean);
+    const audienceNames = selectedAudiences.map(id => targetAudiences.find(a => a.id === id)?.name).filter(Boolean);
+    
+    let enrichedTopic = "";
+    if (goalNames.length > 0) {
+      enrichedTopic += `The purpose of this post is to: ${goalNames.join(", ")}.\n\n`;
+    }
+    if (audienceNames.length > 0) {
+      enrichedTopic += `The target audience for this post are: ${audienceNames.join(", ")}.\n\n`;
+    }
+    enrichedTopic += topic;
+
     try {
-      const posts = await generatePosts(count, topic, tone, style, false, "dalle3");
+      const posts = await generatePosts(count, enrichedTopic, tone, style, false, "dalle3");
 
       if (posts && Array.isArray(posts) && posts.length > 0) {
         console.log("Adding posts to context:", posts);
         addPosts(posts);
         toast.success(`Generated ${posts.length} posts!`);
         setTopic("");
+        setSelectedGoals([]);
+        setSelectedAudiences([]);
         navigate("/approve");
       } else {
         console.error("Invalid posts data received:", posts);
@@ -81,6 +137,51 @@ export const GenerateForm = () => {
           className="min-h-[100px]"
           required
         />
+      </div>
+
+      {/* Post Goal and Target Audience - Side by Side */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-3">
+          <Label>Post Goal (select all that apply)</Label>
+          <div className="space-y-2 max-h-[200px] overflow-y-auto border rounded-md p-3">
+            {postGoals.map((goal) => (
+              <div key={goal.id} className="flex items-center space-x-2">
+                <Checkbox
+                  id={goal.id}
+                  checked={selectedGoals.includes(goal.id)}
+                  onCheckedChange={() => toggleGoal(goal.id)}
+                />
+                <label
+                  htmlFor={goal.id}
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                >
+                  {goal.name}
+                </label>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          <Label>Target Audience (select all that apply)</Label>
+          <div className="space-y-2 max-h-[200px] overflow-y-auto border rounded-md p-3">
+            {targetAudiences.map((audience) => (
+              <div key={audience.id} className="flex items-center space-x-2">
+                <Checkbox
+                  id={audience.id}
+                  checked={selectedAudiences.includes(audience.id)}
+                  onCheckedChange={() => toggleAudience(audience.id)}
+                />
+                <label
+                  htmlFor={audience.id}
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                >
+                  {audience.name}
+                </label>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
