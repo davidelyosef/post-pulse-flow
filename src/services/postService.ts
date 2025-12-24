@@ -13,7 +13,7 @@ export const savePostWithImage = async (
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        content: description,
+        description: description,
         imageUrl: imageUrl || "",
         visibility: "PUBLIC",
         user_id: userId,

@@ -32,7 +32,7 @@ export const generateImage = async (prompt: string, content: string, imageUrl: s
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        content: content,
+        description: content,
         imageUrl: imageUrl,
         visibility: "PUBLIC",
         user_id: userId,
