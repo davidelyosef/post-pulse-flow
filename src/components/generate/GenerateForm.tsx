@@ -259,7 +259,7 @@ export const GenerateForm = () => {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="topic">What would you like posts about?</Label>
+        <Label htmlFor="topic">What would you like to posts about?</Label>
         <Textarea
           id="topic"
           placeholder="e.g., Leadership tips, industry trends, career advice, etc."
