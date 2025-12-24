@@ -7,15 +7,17 @@ export const savePostWithImage = async (
   imageUrl?: string
 ): Promise<any> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/saveimage`, {
+    const response = await fetch(`${API_BASE_URL}/linkedin/create`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        description,
-        userId,
-        imageUrl: imageUrl || false,
+        content: description,
+        imageUrl: imageUrl || "",
+        visibility: "PUBLIC",
+        user_id: userId,
+        post_id: "", // Will be assigned by server
       }),
     });
 
