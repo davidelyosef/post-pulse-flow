@@ -11,6 +11,7 @@ export type Post = {
   imageUrl?: string;
   scheduledFor?: Date;
   publishedAt?: Date;
+  linkedInUrl?: string;
   tone?: string;
   style?: string;
   analytics?: {
