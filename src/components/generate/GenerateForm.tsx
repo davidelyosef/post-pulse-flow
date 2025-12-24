@@ -128,18 +128,6 @@ export const GenerateForm = () => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="space-y-2">
-        <Label htmlFor="topic">What would you like posts about?</Label>
-        <Textarea
-          id="topic"
-          placeholder="e.g., Leadership tips, industry trends, career advice, etc."
-          value={topic}
-          onChange={(e) => setTopic(e.target.value)}
-          className="min-h-[100px]"
-          required
-        />
-      </div>
-
       {/* Post Goal and Target Audience - Side by Side */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
@@ -217,6 +205,18 @@ export const GenerateForm = () => {
             </PopoverContent>
           </Popover>
         </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="topic">What would you like posts about?</Label>
+        <Textarea
+          id="topic"
+          placeholder="e.g., Leadership tips, industry trends, career advice, etc."
+          value={topic}
+          onChange={(e) => setTopic(e.target.value)}
+          className="min-h-[100px]"
+          required
+        />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
