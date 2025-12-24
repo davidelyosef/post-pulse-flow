@@ -35,8 +35,8 @@ export const generateImage = async (prompt: string, content: string, imageUrl: s
         description: content,
         imageUrl: imageUrl,
         visibility: "PUBLIC",
-        user_id: userId,
-        post_id: postId,
+        userId: userId,
+        postId: postId,
       }),
     });
 

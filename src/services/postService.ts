@@ -13,11 +13,9 @@ export const savePostWithImage = async (
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        description: description,
-        imageUrl: imageUrl || "",
-        visibility: "PUBLIC",
-        user_id: userId,
-        post_id: "", // Will be assigned by server
+        description,
+        userId,
+        imageUrl: imageUrl || false,
       }),
     });
 
