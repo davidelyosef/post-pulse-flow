@@ -1,10 +1,95 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Image, Loader2, RefreshCw } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Image, Loader2, RefreshCw, PenLine } from "lucide-react";
 import { Post } from "@/types";
 import { generateImageFromPrompt } from "@/services/openAIService";
 import { useUser } from "@/contexts/UserContext";
 import { usePostContext } from "@/contexts/PostContext";
+
+interface ImagePromptSelectorProps {
+  prompts: string[];
+  isGeneratingImage: boolean;
+  onSelectPrompt: (prompt: string) => void;
+}
+
+const ImagePromptSelector = ({ prompts, isGeneratingImage, onSelectPrompt }: ImagePromptSelectorProps) => {
+  const [showCustomInput, setShowCustomInput] = useState(false);
+  const [customPrompt, setCustomPrompt] = useState("");
+
+  const handleCustomSubmit = () => {
+    if (customPrompt.trim()) {
+      onSelectPrompt(customPrompt.trim());
+      setCustomPrompt("");
+      setShowCustomInput(false);
+    }
+  };
+
+  return (
+    <div className="space-y-3 overflow-hidden">
+      <p className="text-sm font-medium">Select an image concept:</p>
+      <div className="grid gap-2 overflow-y-auto max-h-52">
+        {prompts.map((prompt, index) => (
+          <Button 
+            key={index} 
+            variant="outline" 
+            className="justify-start text-left h-auto py-2 font-normal break-words whitespace-normal"
+            onClick={() => onSelectPrompt(prompt)}
+            disabled={isGeneratingImage}
+          >
+            {isGeneratingImage ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                Generating...
+              </>
+            ) : (
+              prompt
+            )}
+          </Button>
+        ))}
+      </div>
+      
+      {showCustomInput ? (
+        <div className="flex gap-2">
+          <Input
+            placeholder="Write your own image concept..."
+            value={customPrompt}
+            onChange={(e) => setCustomPrompt(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleCustomSubmit()}
+            disabled={isGeneratingImage}
+            className="flex-1"
+          />
+          <Button 
+            size="sm" 
+            onClick={handleCustomSubmit}
+            disabled={isGeneratingImage || !customPrompt.trim()}
+          >
+            Generate
+          </Button>
+          <Button 
+            size="sm" 
+            variant="ghost" 
+            onClick={() => setShowCustomInput(false)}
+            disabled={isGeneratingImage}
+          >
+            Cancel
+          </Button>
+        </div>
+      ) : (
+        <Button 
+          variant="outline" 
+          size="sm"
+          className="w-full"
+          onClick={() => setShowCustomInput(true)}
+          disabled={isGeneratingImage}
+        >
+          <PenLine className="h-4 w-4 mr-2" />
+          Write my own concept
+        </Button>
+      )}
+    </div>
+  );
+};
 
 interface PostCardImageProps {
   post: Post;
@@ -138,29 +223,11 @@ export const PostCardImage = ({
           <span>Generating image...</span>
         </div>
       ) : post.imagePrompts ? (
-        <div className="space-y-3 overflow-hidden">
-          <p className="text-sm font-medium">Select an image concept:</p>
-          <div className="grid gap-2 overflow-y-auto max-h-52">
-            {post.imagePrompts.map((prompt, index) => (
-              <Button 
-                key={index} 
-                variant="outline" 
-                className="justify-start text-left h-auto py-2 font-normal break-words whitespace-normal"
-                onClick={() => handleSelectPrompt(prompt)}
-                disabled={isGeneratingImage}
-              >
-                {isGeneratingImage ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    Generating...
-                  </>
-                ) : (
-                  prompt
-                )}
-              </Button>
-            ))}
-          </div>
-        </div>
+        <ImagePromptSelector
+          prompts={post.imagePrompts}
+          isGeneratingImage={isGeneratingImage}
+          onSelectPrompt={handleSelectPrompt}
+        />
       ) : (
         <Button 
           variant="outline" 
