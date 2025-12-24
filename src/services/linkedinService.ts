@@ -22,19 +22,21 @@ export const disconnectLinkedIn = (): void => {
 };
 
 // New function to generate an image based on a prompt
-export const generateImage = async (prompt: string, content: string): Promise<string | null> => {
+export const generateImage = async (prompt: string, content: string, imageUrl: string, userId: string, postId: string): Promise<string | null> => {
   try {
     console.log("Generating image with prompt:", prompt);
 
-    const response = await fetch("https://linkedai-server.moburst.com/api/generate/saveimage", {
+    const response = await fetch("https://linkedai-server.moburst.com/api/linkedin/create", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJxo2NFiYcR35GzCk5T3nxA7rGlSsXvIfJwg&s",
-        description: content,
-        userId: "682c65e996c62a2bca89a8ba",
+        content: content,
+        imageUrl: imageUrl,
+        visibility: "PUBLIC",
+        user_id: userId,
+        post_id: postId,
       }),
     });
 
