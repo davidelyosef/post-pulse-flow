@@ -7,7 +7,7 @@ export const savePostWithImage = async (
   imageUrl?: string
 ): Promise<any> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/linkedin/create`, {
+    const response = await fetch(`${API_BASE_URL}/saveimage`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
