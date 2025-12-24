@@ -254,6 +254,18 @@ export const GenerateForm = () => {
         </div>
       </div>
 
+      {/* Writing Tone and Style Display */}
+      <div className="space-y-1 text-sm text-muted-foreground bg-muted/50 rounded-lg p-4">
+        <p>
+          <span className="font-medium text-foreground">The writing tone for that post is:</span>{" "}
+          {writingTones.find(t => t.id === tone)?.name} - {writingTones.find(t => t.id === tone)?.description}
+        </p>
+        <p>
+          <span className="font-medium text-foreground">The writing style for that post is:</span>{" "}
+          {writingStyles.find(s => s.id === style)?.name} - {writingStyles.find(s => s.id === style)?.description}
+        </p>
+      </div>
+
       <div className="space-y-2">
         <Label htmlFor="topic">What would you like posts about?</Label>
         <Textarea
