@@ -76,10 +76,10 @@ export const publishPost = async (content: string, imageUrl?: string, postId?: s
 
     // Prepare request body according to the backend API
     const requestBody = {
-      content: content,
+      description: content,
       imageUrl: imageUrl || "",
       visibility: "PUBLIC",
-      user_id: userData.id || userData.userId || userData._id?.$oid || userData._id,
+      userId: userData.id || userData.userId || userData._id?.$oid || userData._id,
       postId: postId, // Include the postId in the request
     };
 
