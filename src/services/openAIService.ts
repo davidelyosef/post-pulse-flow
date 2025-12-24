@@ -15,6 +15,12 @@ export const generatePosts = async (
   model: string = "dalle3"
 ): Promise<Post[]> => {
   console.log(`Generating ${count} posts about "${topic}" with tone "${tone}" and style "${style}"`);
+
+  // Get user data from localStorage for linkedinProfileUrl and linkedinId
+  const storedUser = localStorage.getItem("linkedInUser");
+  const userData = storedUser ? JSON.parse(storedUser) : {};
+  const linkedinProfileUrl = userData.profileUrl || "";
+  const linkedinId = userData.linkedinId || userData.id || userData.userId || userData._id?.$oid || userData._id || "";
   
   try {
     // Call the LinkedIn posts generation API
@@ -26,7 +32,9 @@ export const generatePosts = async (
       body: JSON.stringify({
         role: tone,
         description: topic,
-        numberOfRequests: count
+        numberOfRequests: count,
+        linkedinProfileUrl: linkedinProfileUrl,
+        linkedinId: linkedinId
       }),
     });
 
