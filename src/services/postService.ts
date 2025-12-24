@@ -78,7 +78,9 @@ export const updatePost = async (
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        ...updates,
+        description: updates.description,
+        imageUrl: updates.imageUrl,
+        scheduleTime: updates.scheduleTime,
         userId,
       }),
     });
