@@ -28,9 +28,9 @@ export const usePostActions = () => {
     setEditDialogOpen(true);
   };
   
-  const handleEditSave = (content: string, tags: string[]) => {
+  const handleEditSave = (content: string, tags: string[], imageUrl?: string) => {
     if (!selectedPostId) return;
-    updatePost(selectedPostId, { content, tags });
+    updatePost(selectedPostId, { content, tags, ...(imageUrl && { imageUrl }) });
     setEditDialogOpen(false);
     toast.success("Post updated successfully");
   };

@@ -14,7 +14,7 @@ interface EditPostDialogProps {
   post: Post | null;
   isOpen: boolean;
   onClose: () => void;
-  onSave: (content: string, tags: string[]) => void;
+  onSave: (content: string, tags: string[], imageUrl?: string) => void;
 }
 
 export const EditPostDialog = ({ post, isOpen, onClose, onSave }: EditPostDialogProps) => {
@@ -41,8 +41,8 @@ export const EditPostDialog = ({ post, isOpen, onClose, onSave }: EditPostDialog
   }, [currentPost, isOpen]);
 
   const handleSave = () => {
-    console.log('EditPostDialog: Saving with content:', editContent, 'and tags:', editTags);
-    onSave(editContent, editTags);
+    console.log('EditPostDialog: Saving with content:', editContent, 'tags:', editTags, 'imageUrl:', currentPost?.imageUrl);
+    onSave(editContent, editTags, currentPost?.imageUrl);
   };
 
   const handleGenerateImagePrompts = async () => {
