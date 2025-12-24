@@ -91,11 +91,15 @@ export const GenerateForm = () => {
 
     setIsLoading(true);
 
-    // Build the enriched description with goals and audience
+    // Build the enriched description with goals, audience, tone and style
     const goalNames = selectedGoals.map(id => postGoals.find(g => g.id === id)?.name).filter(Boolean);
     const audienceNames = selectedAudiences.map(id => targetAudiences.find(a => a.id === id)?.name).filter(Boolean);
+    const selectedTone = writingTones.find(t => t.id === tone);
+    const selectedStyle = writingStyles.find(s => s.id === style);
     
     let enrichedTopic = "";
+    enrichedTopic += `The writing tone for that post is: ${selectedTone?.name} - ${selectedTone?.description}.\n\n`;
+    enrichedTopic += `The writing style for that post is: ${selectedStyle?.name} - ${selectedStyle?.description}.\n\n`;
     if (goalNames.length > 0) {
       enrichedTopic += `The purpose of this post is to: ${goalNames.join(", ")}.\n\n`;
     }
@@ -252,18 +256,6 @@ export const GenerateForm = () => {
             </div>
           )}
         </div>
-      </div>
-
-      {/* Writing Tone and Style Display */}
-      <div className="space-y-1 text-sm text-muted-foreground bg-muted/50 rounded-lg p-4">
-        <p>
-          <span className="font-medium text-foreground">The writing tone for that post is:</span>{" "}
-          {writingTones.find(t => t.id === tone)?.name} - {writingTones.find(t => t.id === tone)?.description}
-        </p>
-        <p>
-          <span className="font-medium text-foreground">The writing style for that post is:</span>{" "}
-          {writingStyles.find(s => s.id === style)?.name} - {writingStyles.find(s => s.id === style)?.description}
-        </p>
       </div>
 
       <div className="space-y-2">
