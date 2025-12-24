@@ -7,7 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Loader2, ChevronDown } from "lucide-react";
+import { Loader2, ChevronDown, X } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { generatePosts } from "@/services/openAIService";
 import { usePostContext } from "@/contexts/PostContext";
 import { useUser } from "@/contexts/UserContext";
@@ -166,6 +167,29 @@ export const GenerateForm = () => {
               </div>
             </PopoverContent>
           </Popover>
+          {selectedGoals.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 pt-1">
+              {selectedGoals.map((goalId) => {
+                const goal = postGoals.find(g => g.id === goalId);
+                return (
+                  <Badge
+                    key={goalId}
+                    variant="secondary"
+                    className="text-xs pl-2 pr-1 py-0.5 flex items-center gap-1"
+                  >
+                    <span className="truncate max-w-[150px]">{goal?.name}</span>
+                    <button
+                      type="button"
+                      onClick={() => toggleGoal(goalId)}
+                      className="hover:bg-muted rounded-full p-0.5"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         <div className="space-y-2">
@@ -204,6 +228,29 @@ export const GenerateForm = () => {
               </div>
             </PopoverContent>
           </Popover>
+          {selectedAudiences.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 pt-1">
+              {selectedAudiences.map((audienceId) => {
+                const audience = targetAudiences.find(a => a.id === audienceId);
+                return (
+                  <Badge
+                    key={audienceId}
+                    variant="secondary"
+                    className="text-xs pl-2 pr-1 py-0.5 flex items-center gap-1"
+                  >
+                    <span className="truncate max-w-[150px]">{audience?.name}</span>
+                    <button
+                      type="button"
+                      onClick={() => toggleAudience(audienceId)}
+                      className="hover:bg-muted rounded-full p-0.5"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
 
