@@ -17,7 +17,7 @@ export const generatePosts = async (
   
   try {
     // Call the LinkedIn posts generation API
-    const response = await fetch("https://34.226.170.38:3000/api/generate", {
+    const response = await fetch("https://linkedai-server.moburst.com/api/generate", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
