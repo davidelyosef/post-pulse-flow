@@ -121,7 +121,7 @@ const GeneratePage = () => {
                         className="h-6 w-6"
                         onClick={() => setProfileUrlDialogOpen(true)}
                       >
-                        <Pencil className="h-3 w-3" />
+                        <Pencil className="h-3 w-3 text-foreground" />
                       </Button>
                     </div>
                   </div>
