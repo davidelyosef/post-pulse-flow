@@ -6,7 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Loader2 } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Loader2, ChevronDown } from "lucide-react";
 import { generatePosts } from "@/services/openAIService";
 import { usePostContext } from "@/contexts/PostContext";
 import { useUser } from "@/contexts/UserContext";
@@ -141,46 +142,80 @@ export const GenerateForm = () => {
 
       {/* Post Goal and Target Audience - Side by Side */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-3">
-          <Label>Post Goal (select all that apply)</Label>
-          <div className="space-y-2 max-h-[200px] overflow-y-auto border rounded-md p-3">
-            {postGoals.map((goal) => (
-              <div key={goal.id} className="flex items-center space-x-2">
-                <Checkbox
-                  id={goal.id}
-                  checked={selectedGoals.includes(goal.id)}
-                  onCheckedChange={() => toggleGoal(goal.id)}
-                />
-                <label
-                  htmlFor={goal.id}
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                >
-                  {goal.name}
-                </label>
+        <div className="space-y-2">
+          <Label>Post Goal</Label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-full justify-between font-normal"
+              >
+                <span className="truncate">
+                  {selectedGoals.length > 0
+                    ? `${selectedGoals.length} selected`
+                    : "Select goals..."}
+                </span>
+                <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[300px] p-3 bg-popover z-50" align="start">
+              <div className="space-y-2 max-h-[250px] overflow-y-auto">
+                {postGoals.map((goal) => (
+                  <div key={goal.id} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`goal-${goal.id}`}
+                      checked={selectedGoals.includes(goal.id)}
+                      onCheckedChange={() => toggleGoal(goal.id)}
+                    />
+                    <label
+                      htmlFor={`goal-${goal.id}`}
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                    >
+                      {goal.name}
+                    </label>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </PopoverContent>
+          </Popover>
         </div>
 
-        <div className="space-y-3">
-          <Label>Target Audience (select all that apply)</Label>
-          <div className="space-y-2 max-h-[200px] overflow-y-auto border rounded-md p-3">
-            {targetAudiences.map((audience) => (
-              <div key={audience.id} className="flex items-center space-x-2">
-                <Checkbox
-                  id={audience.id}
-                  checked={selectedAudiences.includes(audience.id)}
-                  onCheckedChange={() => toggleAudience(audience.id)}
-                />
-                <label
-                  htmlFor={audience.id}
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                >
-                  {audience.name}
-                </label>
+        <div className="space-y-2">
+          <Label>Target Audience</Label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-full justify-between font-normal"
+              >
+                <span className="truncate">
+                  {selectedAudiences.length > 0
+                    ? `${selectedAudiences.length} selected`
+                    : "Select audience..."}
+                </span>
+                <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[300px] p-3 bg-popover z-50" align="start">
+              <div className="space-y-2 max-h-[250px] overflow-y-auto">
+                {targetAudiences.map((audience) => (
+                  <div key={audience.id} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`audience-${audience.id}`}
+                      checked={selectedAudiences.includes(audience.id)}
+                      onCheckedChange={() => toggleAudience(audience.id)}
+                    />
+                    <label
+                      htmlFor={`audience-${audience.id}`}
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                    >
+                      {audience.name}
+                    </label>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
 
