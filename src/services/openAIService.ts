@@ -19,7 +19,7 @@ export const generatePosts = async (
   // Get user data from localStorage for linkedinProfileUrl and linkedinId
   const storedUser = localStorage.getItem("linkedinUser");
   const userData = storedUser ? JSON.parse(storedUser) : {};
-  const linkedinProfileUrl = userData.linkedinProfileUrl || "";
+  const linkedinProfileUrl = userData.profileUserUrl || "";
   const linkedinId = userData.linkedinId || "";
   
   try {
