@@ -26,7 +26,7 @@ export const connectToLinkedIn = async (): Promise<boolean> => {
     console.log("urlParams", urlParams);
 
     if (urlParams.get("success") !== "true") {
-      window.location.href = "https://34.226.170.38:3000/api/auth/linkedin";
+      window.location.href = "https://34.226.170.38/api/auth/linkedin";
     }
     
     return true;
@@ -57,7 +57,7 @@ export const generateImage = async (prompt: string, content: string): Promise<st
   try {
     console.log("Generating image with prompt:", prompt);
     
-    const response = await fetch("https://34.226.170.38:3000/api/generate/saveimage", {
+    const response = await fetch("https://34.226.170.38/api/generate/saveimage", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -121,7 +121,7 @@ export const publishPost = async (
     console.log("Sending LinkedIn post request:", requestBody);
     
     // Make POST request to publish endpoint
-    const response = await fetch("https://34.226.170.38:3000/api/linkedin/create", {
+    const response = await fetch("https://34.226.170.38/api/linkedin/create", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

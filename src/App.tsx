@@ -31,7 +31,7 @@ const AppContent = () => {
   useEffect(() => {
     const init = async () => {
       try {
-        const response = await fetch("https://34.226.170.38:3000/api/auth/success", { credentials: "include" });
+        const response = await fetch("https://34.226.170.38/api/auth/success", { credentials: "include" });
         const data = await response.json();
         console.log("LinkedIn auth response:", data);
         
