@@ -2,7 +2,7 @@
 import { toast } from "sonner";
 
 export const connectToLinkedIn = async (): Promise<boolean> => {
-  window.location.href = "https://34.226.170.38/api/auth/linkedin";
+  window.location.href = "https://linkedai-server.moburst.com/api/auth/linkedin";
   return;
 };
 
@@ -26,7 +26,7 @@ export const generateImage = async (prompt: string, content: string): Promise<st
   try {
     console.log("Generating image with prompt:", prompt);
 
-    const response = await fetch("https://34.226.170.38/api/generate/saveimage", {
+    const response = await fetch("https://linkedai-server.moburst.com/api/generate/saveimage", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -84,7 +84,7 @@ export const publishPost = async (content: string, imageUrl?: string, postId?: s
     console.log("Sending LinkedIn post request:", requestBody);
 
     // Make POST request to the correct endpoint
-    const response = await fetch("https://34.226.170.38/api/linkedin/create", {
+    const response = await fetch("https://linkedai-server.moburst.com/api/linkedin/create", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
