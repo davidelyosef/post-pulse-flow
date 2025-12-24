@@ -30,7 +30,11 @@ export const usePostActions = () => {
   
   const handleEditSave = (content: string, tags: string[], imageUrl?: string) => {
     if (!selectedPostId) return;
-    updatePost(selectedPostId, { content, tags, ...(imageUrl && { imageUrl }) });
+    const updates: Partial<{ content: string; tags: string[]; imageUrl: string }> = { content, tags };
+    if (imageUrl !== undefined) {
+      updates.imageUrl = imageUrl;
+    }
+    updatePost(selectedPostId, updates);
     setEditDialogOpen(false);
     toast.success("Post updated successfully");
   };
