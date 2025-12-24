@@ -26,7 +26,7 @@ export const generateImage = async (prompt: string, content: string, imageUrl: s
   try {
     console.log("Generating image with prompt:", prompt);
 
-    const response = await fetch("https://linkedai-server.moburst.com/api/linkedin/create", {
+    const response = await fetch("https://linkedai-server.moburst.com/api/generate/saveimage", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -86,7 +86,7 @@ export const publishPost = async (content: string, imageUrl?: string, postId?: s
     console.log("Sending LinkedIn post request:", requestBody);
 
     // Make POST request to the correct endpoint
-    const response = await fetch("https://linkedai-server.moburst.com/api/linkedin/create", {
+    const response = await fetch("https://linkedai-server.moburst.com/api/generate/saveimage", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
