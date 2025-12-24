@@ -56,6 +56,7 @@ export const PostSection = ({
                 onView={onView}
                 onEdit={onEdit}
                 onDelete={onDelete}
+                onPublish={onPublish!}
               />
             ) : (
               <ScheduledPostCard

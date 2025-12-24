@@ -121,20 +121,7 @@ export const Navbar = () => {
       {connected && user && (
         <div className="bg-muted/30 py-2 px-4 sm:px-6 lg:px-8 text-sm flex items-center justify-end">
           <span className="text-muted-foreground mr-2">Connected as:</span>
-          {user.profileUrl ? (
-            <a 
-              href={user.profileUrl} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="font-medium text-linkedin-blue hover:underline"
-            >
-              {user.currentPosition || user.displayName || user.name || 'LinkedIn User'}
-            </a>
-          ) : (
-            <span className="font-medium text-foreground">
-              {user.currentPosition || user.displayName || user.name || 'LinkedIn User'}
-            </span>
-          )}
+          <span className="font-medium text-foreground">{user.displayName}</span>
         </div>
       )}
     </header>

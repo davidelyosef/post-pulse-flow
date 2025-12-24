@@ -4,15 +4,13 @@ import { Button } from "@/components/ui/button";
 import { connectToLinkedIn, isLinkedInConnected, getLinkedInUser, disconnectLinkedIn } from "@/services/linkedinService";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Pencil } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { usePostContext } from "@/contexts/PostContext";
-import { ProfileUrlDialog } from "@/components/generate/ProfileUrlDialog";
 
 const GeneratePage = () => {
   const [connected, setConnected] = useState(false);
   const [userData, setUserData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
-  const [profileUrlDialogOpen, setProfileUrlDialogOpen] = useState(false);
   const { addPosts } = usePostContext();
 
   useEffect(() => {
@@ -27,7 +25,7 @@ const GeneratePage = () => {
         console.log("Successfully connected to LinkedIn");
         try {
           // get request to the backend to get the user data
-          const response = await fetch("https://linkedai-server.moburst.com/api/auth/success", { credentials: "include" });
+          const response = await fetch("https://34.226.170.38:3000/api/auth/success", { credentials: "include" });
           const data = await response.json();
           console.log("LinkedIn user data:", data);
           setUserData(data);
@@ -76,12 +74,6 @@ const GeneratePage = () => {
     setUserData(null);
   };
 
-  const handleProfileUrlSave = (newUrl: string) => {
-    const updatedUserData = { ...userData, linkedinProfileUrl: newUrl };
-    setUserData(updatedUserData);
-    localStorage.setItem("linkedinUser", JSON.stringify(updatedUserData));
-  };
-
   useEffect(() => {
     const linkedinUser = localStorage.getItem("linkedinUser");
     if (linkedinUser) {
@@ -113,17 +105,7 @@ const GeneratePage = () => {
                   {userData?.profileUrl && <img src={userData.profileUrl} alt="Profile" className="w-10 h-10 rounded-full" />}
                   <div className="text-left">
                     <p className="font-medium">{userData?.displayName || "Connected User"}</p>
-                    <div className="flex items-center gap-2">
-                      <p className="text-sm text-muted-foreground">Profile URL:</p>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6"
-                        onClick={() => setProfileUrlDialogOpen(true)}
-                      >
-                        <Pencil className="h-3 w-3 text-foreground" />
-                      </Button>
-                    </div>
+                    <p className="text-sm text-muted-foreground">{userData?.position || "LinkedIn User"}</p>
                   </div>
                 </div>
                 <Button variant="outline" size="sm" onClick={handleDisconnect}>
@@ -143,14 +125,6 @@ const GeneratePage = () => {
 
         <GenerateForm />
       </div>
-
-      <ProfileUrlDialog
-        isOpen={profileUrlDialogOpen}
-        onClose={() => setProfileUrlDialogOpen(false)}
-        currentUrl={userData?.linkedinProfileUrl || ""}
-        userId={userData?.id || userData?._id?.$oid || ""}
-        onSave={handleProfileUrlSave}
-      />
     </PageLayout>
   );
 };

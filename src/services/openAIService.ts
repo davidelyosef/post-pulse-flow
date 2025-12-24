@@ -16,15 +16,9 @@ export const generatePosts = async (
 ): Promise<Post[]> => {
   console.log(`Generating ${count} posts about "${topic}" with tone "${tone}" and style "${style}"`);
   
-  // Get user data from localStorage for linkedinProfileUrl and linkedinId
-  const storedUser = localStorage.getItem("linkedinUser");
-  const userData = storedUser ? JSON.parse(storedUser) : {};
-  const linkedinProfileUrl = userData.profileUserUrl || "";
-  const linkedinId = userData.linkedinId || "";
-  
   try {
     // Call the LinkedIn posts generation API
-    const response = await fetch("https://linkedai-server.moburst.com/api/generate", {
+    const response = await fetch("https://34.226.170.38:3000/api/generate", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -32,9 +26,7 @@ export const generatePosts = async (
       body: JSON.stringify({
         role: tone,
         description: topic,
-        numberOfRequests: count,
-        linkedinProfileUrl: linkedinProfileUrl,
-        linkedinId: linkedinId
+        numberOfRequests: count
       }),
     });
 

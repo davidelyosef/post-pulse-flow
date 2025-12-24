@@ -2,7 +2,7 @@
 import { toast } from "sonner";
 
 export const connectToLinkedIn = async (): Promise<boolean> => {
-  window.location.href = "https://linkedai-server.moburst.com/api/auth/linkedin";
+  window.location.href = "https://34.226.170.38:3000/api/auth/linkedin";
   return;
 };
 
@@ -22,21 +22,19 @@ export const disconnectLinkedIn = (): void => {
 };
 
 // New function to generate an image based on a prompt
-export const generateImage = async (prompt: string, content: string, imageUrl: string, userId: string, postId: string): Promise<string | null> => {
+export const generateImage = async (prompt: string, content: string): Promise<string | null> => {
   try {
     console.log("Generating image with prompt:", prompt);
 
-    const response = await fetch("https://linkedai-server.moburst.com/api/generate/saveimage", {
+    const response = await fetch("https://34.226.170.38:3000/api/generate/saveimage", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
+        imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJxo2NFiYcR35GzCk5T3nxA7rGlSsXvIfJwg&s",
         description: content,
-        imageUrl: imageUrl,
-        visibility: "PUBLIC",
-        userId: userId,
-        postId: postId,
+        userId: "682c65e996c62a2bca89a8ba",
       }),
     });
 
@@ -76,17 +74,17 @@ export const publishPost = async (content: string, imageUrl?: string, postId?: s
 
     // Prepare request body according to the backend API
     const requestBody = {
-      description: content,
+      content: content,
       imageUrl: imageUrl || "",
       visibility: "PUBLIC",
-      userId: userData.id || userData.userId || userData._id?.$oid || userData._id,
+      user_id: userData.id || userData.userId || userData._id?.$oid || userData._id,
       postId: postId, // Include the postId in the request
     };
 
     console.log("Sending LinkedIn post request:", requestBody);
 
     // Make POST request to the correct endpoint
-    const response = await fetch("https://linkedai-server.moburst.com/api/generate/saveimage", {
+    const response = await fetch("https://34.226.170.38:3000/api/linkedin/create", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

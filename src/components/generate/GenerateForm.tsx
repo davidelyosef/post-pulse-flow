@@ -5,10 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Loader2, ChevronDown, X } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Loader2 } from "lucide-react";
 import { generatePosts } from "@/services/openAIService";
 import { usePostContext } from "@/contexts/PostContext";
 import { useUser } from "@/contexts/UserContext";
@@ -31,55 +28,15 @@ const writingStyles = [
   { id: "thought-leadership", name: "Thought Leadership", description: "Visionary and authoritative" },
 ];
 
-const postGoals = [
-  { id: "networking", name: "Networking / Build relationships" },
-  { id: "job-search", name: "Job search / Open to opportunities" },
-  { id: "milestone", name: "Personal milestone / Achievement" },
-  { id: "portfolio", name: "Project showcase / Portfolio" },
-  { id: "educational", name: "Educational / Share learnings" },
-  { id: "gratitude", name: "Community / Give credit / Gratitude" },
-  { id: "company-update", name: "Company / Product update (value-first)" },
-  { id: "hiring", name: "Hiring / Recruiting" },
-  { id: "other-goal", name: "Other" },
-];
-
-const targetAudiences = [
-  { id: "hr-recruiters", name: "HR / Recruiters" },
-  { id: "hiring-managers", name: "Hiring Managers (Data / Product / Engineering)" },
-  { id: "data-analytics", name: "Data / Analytics community" },
-  { id: "product-pm", name: "Product / PM / Growth" },
-  { id: "founders", name: "Founders / Startups" },
-  { id: "students-juniors", name: "Students / Juniors" },
-  { id: "other-audience", name: "Other" },
-];
-
 export const GenerateForm = () => {
   const [topic, setTopic] = useState("");
   const [count, setCount] = useState(3);
   const [tone, setTone] = useState("professional");
   const [style, setStyle] = useState("concise");
-  const [selectedGoals, setSelectedGoals] = useState<string[]>([]);
-  const [selectedAudiences, setSelectedAudiences] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { addPosts } = usePostContext();
   const { getUserId } = useUser();
-
-  const toggleGoal = (goalId: string) => {
-    setSelectedGoals(prev => 
-      prev.includes(goalId) 
-        ? prev.filter(id => id !== goalId) 
-        : [...prev, goalId]
-    );
-  };
-
-  const toggleAudience = (audienceId: string) => {
-    setSelectedAudiences(prev => 
-      prev.includes(audienceId) 
-        ? prev.filter(id => id !== audienceId) 
-        : [...prev, audienceId]
-    );
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -91,33 +48,14 @@ export const GenerateForm = () => {
 
     setIsLoading(true);
 
-    // Build the enriched description with goals, audience, tone and style
-    const goalNames = selectedGoals.map(id => postGoals.find(g => g.id === id)?.name).filter(Boolean);
-    const audienceNames = selectedAudiences.map(id => targetAudiences.find(a => a.id === id)?.name).filter(Boolean);
-    const selectedTone = writingTones.find(t => t.id === tone);
-    const selectedStyle = writingStyles.find(s => s.id === style);
-    
-    let enrichedTopic = "";
-    enrichedTopic += `The writing tone for that post is: ${selectedTone?.name} - ${selectedTone?.description}.\n\n`;
-    enrichedTopic += `The writing style for that post is: ${selectedStyle?.name} - ${selectedStyle?.description}.\n\n`;
-    if (goalNames.length > 0) {
-      enrichedTopic += `The purpose of this post is to: ${goalNames.join(", ")}.\n\n`;
-    }
-    if (audienceNames.length > 0) {
-      enrichedTopic += `The target audience for this post are: ${audienceNames.join(", ")}.\n\n`;
-    }
-    enrichedTopic += topic;
-
     try {
-      const posts = await generatePosts(count, enrichedTopic, tone, style, false, "dalle3");
+      const posts = await generatePosts(count, topic, tone, style, false, "dalle3");
 
       if (posts && Array.isArray(posts) && posts.length > 0) {
         console.log("Adding posts to context:", posts);
         addPosts(posts);
         toast.success(`Generated ${posts.length} posts!`);
         setTopic("");
-        setSelectedGoals([]);
-        setSelectedAudiences([]);
         navigate("/approve");
       } else {
         console.error("Invalid posts data received:", posts);
@@ -133,133 +71,8 @@ export const GenerateForm = () => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Post Goal and Target Audience - Side by Side */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-2">
-          <Label>Post Goal</Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className="w-full justify-between font-normal"
-              >
-                <span className="truncate">
-                  {selectedGoals.length > 0
-                    ? `${selectedGoals.length} selected`
-                    : "Select goals..."}
-                </span>
-                <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[300px] p-3 bg-popover z-50" align="start">
-              <div className="space-y-2 max-h-[250px] overflow-y-auto">
-                {postGoals.map((goal) => (
-                  <div key={goal.id} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`goal-${goal.id}`}
-                      checked={selectedGoals.includes(goal.id)}
-                      onCheckedChange={() => toggleGoal(goal.id)}
-                    />
-                    <label
-                      htmlFor={`goal-${goal.id}`}
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                    >
-                      {goal.name}
-                    </label>
-                  </div>
-                ))}
-              </div>
-            </PopoverContent>
-          </Popover>
-          {selectedGoals.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 pt-1">
-              {selectedGoals.map((goalId) => {
-                const goal = postGoals.find(g => g.id === goalId);
-                return (
-                  <Badge
-                    key={goalId}
-                    variant="secondary"
-                    className="text-xs pl-2 pr-1 py-0.5 flex items-center gap-1"
-                  >
-                    <span className="truncate max-w-[150px]">{goal?.name}</span>
-                    <button
-                      type="button"
-                      onClick={() => toggleGoal(goalId)}
-                      className="hover:bg-muted rounded-full p-0.5"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </Badge>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <Label>Target Audience</Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className="w-full justify-between font-normal"
-              >
-                <span className="truncate">
-                  {selectedAudiences.length > 0
-                    ? `${selectedAudiences.length} selected`
-                    : "Select audience..."}
-                </span>
-                <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[300px] p-3 bg-popover z-50" align="start">
-              <div className="space-y-2 max-h-[250px] overflow-y-auto">
-                {targetAudiences.map((audience) => (
-                  <div key={audience.id} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`audience-${audience.id}`}
-                      checked={selectedAudiences.includes(audience.id)}
-                      onCheckedChange={() => toggleAudience(audience.id)}
-                    />
-                    <label
-                      htmlFor={`audience-${audience.id}`}
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                    >
-                      {audience.name}
-                    </label>
-                  </div>
-                ))}
-              </div>
-            </PopoverContent>
-          </Popover>
-          {selectedAudiences.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 pt-1">
-              {selectedAudiences.map((audienceId) => {
-                const audience = targetAudiences.find(a => a.id === audienceId);
-                return (
-                  <Badge
-                    key={audienceId}
-                    variant="secondary"
-                    className="text-xs pl-2 pr-1 py-0.5 flex items-center gap-1"
-                  >
-                    <span className="truncate max-w-[150px]">{audience?.name}</span>
-                    <button
-                      type="button"
-                      onClick={() => toggleAudience(audienceId)}
-                      className="hover:bg-muted rounded-full p-0.5"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </Badge>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      </div>
-
       <div className="space-y-2">
-        <Label htmlFor="topic">What would you like to posts about?</Label>
+        <Label htmlFor="topic">What would you like posts about?</Label>
         <Textarea
           id="topic"
           placeholder="e.g., Leadership tips, industry trends, career advice, etc."
