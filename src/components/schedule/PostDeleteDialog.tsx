@@ -6,19 +6,23 @@ interface PostDeleteDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
+  title?: string;
+  description?: string;
 }
 
 export const PostDeleteDialog = ({
   isOpen,
   onClose,
   onConfirm,
+  title = "Confirm Deletion",
+  description = "Are you sure you want to delete this post? This action cannot be undone.",
 }: PostDeleteDialogProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Confirm Deletion</DialogTitle>
-          <DialogDescription>Are you sure you want to delete this post? This action cannot be undone.</DialogDescription>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
         <DialogFooter className="flex flex-col sm:flex-row gap-2">
           <Button variant="outline" onClick={onClose}>

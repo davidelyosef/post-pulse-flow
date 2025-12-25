@@ -239,22 +239,6 @@ export const PostViewDialog = ({
               <div className="text-sm text-gray-900 dark:text-foreground leading-relaxed whitespace-pre-wrap">
                 {formatContentWithHashtags(currentPost.content)}
               </div>
-              
-              {/* Tags */}
-              {allTags.length > 0 && (
-                <div className="flex flex-wrap gap-1 mt-3">
-                  {allTags.slice(0, 5).map((tag) => (
-                    <Badge key={tag} variant="secondary" className="text-xs px-2 py-1 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800">
-                      {tag.startsWith('#') ? tag : `#${tag}`}
-                    </Badge>
-                  ))}
-                  {allTags.length > 5 && (
-                    <Badge variant="secondary" className="text-xs px-2 py-1 bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300">
-                      +{allTags.length - 5} more
-                    </Badge>
-                  )}
-                </div>
-              )}
 
               {/* Post Image */}
               {currentPost.imageUrl && (

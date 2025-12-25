@@ -8,10 +8,14 @@ import { PostDeleteDialog } from "./PostDeleteDialog";
 import { ScheduledPostsSection } from "./components/ScheduledPostsSection";
 import { PostSection } from "./components/PostSection";
 import { usePostActions } from "./hooks/usePostActions";
+import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 export const ScheduledPostList = () => {
-  const { approvedPosts } = usePostContext();
+  const { approvedPosts, deletePost } = usePostContext();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [removeAllDialogOpen, setRemoveAllDialogOpen] = useState(false);
   
   const {
     viewPostDialogOpen,
@@ -48,8 +52,39 @@ export const ScheduledPostList = () => {
     ? [...approvedPosts, ...publishedPosts].find(post => post.id === selectedPostId) 
     : null;
 
+  const handleRemoveAllApproved = async () => {
+    const postsToDelete = approvedPosts.filter(post => !post.publishedAt);
+    if (postsToDelete.length === 0) {
+      toast.info("No approved posts to remove");
+      return;
+    }
+    
+    try {
+      await Promise.all(postsToDelete.map(post => deletePost(post.id)));
+      toast.success(`Removed ${postsToDelete.length} approved post${postsToDelete.length > 1 ? 's' : ''}`);
+    } catch (error) {
+      toast.error("Failed to remove some posts");
+    }
+    setRemoveAllDialogOpen(false);
+  };
+
   return (
     <div className="space-y-6">
+
+      {/* Remove All Approved Posts Button */}
+      {approvedPosts.filter(post => !post.publishedAt).length > 0 && (
+        <div className="flex justify-end">
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={() => setRemoveAllDialogOpen(true)}
+          >
+            <Trash2 className="h-4 w-4 mr-2" />
+            Remove All Approved Posts
+          </Button>
+        </div>
+      )}
+
       <ScheduledPostsSection
         scheduledPosts={scheduledPosts}
         selectedDate={selectedDate}
@@ -117,6 +152,15 @@ export const ScheduledPostList = () => {
         isOpen={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
         onConfirm={handleConfirmDelete}
+      />
+
+      {/* Remove All Approved Posts Dialog */}
+      <PostDeleteDialog
+        isOpen={removeAllDialogOpen}
+        onClose={() => setRemoveAllDialogOpen(false)}
+        onConfirm={handleRemoveAllApproved}
+        title="Remove All Approved Posts"
+        description="Are you sure you want to remove all approved posts? This action cannot be undone."
       />
     </div>
   );
