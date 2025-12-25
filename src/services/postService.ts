@@ -15,7 +15,7 @@ export const savePostWithImage = async (
       body: JSON.stringify({
         description,
         userId,
-        imageUrl: imageUrl || false,
+        imageUrl: imageUrl || "",
       }),
     });
 
