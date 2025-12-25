@@ -7,7 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Loader2, ChevronDown } from "lucide-react";
+import { Loader2, ChevronDown, X } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { generatePosts } from "@/services/openAIService";
 import { usePostContext } from "@/contexts/PostContext";
 import { useUser } from "@/contexts/UserContext";
@@ -167,6 +168,29 @@ export const GenerateForm = () => {
               </div>
             </PopoverContent>
           </Popover>
+          {selectedGoals.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 pt-1">
+              {selectedGoals.map((goalId) => {
+                const goal = postGoals.find(g => g.id === goalId);
+                return (
+                  <Badge
+                    key={goalId}
+                    variant="secondary"
+                    className="text-xs pl-2 pr-1 py-0.5 flex items-center gap-1"
+                  >
+                    <span className="truncate max-w-[150px]">{goal?.name}</span>
+                    <button
+                      type="button"
+                      onClick={() => toggleGoal(goalId)}
+                      className="hover:bg-muted rounded-full p-0.5"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         <div className="space-y-2">
@@ -205,11 +229,46 @@ export const GenerateForm = () => {
               </div>
             </PopoverContent>
           </Popover>
+          {selectedGoals.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 pt-1">
+              {selectedGoals.map((goalId) => {
+                const goal = postGoals.find(g => g.id === goalId);
+                return (
+                  <Badge
+                    key={goalId}
+                    variant="secondary"
+                    className="text-xs pl-2 pr-1 py-0.5 flex items-center gap-1"
+                  >
+                    <span className="truncate max-w-[150px]">{goal?.name}</span>
+                    <button
+                      type="button"
+                      onClick={() => toggleGoal(goalId)}
+                      className="hover:bg-muted rounded-full p-0.5"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
-      
+
+      {/* Writing Tone and Style Display */}
+      <div className="space-y-1 text-sm text-muted-foreground bg-muted/50 rounded-lg p-4">
+        <p>
+          <span className="font-medium text-foreground">The writing tone for that post is:</span>{" "}
+          {writingTones.find(t => t.id === tone)?.name} - {writingTones.find(t => t.id === tone)?.description}
+        </p>
+        <p>
+          <span className="font-medium text-foreground">The writing style for that post is:</span>{" "}
+          {writingStyles.find(s => s.id === style)?.name} - {writingStyles.find(s => s.id === style)?.description}
+        </p>
+      </div>
+
       <div className="space-y-2">
-        <Label htmlFor="topic">What would you like posts about?</Label>
+        <Label htmlFor="topic">What would you like to post about?</Label>
         <Textarea
           id="topic"
           placeholder="e.g., Leadership tips, industry trends, career advice, etc."
