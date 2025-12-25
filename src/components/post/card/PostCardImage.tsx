@@ -13,6 +13,7 @@ interface PostCardImageProps {
   onGeneratePrompts: () => void;
   onSelectPrompt: (prompt: string) => void;
   onImageRegenerated?: (newImageUrl: string) => void;
+  content?: string; // Optional content override for prompt generation
 }
 
 export const PostCardImage = ({ 
@@ -20,14 +21,18 @@ export const PostCardImage = ({
   isGeneratingPrompts, 
   onGeneratePrompts, 
   onSelectPrompt,
-  onImageRegenerated
+  onImageRegenerated,
+  content
 }: PostCardImageProps) => {
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const { getUserId } = useUser();
   const { updatePostImage } = usePostContext();
 
+  // Use provided content override or fall back to post.content
+  const postContent = content || post.content;
+
   const createFullPrompt = (imageConcept: string) => {
-    return `${post.content} image concept: ${imageConcept}`;
+    return `${postContent} image concept: ${imageConcept}`;
   };
 
   const handleSelectPrompt = async (prompt: string) => {
@@ -61,7 +66,7 @@ export const PostCardImage = ({
 
   const handleRegenerateImage = async () => {
     // Use the selected prompt if available, otherwise use a default prompt
-    const imageConcept = post.selectedImagePrompt || `Professional illustration related to ${post.content.substring(0, 100)}`;
+    const imageConcept = post.selectedImagePrompt || `Professional illustration related to ${postContent.substring(0, 100)}`;
     const fullPrompt = createFullPrompt(imageConcept);
     console.log("PostCardImage: Regenerating image with full prompt:", fullPrompt);
     

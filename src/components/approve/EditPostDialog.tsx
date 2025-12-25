@@ -26,19 +26,29 @@ export const EditPostDialog = ({ post, isOpen, onClose, onSave }: EditPostDialog
   // Get the current post from context to have the latest image data
   const currentPost = post ? posts.find(p => p.id === post.id) || post : null;
 
-  // Set initial values when dialog opens with a post
+  // Track the post ID to detect when a different post is opened
+  const [openedPostId, setOpenedPostId] = useState<string | null>(null);
+
+  // Set initial values when dialog opens with a post (only when opening or switching posts)
   useEffect(() => {
     if (currentPost && isOpen) {
-      console.log('EditPostDialog: Setting initial values for post:', currentPost.id, 'tags:', currentPost.tags);
-      setEditContent(currentPost.content);
-      
-      // Extract hashtags from content and combine with existing tags
-      const extractedTags = extractHashtags(currentPost.content);
-      const allTags = [...new Set([...(currentPost.tags || []), ...extractedTags])];
-      
-      setEditTags(allTags);
+      // Only reset content if this is a new post being opened (different ID)
+      if (openedPostId !== currentPost.id) {
+        console.log('EditPostDialog: Setting initial values for post:', currentPost.id, 'tags:', currentPost.tags);
+        setEditContent(currentPost.content);
+        
+        // Extract hashtags from content and combine with existing tags
+        const extractedTags = extractHashtags(currentPost.content);
+        const allTags = [...new Set([...(currentPost.tags || []), ...extractedTags])];
+        
+        setEditTags(allTags);
+        setOpenedPostId(currentPost.id);
+      }
+    } else if (!isOpen) {
+      // Reset when dialog closes
+      setOpenedPostId(null);
     }
-  }, [currentPost, isOpen]);
+  }, [currentPost, isOpen, openedPostId]);
 
   const handleSave = () => {
     console.log('EditPostDialog: Saving with content:', editContent, 'tags:', editTags, 'imageUrl:', currentPost?.imageUrl);
@@ -128,6 +138,7 @@ export const EditPostDialog = ({ post, isOpen, onClose, onSave }: EditPostDialog
                 onGeneratePrompts={handleGenerateImagePrompts}
                 onSelectPrompt={handleSelectImagePrompt}
                 onImageRegenerated={handleImageRegenerated}
+                content={editContent}
               />
             </div>
           )}
