@@ -107,7 +107,7 @@ export const GenerateForm = () => {
     if (audienceNames.length > 0) {
       enrichedTopic += `The target audience for this post are: ${audienceNames.join(", ")}.\n\n`;
     }
-    enrichedTopic += topic;
+    enrichedTopic += `The topic of this post should be about: ${topic}.`;
 
     try {
       const posts = await generatePosts(count, enrichedTopic, tone, style, false, "dalle3");
