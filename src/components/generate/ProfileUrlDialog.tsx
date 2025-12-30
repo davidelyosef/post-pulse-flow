@@ -24,7 +24,7 @@ export const ProfileUrlDialog = ({ isOpen, onClose, currentUrl, userId, onSave }
       if (linkedinUser) {
         try {
           const parsedUser = JSON.parse(linkedinUser);
-          const urlFromStorage = parsedUser.linkedinProfileUrl || parsedUser.profileUrl || parsedUser.profileUserUrl;
+          const urlFromStorage = parsedUser.profileUserUrl || parsedUser.profileUrl;
           if (urlFromStorage && urlFromStorage.trim() !== "") {
             setProfileUrl(urlFromStorage);
           } else if (currentUrl) {

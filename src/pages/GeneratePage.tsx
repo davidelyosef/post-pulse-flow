@@ -88,7 +88,7 @@ const GeneratePage = () => {
       const parsedUser = JSON.parse(linkedinUser);
       // Check for profileUrl or profileUserUrl and set it to linkedinProfileUrl if not already set
       if (!parsedUser.linkedinProfileUrl) {
-        const profileUrl = parsedUser.profileUrl || parsedUser.profileUserUrl;
+        const profileUrl = parsedUser.profileUserUrl || parsedUser.profileUrl;
         if (profileUrl && profileUrl.trim() !== "") {
           parsedUser.linkedinProfileUrl = profileUrl;
           localStorage.setItem("linkedinUser", JSON.stringify(parsedUser));
@@ -119,7 +119,7 @@ const GeneratePage = () => {
             {connected ? (
               <div className="flex flex-col items-center">
                 <div className="flex items-center gap-3 mb-3">
-                  {userData?.profileUrl && <img src={userData.profileUrl} alt="Profile" className="w-10 h-10 rounded-full" />}
+                  {userData?.profileUserUrl && <img src={userData.profileUserUrl} alt="Profile" className="w-10 h-10 rounded-full" />}
                   <div className="text-left">
                     <p className="font-medium">{userData?.displayName || "Connected User"}</p>
                     <div className="flex items-center gap-2">
