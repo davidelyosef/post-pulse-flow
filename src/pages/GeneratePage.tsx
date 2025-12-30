@@ -119,14 +119,14 @@ const GeneratePage = () => {
             {connected ? (
               <div className="flex flex-col items-center">
                 <div className="flex items-center gap-3 mb-3">
-                  {userData?.profileUserUrl && <img src={userData.profileUserUrl} alt="Profile" className="w-10 h-10 rounded-full" />}
+                  {userData?.profileUserUrl && <img src={userData.profileUrl} alt="Profile" className="w-10 h-10 rounded-full" />}
                   <div className="text-left">
                     <p className="font-medium">{userData?.displayName || "Connected User"}</p>
                     <div className="flex items-center gap-2">
                       <p className="text-sm text-muted-foreground">Profile URL:</p>
-                      {userData?.linkedinProfileUrl ? (
-                        <span className="text-sm text-foreground truncate max-w-[200px]" title={userData.linkedinProfileUrl}>
-                          {userData.linkedinProfileUrl}
+                      {userData?.profileUserUrl ? (
+                        <span className="text-sm text-foreground truncate max-w-[200px]" title={userData.profileUserUrl}>
+                          {userData.profileUserUrl}
                         </span>
                       ) : (
                         <span className="text-sm text-muted-foreground italic">Not set</span>
