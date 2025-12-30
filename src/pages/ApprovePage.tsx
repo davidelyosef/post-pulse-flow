@@ -21,7 +21,7 @@ const ApprovePage = () => {
         
         <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4 sm:gap-0">
           <Link to="/generate">
-            <Button variant="ghost" size="sm" className="flex items-center gap-1 hover-scale">
+            <Button size="sm" className="flex items-center gap-1 hover-scale">
               <ArrowLeft className="h-4 w-4" /> Generate More
             </Button>
           </Link>
