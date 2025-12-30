@@ -117,7 +117,7 @@ export const PostCardImage = ({
   const postContent = content || post.content;
 
   const createFullPrompt = (imageConcept: string) => {
-    return `${postContent} image concept: ${imageConcept}`;
+    return `The image concept/style of this post should look like: ${imageConcept} || The post content is: ${postContent} || The image concept/style of this post should look like: ${imageConcept}`;
   };
 
   const handleSelectPrompt = async (prompt: string) => {

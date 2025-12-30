@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +16,31 @@ interface ProfileUrlDialogProps {
 export const ProfileUrlDialog = ({ isOpen, onClose, currentUrl, userId, onSave }: ProfileUrlDialogProps) => {
   const [profileUrl, setProfileUrl] = useState(currentUrl);
   const [saving, setSaving] = useState(false);
+
+  // Get profile URL from localStorage when dialog opens
+  useEffect(() => {
+    if (isOpen) {
+      const linkedinUser = localStorage.getItem("linkedinUser");
+      if (linkedinUser) {
+        try {
+          const parsedUser = JSON.parse(linkedinUser);
+          const urlFromStorage = parsedUser.linkedinProfileUrl || parsedUser.profileUrl || parsedUser.profileUserUrl;
+          if (urlFromStorage && urlFromStorage.trim() !== "") {
+            setProfileUrl(urlFromStorage);
+          } else if (currentUrl) {
+            setProfileUrl(currentUrl);
+          }
+        } catch (error) {
+          console.error("Error parsing linkedinUser from localStorage:", error);
+          if (currentUrl) {
+            setProfileUrl(currentUrl);
+          }
+        }
+      } else if (currentUrl) {
+        setProfileUrl(currentUrl);
+      }
+    }
+  }, [isOpen, currentUrl]);
 
   const handleSave = async () => {
     if (!profileUrl.trim()) {

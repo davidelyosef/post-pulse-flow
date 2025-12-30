@@ -45,8 +45,13 @@ export const useImageGeneration = (
     console.log("useImageGeneration: Generating image for post", id, "with prompt:", prompt);
     setIsGeneratingImage(true);
     
+    // Format the prompt if it's not already formatted
+    const formattedPrompt = prompt.startsWith("The image concept/style") 
+      ? prompt 
+      : `The image concept/style of this post should look like: ${prompt}`;
+    
     try {
-      const imageUrl = await generateImageFromPrompt(prompt, getUserId());
+      const imageUrl = await generateImageFromPrompt(formattedPrompt, getUserId());
       console.log("useImageGeneration: Received image URL:", imageUrl);
       
       if (imageUrl) {

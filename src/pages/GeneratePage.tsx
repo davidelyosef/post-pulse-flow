@@ -85,7 +85,16 @@ const GeneratePage = () => {
   useEffect(() => {
     const linkedinUser = localStorage.getItem("linkedinUser");
     if (linkedinUser) {
-      setUserData(JSON.parse(linkedinUser));
+      const parsedUser = JSON.parse(linkedinUser);
+      // Check for profileUrl or profileUserUrl and set it to linkedinProfileUrl if not already set
+      if (!parsedUser.linkedinProfileUrl) {
+        const profileUrl = parsedUser.profileUrl || parsedUser.profileUserUrl;
+        if (profileUrl && profileUrl.trim() !== "") {
+          parsedUser.linkedinProfileUrl = profileUrl;
+          localStorage.setItem("linkedinUser", JSON.stringify(parsedUser));
+        }
+      }
+      setUserData(parsedUser);
     }
   }, []);
 
@@ -115,6 +124,13 @@ const GeneratePage = () => {
                     <p className="font-medium">{userData?.displayName || "Connected User"}</p>
                     <div className="flex items-center gap-2">
                       <p className="text-sm text-muted-foreground">Profile URL:</p>
+                      {userData?.linkedinProfileUrl ? (
+                        <span className="text-sm text-foreground truncate max-w-[200px]" title={userData.linkedinProfileUrl}>
+                          {userData.linkedinProfileUrl}
+                        </span>
+                      ) : (
+                        <span className="text-sm text-muted-foreground italic">Not set</span>
+                      )}
                       <Button
                         variant="ghost"
                         size="icon"
