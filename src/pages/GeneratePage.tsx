@@ -90,7 +90,7 @@ const GeneratePage = () => {
       if (!parsedUser.linkedinProfileUrl) {
         const profileUrl = parsedUser.profileUserUrl || parsedUser.profileUrl;
         if (profileUrl && profileUrl.trim() !== "") {
-          parsedUser.linkedinProfileUrl = profileUrl;
+          // parsedUser.linkedinProfileUrl = profileUrl;
           localStorage.setItem("linkedinUser", JSON.stringify(parsedUser));
         }
       }
@@ -119,7 +119,7 @@ const GeneratePage = () => {
             {connected ? (
               <div className="flex flex-col items-center">
                 <div className="flex items-center gap-3 mb-3">
-                  {userData?.profileUserUrl && <img src={userData.profileUrl} alt="Profile" className="w-10 h-10 rounded-full" />}
+                  {userData?.profileUrl && <img src={userData.profileUrl} alt="Profile" className="w-10 h-10 rounded-full" />}
                   <div className="text-left">
                     <p className="font-medium">{userData?.displayName || "Connected User"}</p>
                     <div className="flex items-center gap-2">
@@ -131,12 +131,7 @@ const GeneratePage = () => {
                       ) : (
                         <span className="text-sm text-muted-foreground italic">Not set</span>
                       )}
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6"
-                        onClick={() => setProfileUrlDialogOpen(true)}
-                      >
+                      <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setProfileUrlDialogOpen(true)}>
                         <Pencil className="h-3 w-3 text-foreground" />
                       </Button>
                     </div>
