@@ -81,6 +81,7 @@ const GeneratePage = () => {
   }, [addPosts]);
 
   const handleConnectLinkedIn = async () => {
+    localStorage.setItem("linkedinConnected", "true");
     setLoading(true);
     try {
       await connectToLinkedIn();
