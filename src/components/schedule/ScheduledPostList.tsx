@@ -13,7 +13,7 @@ import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 export const ScheduledPostList = () => {
-  const { approvedPosts, deletePost } = usePostContext();
+  const { approvedPosts, publishedPosts: contextPublishedPosts, deletePost } = usePostContext();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [removeAllDialogOpen, setRemoveAllDialogOpen] = useState(false);
   
@@ -43,9 +43,9 @@ export const ScheduledPostList = () => {
     getUserId,
   } = usePostActions();
 
-  // Filter posts based on their status
+  // Filter posts based on their status (published section uses context so newly published posts appear immediately)
   const scheduledPosts = approvedPosts.filter(post => post.scheduledFor);
-  const publishedPosts = approvedPosts.filter(post => post.publishedAt && !post.scheduledFor);
+  const publishedPosts = contextPublishedPosts;
   const unscheduledPosts = approvedPosts.filter(post => !post.scheduledFor && !post.publishedAt);
 
   const selectedPost = selectedPostId 

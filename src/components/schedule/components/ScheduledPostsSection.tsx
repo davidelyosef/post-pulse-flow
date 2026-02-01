@@ -1,8 +1,9 @@
-
 import { format } from "date-fns";
 import { Card } from "@/components/ui/card";
-import { PostSection } from "./PostSection";
+import { Button } from "@/components/ui/button";
+import { Send } from "lucide-react";
 import { DateFilter } from "./DateFilter";
+import { ScheduledPostCard } from "../ScheduledPostCard";
 import { Post } from "@/types";
 
 interface ScheduledPostsSectionProps {
@@ -26,8 +27,8 @@ export const ScheduledPostsSection = ({
   onDelete,
   onPublish,
 }: ScheduledPostsSectionProps) => {
-  const filteredScheduledPosts = selectedDate 
-    ? scheduledPosts.filter(post => {
+  const filteredScheduledPosts = selectedDate
+    ? scheduledPosts.filter((post) => {
         if (!post.scheduledFor) return false;
         const postDate = new Date(post.scheduledFor);
         return postDate.toDateString() === selectedDate.toDateString();
@@ -40,7 +41,7 @@ export const ScheduledPostsSection = ({
         <h2 className="text-2xl font-semibold">Scheduled Posts</h2>
         <DateFilter selectedDate={selectedDate} onDateSelect={onDateSelect} />
       </div>
-      
+
       {filteredScheduledPosts.length === 0 && (
         <Card className="text-center p-6 animate-fade-in">
           <p className="text-muted-foreground mb-4">
@@ -50,23 +51,28 @@ export const ScheduledPostsSection = ({
           </p>
         </Card>
       )}
-      
+
       {filteredScheduledPosts.length > 0 && (
-        <div className="">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredScheduledPosts.map((post) => (
-            <PostSection
-              key={post.id}
-              title=""
-              posts={[post]}
-              emptyMessage=""
-              onView={onView}
-              onEdit={onEdit}
-              onSchedule={onSchedule}
-              onDelete={onDelete}
-              onPublish={onPublish}
-              showPublishButton={true}
-              isScheduled={true}
-            />
+            <div key={post.id} className="relative">
+              <ScheduledPostCard
+                post={post}
+                onView={onView}
+                onEdit={onEdit}
+                onSchedule={onSchedule}
+                onDelete={onDelete}
+                isScheduled={true}
+              />
+              <Button
+                size="sm"
+                onClick={() => onPublish(post.id)}
+                className="absolute top-2 right-2 bg-green-600 hover:bg-green-700"
+              >
+                <Send className="h-4 w-4 mr-1" />
+                Publish
+              </Button>
+            </div>
           ))}
         </div>
       )}

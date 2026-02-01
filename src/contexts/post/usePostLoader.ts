@@ -18,16 +18,20 @@ export const usePostLoader = (
       console.log('Loading posts for user:', userId);
       const serverPosts = await getUserPosts(userId);
       
-      const clientPosts: Post[] = serverPosts.map((serverPost: any) => ({
-        id: serverPost._id,
-        content: serverPost.data,
-        tags: [],
-        createdAt: new Date(serverPost.createdAt),
-        status: "approved",
-        imageUrl: serverPost.imageUrl,
-        scheduledFor: serverPost.scheduleTime ? new Date(serverPost.scheduleTime) : undefined,
-        publishedAt: serverPost.publishedAt ? new Date(serverPost.publishedAt) : undefined,
-      }));
+      const clientPosts: Post[] = serverPosts.map((serverPost: any) => {
+        const publishedAt = serverPost.publishedAt ? new Date(serverPost.publishedAt) : undefined;
+        const status = publishedAt || serverPost.status === "published" ? "published" : "approved";
+        return {
+          id: serverPost._id,
+          content: serverPost.data,
+          tags: [],
+          createdAt: new Date(serverPost.createdAt),
+          status,
+          imageUrl: serverPost.imageUrl,
+          scheduledFor: publishedAt ? undefined : (serverPost.scheduleTime ? new Date(serverPost.scheduleTime) : undefined),
+          publishedAt,
+        };
+      });
       
       setPosts(clientPosts);
       console.log('Loaded and converted posts:', clientPosts);

@@ -1,8 +1,9 @@
-
 import { toast } from "sonner";
 
 export const connectToLinkedIn = async (): Promise<boolean> => {
-  window.location.href = "https://linkedai-server.moburst.com/api/auth/linkedin";
+  localStorage.setItem("linkedinConnected", "true");
+  window.location.href =
+    "https://linkedai-server.moburst.com/api/auth/linkedin";
   return;
 };
 
@@ -19,27 +20,37 @@ export const disconnectLinkedIn = (): void => {
   localStorage.removeItem("linkedinConnected");
   localStorage.removeItem("linkedinUser");
   toast.success("LinkedIn account disconnected");
+  window.location.reload();
 };
 
 // New function to generate an image based on a prompt
-export const generateImage = async (prompt: string, content: string): Promise<string | null> => {
+export const generateImage = async (
+  prompt: string,
+  content: string,
+): Promise<string | null> => {
   try {
     console.log("Generating image with prompt:", prompt);
 
-    const response = await fetch("https://linkedai-server.moburst.com/api/generate/saveimage", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const response = await fetch(
+      "https://linkedai-server.moburst.com/api/generate/saveimage",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          imageUrl:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJxo2NFiYcR35GzCk5T3nxA7rGlSsXvIfJwg&s",
+          description: content,
+          userId: "682c65e996c62a2bca89a8ba",
+        }),
       },
-      body: JSON.stringify({
-        imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJxo2NFiYcR35GzCk5T3nxA7rGlSsXvIfJwg&s",
-        description: content,
-        userId: "682c65e996c62a2bca89a8ba",
-      }),
-    });
+    );
 
     if (!response.ok) {
-      throw new Error(`Image generation failed with status: ${response.status}`);
+      throw new Error(
+        `Image generation failed with status: ${response.status}`,
+      );
     }
 
     const data = await response.json();
@@ -54,7 +65,11 @@ export const generateImage = async (prompt: string, content: string): Promise<st
   }
 };
 
-export const publishPost = async (content: string, imageUrl?: string, postId?: string): Promise<boolean> => {
+export const publishPost = async (
+  content: string,
+  imageUrl?: string,
+  postId?: string,
+): Promise<boolean> => {
   // Check if connected first
   if (!isLinkedInConnected()) {
     toast.error("Please connect to LinkedIn before publishing");
@@ -68,7 +83,9 @@ export const publishPost = async (content: string, imageUrl?: string, postId?: s
     const userData = getLinkedInUser();
 
     if (!userData) {
-      toast.error("LinkedIn user data not found. Please reconnect your account.");
+      toast.error(
+        "LinkedIn user data not found. Please reconnect your account.",
+      );
       return false;
     }
 
@@ -77,20 +94,24 @@ export const publishPost = async (content: string, imageUrl?: string, postId?: s
       content: content,
       imageUrl: imageUrl || "",
       visibility: "PUBLIC",
-      user_id: userData.id || userData.userId || userData._id?.$oid || userData._id,
+      user_id:
+        userData.id || userData.userId || userData._id?.$oid || userData._id,
       postId: postId, // Include the postId in the request
     };
 
     console.log("Sending LinkedIn post request:", requestBody);
 
     // Make POST request to the correct endpoint
-    const response = await fetch("https://linkedai-server.moburst.com/api/linkedin/create", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const response = await fetch(
+      "https://linkedai-server.moburst.com/api/linkedin/create",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody),
       },
-      body: JSON.stringify(requestBody),
-    });
+    );
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
@@ -114,7 +135,11 @@ export const publishPost = async (content: string, imageUrl?: string, postId?: s
   }
 };
 
-export const schedulePost = async (content: string, scheduledTime: Date, imageUrl?: string): Promise<boolean> => {
+export const schedulePost = async (
+  content: string,
+  scheduledTime: Date,
+  imageUrl?: string,
+): Promise<boolean> => {
   // Check if connected first
   if (!isLinkedInConnected()) {
     toast.error("Please connect to LinkedIn before scheduling posts");

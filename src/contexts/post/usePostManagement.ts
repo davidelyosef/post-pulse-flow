@@ -101,13 +101,14 @@ export const usePostManagement = (
       const success = await publishToLinkedIn(post.content, post.imageUrl, id);
       
       if (success) {
-        // Update local state to mark as published
+        // Update local state to mark as published and clear schedule so it moves to Published section
         setPosts((prevPosts) =>
           prevPosts.map((post) =>
             post.id === id ? { 
               ...post, 
               status: "published" as const,
-              publishedAt: new Date()
+              publishedAt: new Date(),
+              scheduledFor: undefined
             } : post
           )
         );

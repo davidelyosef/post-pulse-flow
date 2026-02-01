@@ -34,7 +34,7 @@ const GeneratePage = () => {
   const { addPosts } = usePostContext();
   const { user, updateUserTimezone } = useUser();
   const timezones = useMemo(() => getSupportedTimezones(), []);
-  const currentTimezone = user?.timezone || userData?.timeZone || userData?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const currentTimezone = user?.timezone || userData?.timeZone || userData?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone || "Asia/Jerusalem";
 
   useEffect(() => {
     // Check LinkedIn connection status on component mount
