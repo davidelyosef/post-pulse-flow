@@ -227,7 +227,7 @@ export const PostCardImage = ({
           <Loader2 className="h-6 w-6 animate-spin mr-2" />
           <span>Generating image...</span>
         </div>
-      ) : post.imagePrompts ? (
+      ) : post.imagePrompts?.length ? (
         <ImagePromptSelector
           prompts={post.imagePrompts}
           isGeneratingImage={isGeneratingImage}

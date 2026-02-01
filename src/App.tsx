@@ -17,7 +17,7 @@ import { ThemeProvider } from "./components/theme/ThemeProvider";
 const queryClient = new QueryClient();
 
 const AppContent = () => {
-  const { updateUserFromLinkedInAuth } = useUser();
+  const { updateUserFromLinkedInAuth, syncTimezoneIfNeeded } = useUser();
 
   useEffect(() => {
     // Set document title
@@ -30,14 +30,17 @@ const AppContent = () => {
 
   useEffect(() => {
     const init = async () => {
+      if (localStorage.getItem("linkedinConnected") !== "true") {
+        return;
+      }
       try {
         const response = await fetch("https://linkedai-server.moburst.com/api/auth/success", { credentials: "include" });
         const data = await response.json();
         console.log("LinkedIn auth response:", data);
-        
+
         if (data && data.user) {
-          // Update user context with the authentication data
           updateUserFromLinkedInAuth(data);
+          syncTimezoneIfNeeded(data);
         }
       } catch (error) {
         console.error("Error fetching LinkedIn user data:", error);
@@ -45,7 +48,7 @@ const AppContent = () => {
     };
 
     init();
-  }, []); // Remove the dependency to prevent infinite loop
+  }, []);
 
   return (
     <PostProvider>

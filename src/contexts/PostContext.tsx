@@ -27,7 +27,9 @@ export const PostProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   // Filter posts by status
   const pendingPosts = posts.filter((post) => post.status === "pending");
-  const approvedPosts = posts.filter((post) => post.status === "approved");
+  const approvedPosts = [...posts.filter((post) => post.status === "approved")].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
   const rejectedPosts = posts.filter((post) => post.status === "rejected");
   const publishedPosts = posts.filter((post) => post.status === "published");
 

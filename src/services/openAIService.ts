@@ -68,7 +68,10 @@ export const generatePosts = async (
           }
           
           const postTags = [];
-          
+          const imagePrompts = typeof item === 'object' && item !== null && Array.isArray(item.imageConcepts)
+            ? item.imageConcepts
+            : undefined;
+
           return {
             id: generateUniqueId(),
             content: content,
@@ -77,6 +80,7 @@ export const generatePosts = async (
             status: "pending",
             tone: tone || undefined,
             style: style || undefined,
+            imagePrompts,
           };
         }).filter(Boolean) as Post[];
         
@@ -137,7 +141,10 @@ export const generatePosts = async (
             }
             
             const postTags = [];
-            
+            const imagePrompts = typeof item === 'object' && item !== null && Array.isArray(item.imageConcepts)
+              ? item.imageConcepts
+              : undefined;
+
             return {
               id: generateUniqueId(),
               content: content,
@@ -146,6 +153,7 @@ export const generatePosts = async (
               status: "pending",
               tone: tone || undefined,
               style: style || undefined,
+              imagePrompts,
             };
           }).filter(Boolean) as Post[];
           

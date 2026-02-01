@@ -37,8 +37,8 @@ export const PostScheduleDialog = ({
           <DialogTitle>Schedule Post</DialogTitle>
           <DialogDescription>Set when you want this post to be published on LinkedIn.</DialogDescription>
         </DialogHeader>
-        <div className="py-4 space-y-4">
-          <div>
+        <div className="py-4 space-y-4 w-full">
+          <div className="w-full">
             <p className="text-sm font-medium mb-2">Select Date</p>
             <Calendar 
               mode="single"
@@ -46,7 +46,7 @@ export const PostScheduleDialog = ({
               onSelect={onDateChange}
               initialFocus
               disabled={(date) => date < today}
-              className="rounded-md border mx-auto"
+              className="rounded-md border w-full"
             />
           </div>
           

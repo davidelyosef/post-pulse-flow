@@ -13,6 +13,7 @@ interface User {
   avatar?: string;
   lastLogin?: string;
   linkedinConnected: boolean;
+  timezone?: string;
 }
 
 interface UserContextType {
@@ -22,6 +23,9 @@ interface UserContextType {
   isAuthenticated: boolean;
   updateUserLinkedInStatus: (connected: boolean) => void;
   updateUserFromLinkedInAuth: (authData: any) => void;
+  /** Call after /api/auth/success - updates user and syncs timezone only if response has no timeZone */
+  syncTimezoneIfNeeded: (authSuccessData: any) => void;
+  updateUserTimezone: (timezone: string) => void;
   loadUserPosts: () => Promise<any[]>;
 }
 
@@ -41,7 +45,8 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     const linkedinConnected = localStorage.getItem('linkedinConnected') === 'true';
 
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      const parsed = JSON.parse(storedUser);
+      setUser({ ...parsed, timezone: parsed.timezone ?? parsed.timeZone });
     } else if (linkedinUser) {
       // Create user from LinkedIn data
       const userData = JSON.parse(linkedinUser);
@@ -54,6 +59,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         profileUrl: userData.profileUrl,
         lastLogin: userData.lastLogin,
         linkedinConnected,
+        timezone: userData.timezone ?? userData.timeZone,
       };
       setUser(newUser);
       localStorage.setItem('user', JSON.stringify(newUser));
@@ -75,6 +81,21 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     }
   }, [user]);
 
+  const syncTimezoneIfNeeded = (authSuccessData: any) => {
+    const existingTimezone = authSuccessData?.timeZone ?? authSuccessData?.user?.timeZone;
+    if (existingTimezone && typeof existingTimezone === 'string' && existingTimezone.trim() !== '') {
+      return;
+    }
+    const userId = authSuccessData?.user?.id ?? authSuccessData?.userId ?? user?.id;
+    if (!userId || userId === 'default-user-id') return;
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    fetch('https://linkedai-server.moburst.com/api/auth/timezone', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, timezone }),
+    }).catch((err) => console.warn('Failed to sync timezone:', err));
+  };
+
   const getUserId = (): string => {
     return user?.id || 'default-user-id';
   };
@@ -88,6 +109,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const updateUserFromLinkedInAuth = (authData: any) => {
     if (authData && authData.user) {
       const userData = authData.user;
+      const tz = authData.timeZone ?? authData.timezone ?? userData.timeZone ?? userData.timezone;
       const newUser: User = {
         id: userData.id || 'default-user-id',
         linkedinId: userData.linkedinId,
@@ -97,13 +119,25 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         profileUrl: userData.profileUrl,
         lastLogin: userData.lastLogin,
         linkedinConnected: true,
+        timezone: tz,
       };
       setUser(newUser);
+      const toStore = { ...userData, timeZone: tz, timezone: tz };
       localStorage.setItem('user', JSON.stringify(newUser));
-      localStorage.setItem('linkedinUser', JSON.stringify(userData));
+      localStorage.setItem('linkedinUser', JSON.stringify(toStore));
       localStorage.setItem('linkedinConnected', 'true');
       console.log('User context updated with LinkedIn auth data:', newUser);
     }
+  };
+
+  const updateUserTimezone = (timezone: string) => {
+    if (!user?.id || user.id === 'default-user-id') return;
+    setUser({ ...user, timezone });
+    fetch('https://linkedai-server.moburst.com/api/auth/timezone', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: user.id, timezone }),
+    }).catch((err) => console.warn('Failed to update timezone:', err));
   };
 
   const loadUserPosts = async () => {
@@ -133,6 +167,8 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         isAuthenticated,
         updateUserLinkedInStatus,
         updateUserFromLinkedInAuth,
+        syncTimezoneIfNeeded,
+        updateUserTimezone,
         loadUserPosts,
       }}
     >

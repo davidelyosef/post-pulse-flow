@@ -55,6 +55,7 @@ export const PostSection = ({
                 post={post}
                 onView={onView}
                 onEdit={onEdit}
+                onSchedule={onSchedule}
                 onDelete={onDelete}
                 onPublish={onPublish!}
               />

@@ -48,11 +48,9 @@ export const ScheduledPostCard = ({
           <Button variant="outline" size="sm" onClick={() => onEdit(post.id)} className="flex-grow-0">
             <Edit className="h-4 w-4" />
           </Button>
-          {!isScheduled && (
-            <Button variant="outline" size="sm" onClick={() => onSchedule(post.id)} className="flex-grow-0">
-              <CalendarIcon className="h-4 w-4" />
-            </Button>
-          )}
+          <Button variant="outline" size="sm" onClick={() => onSchedule(post.id)} className="flex-grow-0" title={post.scheduledFor ? "Change schedule" : "Schedule post"}>
+            <CalendarIcon className="h-4 w-4" />
+          </Button>
           <Button variant="outline" size="sm" onClick={() => onDelete(post.id)} className="flex-grow-0 text-destructive hover:text-destructive">
             <Trash2 className="h-4 w-4" />
           </Button>

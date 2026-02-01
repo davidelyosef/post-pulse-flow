@@ -9,6 +9,7 @@ interface PublishedPostCardProps {
   post: Post;
   onView: (postId: string) => void;
   onEdit: (postId: string) => void;
+  onSchedule: (postId: string) => void;
   onDelete: (postId: string) => void;
   onPublish: (postId: string) => void;
 }
@@ -17,6 +18,7 @@ export const PublishedPostCard = ({
   post,
   onView,
   onEdit,
+  onSchedule,
   onDelete,
   onPublish,
 }: PublishedPostCardProps) => {
@@ -36,13 +38,16 @@ export const PublishedPostCard = ({
         <div className="line-clamp-4 mb-4 min-h-0 flex-shrink">
           {post.content}
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => onView(post.id)} className="flex-1">
+        <div className="flex gap-2 flex-wrap">
+          <Button variant="outline" size="sm" onClick={() => onView(post.id)} className="flex-1 min-w-0">
             <Eye className="h-4 w-4 mr-2" />
             View
           </Button>
           <Button variant="outline" size="sm" onClick={() => onEdit(post.id)} className="flex-grow-0">
             <Edit className="h-4 w-4" />
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => onSchedule(post.id)} className="flex-grow-0" title="Reschedule">
+            <CalendarIcon className="h-4 w-4" />
           </Button>
           <Button variant="outline" size="sm" onClick={() => onPublish(post.id)} className="flex-grow-0 bg-green-600 hover:bg-green-700 text-white border-green-600">
             <Send className="h-4 w-4" />

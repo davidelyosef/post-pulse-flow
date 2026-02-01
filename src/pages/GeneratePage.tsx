@@ -2,18 +2,39 @@ import PageLayout from "@/components/layout/PageLayout";
 import GenerateForm from "@/components/generate/GenerateForm";
 import { Button } from "@/components/ui/button";
 import { connectToLinkedIn, isLinkedInConnected, getLinkedInUser, disconnectLinkedIn } from "@/services/linkedinService";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Pencil } from "lucide-react";
 import { usePostContext } from "@/contexts/PostContext";
 import { ProfileUrlDialog } from "@/components/generate/ProfileUrlDialog";
+import { TimezoneDialog } from "@/components/generate/TimezoneDialog";
+import { useUser } from "@/contexts/UserContext";
+
+function getSupportedTimezones(): string[] {
+  try {
+    const supported = (Intl as unknown as { supportedValuesOf?(key: string): string[] }).supportedValuesOf?.("timeZone");
+    return supported ? supported.slice().sort() : getFallbackTimezones();
+  } catch {
+    return getFallbackTimezones();
+  }
+}
+
+function getFallbackTimezones(): string[] {
+  const zones: string[] = [];
+  for (let h = -12; h <= 14; h++) zones.push(`Etc/GMT${h >= 0 ? "+" : ""}${h}`);
+  return ["UTC", "Asia/Jerusalem", "America/New_York", "Europe/London", "Europe/Paris", "Asia/Tokyo", ...zones].sort();
+}
 
 const GeneratePage = () => {
   const [connected, setConnected] = useState(false);
   const [userData, setUserData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [profileUrlDialogOpen, setProfileUrlDialogOpen] = useState(false);
+  const [timezoneDialogOpen, setTimezoneDialogOpen] = useState(false);
   const { addPosts } = usePostContext();
+  const { user, updateUserTimezone } = useUser();
+  const timezones = useMemo(() => getSupportedTimezones(), []);
+  const currentTimezone = user?.timezone || userData?.timeZone || userData?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   useEffect(() => {
     // Check LinkedIn connection status on component mount
@@ -135,6 +156,13 @@ const GeneratePage = () => {
                         <Pencil className="h-3 w-3 text-foreground" />
                       </Button>
                     </div>
+                    <div className="flex items-center gap-2 mt-1">
+                      <p className="text-sm text-muted-foreground">Timezone:</p>
+                      <span className="text-sm text-foreground">{currentTimezone}</span>
+                      <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setTimezoneDialogOpen(true)} aria-label="Edit timezone">
+                        <Pencil className="h-3 w-3 text-foreground" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
                 <Button variant="outline" size="sm" onClick={handleDisconnect}>
@@ -160,6 +188,16 @@ const GeneratePage = () => {
         currentUrl={userData?.linkedinProfileUrl || ""}
         userId={userData?.id || userData?._id?.$oid || ""}
         onSave={handleProfileUrlSave}
+      />
+      <TimezoneDialog
+        isOpen={timezoneDialogOpen}
+        onClose={() => setTimezoneDialogOpen(false)}
+        timezones={timezones}
+        currentTimezone={currentTimezone}
+        onSelect={(tz) => {
+          updateUserTimezone(tz);
+          setTimezoneDialogOpen(false);
+        }}
       />
     </PageLayout>
   );
